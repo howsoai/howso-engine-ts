@@ -1,0 +1,45 @@
+import type { Cases, CasesRequest, FeatureAttributes, OptimizeRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, ReactGroupRequest, ReactGroupResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, Session, SetAutoOptimizeRequest, TraineeAcquireResourcesRequest, TraineeIdentity, TrainRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest, FeatureContributionsRequest, FeatureMdaRequest } from "diveplane-openapi-client/models";
+import { Configuration, ConfigurationParameters } from "diveplane-openapi-client/runtime";
+import { TaskOperationsApi, TraineeManagementApi, SessionManagementApi } from "diveplane-openapi-client/apis";
+import { Trainee } from "../../trainees/index.js";
+import { Capabilities, DiveplaneBaseClient, TraineeBaseCache, ITraineeClient, ISessionClient } from "../capabilities/index.js";
+import { CacheMap } from "../utilities/index.js";
+export declare class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClient, ISessionClient {
+    static readonly capabilities: Capabilities;
+    protected readonly traineeCache: CacheMap<TraineeBaseCache>;
+    protected readonly config: Configuration;
+    protected readonly api: {
+        readonly task: TaskOperationsApi;
+        readonly trainee: TraineeManagementApi;
+        readonly session: SessionManagementApi;
+    };
+    protected activeSession?: Session;
+    constructor(options: ConfigurationParameters);
+    setup(): Promise<void>;
+    getActiveSession(): Promise<Readonly<Session>>;
+    beginSession(name?: string, metadata?: Record<string, unknown>): Promise<Session>;
+    acquireTraineeResources(traineeId: string, options?: TraineeAcquireResourcesRequest): Promise<void>;
+    releaseTraineeResources(_traineeId: string): Promise<void>;
+    createTrainee(_trainee: Omit<Trainee, "id">): Promise<Trainee>;
+    updateTrainee(_trainee: Trainee): Promise<Trainee>;
+    getTrainee(_traineeId: string): Promise<Trainee>;
+    deleteTrainee(_traineeId: string): Promise<void>;
+    listTrainees(_keywords: string | string[]): Promise<TraineeIdentity[]>;
+    train(_traineeId: string, _request: TrainRequest): Promise<void>;
+    optimize(_traineeId: string, _request: OptimizeRequest): Promise<void>;
+    setAutoOptimize(_traineeId: string, _request: SetAutoOptimizeRequest): Promise<void>;
+    autoOptimize(_traineeId: string): Promise<void>;
+    getCases(_traineeId: string, _request?: CasesRequest | undefined): Promise<Cases>;
+    getNumTrainingCases(_traineeId: string): Promise<number>;
+    setFeatureAttributes(_traineeId: string, _attributes: Record<string, FeatureAttributes>): Promise<void>;
+    getFeatureAttributes(_traineeId: string): Promise<Record<string, FeatureAttributes>>;
+    react(_traineeId: string, _request: ReactRequest): Promise<ReactResponse>;
+    reactSeries(_traineeId: string, _request: ReactSeriesRequest): Promise<ReactSeriesResponse>;
+    reactGroup(_traineeId: string, _request: ReactGroupRequest): Promise<ReactGroupResponse>;
+    reactIntoFeatures(_traineeId: string, _request: ReactIntoFeaturesRequest): Promise<ReactIntoFeaturesResponse>;
+    reactIntoTrainee(_traineeId: string, _request: ReactIntoTraineeRequest): Promise<ReactIntoTraineeResponse>;
+    getFeatureConviction(_traineeId: string, _request: FeatureConvictionRequest): Promise<FeatureConviction>;
+    getFeatureContributions(_traineeId: string, _request: FeatureContributionsRequest): Promise<Record<string, number>>;
+    getFeatureResiduals(_traineeId: string, _request: FeatureResidualsRequest): Promise<Record<string, number>>;
+    getFeatureMda(_traineeId: string, _request: FeatureMdaRequest): Promise<Record<string, number>>;
+}

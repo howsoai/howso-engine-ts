@@ -1,0 +1,114 @@
+{
+  "name": "diveplane-client",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "repository": {
+    "type": "git",
+    "url": "https://diveplane.visualstudio.com/dp/_git/diveplane-client-ts"
+  },
+  "author": {
+    "name": "Diveplane Corporation"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "prebuild": "rimraf ./lib",
+    "build": "tsc --build",
+    "lint": "eslint 'src/**'"
+  },
+  "files": [
+    "LICENSE.md",
+    "README.md",
+    "lib"
+  ],
+  "main": "./lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./amalgam": "./lib/client/amalgam/index.js",
+    "./rest": "./lib/client/rest/index.js",
+    "./capabilities": "./lib/client/capabilities/index.js",
+    "./utilities": "./lib/utilities.js",
+    "./features": "./lib/features/index.js",
+    "./features/abstract": "./lib/features/abstract/index.js",
+    "./errors": "./lib/client/errors.js",
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.2",
+    "@types/uuid": "^9.0.1",
+    "@typescript-eslint/eslint-plugin": "^5.51.0",
+    "@typescript-eslint/parser": "^5.51.0",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.2",
+    "rimraf": "^4.2.0",
+    "typescript": "^4.9.5"
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 11,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "@typescript-eslint",
+      "prettier"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "prettier/prettier": "error",
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": [
+            "class",
+            "interface"
+          ],
+          "format": [
+            "PascalCase"
+          ]
+        }
+      ],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ]
+    },
+    "ignorePatterns": [
+      "lib/**"
+    ],
+    "env": {
+      "browser": true,
+      "es2020": true
+    }
+  },
+  "prettier": {
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": false,
+    "printWidth": 120
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie > 0"
+  ]
+}
