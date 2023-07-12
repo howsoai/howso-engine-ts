@@ -3,7 +3,7 @@ import {
   FeatureAttributes,
   FeatureAttributesTypeEnum,
   FeatureAttributesDataTypeEnum,
-  FeatureDataType,
+  FeatureOriginalType,
 } from "diveplane-openapi-client/models";
 import {
   ArrayData,
@@ -206,7 +206,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     return false;
   }
 
-  protected async getFeatureType(featureName: string): Promise<FeatureDataType | undefined> {
+  protected async getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined> {
     const value = this.findFirstValue(featureName);
     const dataType = typeof value;
     switch (dataType) {

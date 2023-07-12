@@ -8,13 +8,15 @@ import type { Capabilities, ITraineeClient, ISessionClient } from "../capabiliti
 
 import { AmalgamOptions } from "diveplane-amalgam-api/wasm";
 import {
+  AnalyzeRequest,
   Cases,
   CasesRequest,
   CaseCountResponse,
   FeatureAttributes,
+  FeaturePredictionStats,
+  FeaturePredictionStatsRequest,
   TrainRequest,
   TrainResponse,
-  OptimizeRequest,
   ReactRequest,
   ReactResponse,
   ReactResponseContent,
@@ -22,7 +24,7 @@ import {
   ReactSeriesResponse,
   ReactSeriesResponseContent,
   Session,
-  SetAutoOptimizeRequest,
+  SetAutoAnalyzeParamsRequest,
   TraineeIdentity,
   ReactGroupRequest,
   ReactGroupResponse,
@@ -38,8 +40,10 @@ import {
   CasesRequestToJSON,
   FeatureAttributesToJSON,
   FeatureAttributesFromJSON,
-  SetAutoOptimizeRequestToJSON,
+  FeaturePredictionStatsFromJSON,
+  FeaturePredictionStatsRequestToJSON,
   SessionToJSON,
+  SetAutoAnalyzeParamsRequestToJSON,
   TraineeToJSON,
   TraineeFromJSON,
   TrainRequestToJSON,
@@ -57,7 +61,7 @@ import {
   FeatureContributionsRequestToJSON,
   FeatureResidualsRequestToJSON,
   FeatureMdaRequestToJSON,
-  OptimizeRequestToJSON,
+  AnalyzeRequestToJSON,
   ReactGroupResponseContent,
 } from "diveplane-openapi-client/models";
 import { RequiredError, mapValues } from "diveplane-openapi-client/runtime";
@@ -494,7 +498,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
   public async train(traineeId: string, request: TrainRequest): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const session = await this.getActiveSession();
-    let autoOptimize = false;
+    let autoAnalyze = false;
 
     const { cases = [], ...rest } = TrainRequestToJSON(request);
 
@@ -523,8 +527,8 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
             session: session.id,
             ...rest,
           });
-          if (response.content?.status === "optimize") {
-            autoOptimize = true;
+          if (response.content?.status === "analyze") {
+            autoAnalyze = true;
           }
           offset += size;
           size = yield;
@@ -534,48 +538,48 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     );
 
     await this.autoPersistTrainee(trainee.id);
-    if (autoOptimize) {
-      this.autoOptimize(trainee.id);
+    if (autoAnalyze) {
+      this.autoAnalyze(trainee.id);
     }
   }
 
   /**
-   * Run an auto optimize on the trainee.
+   * Run an auto analyze on the trainee.
    * @param traineeId The trainee identifier.
    */
-  public async autoOptimize(traineeId: string): Promise<void> {
+  public async autoAnalyze(traineeId: string): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("auto_optimize", { trainee: trainee.id });
+    await this.execute("auto_analyze", { trainee: trainee.id });
     await this.autoPersistTrainee(trainee.id);
   }
 
   /**
-   * Set the parameters use by auto optimize.
+   * Set the parameters use by auto analyze.
    * @param traineeId The trainee identifier.
-   * @param request The optimize parameters.
+   * @param request The analysis parameters.
    */
-  public async setAutoOptimize(traineeId: string, request: SetAutoOptimizeRequest = {}): Promise<void> {
+  public async setAutoAnalyzeParams(traineeId: string, request: SetAutoAnalyzeParamsRequest = {}): Promise<void> {
     const { experimental_options, ...rest } = request;
     const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("set_auto_optimize", {
+    await this.execute("set_auto_analyze_params", {
       trainee: trainee.id,
-      ...SetAutoOptimizeRequestToJSON(rest),
+      ...SetAutoAnalyzeParamsRequestToJSON(rest),
       ...experimental_options,
     });
     await this.autoPersistTrainee(traineeId);
   }
 
   /**
-   * Optimize the trainee.
+   * Analyze the trainee.
    * @param traineeId The trainee identifier.
-   * @param request The optimize parameters.
+   * @param request The analysis parameters.
    */
-  public async optimize(traineeId: string, request: OptimizeRequest = {}): Promise<void> {
+  public async analyze(traineeId: string, request: AnalyzeRequest = {}): Promise<void> {
     const { experimental_options, ...rest } = request;
     const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("optimize", {
+    await this.execute("analyze", {
       trainee: trainee.id,
-      ...OptimizeRequestToJSON(rest),
+      ...AnalyzeRequestToJSON(rest),
       ...experimental_options,
     });
   }
@@ -701,6 +705,18 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     return ReactIntoTraineeResponseFromJSON({ warnings });
   }
 
+  public async getPredictionStats(
+    traineeId: string,
+    request: FeaturePredictionStatsRequest
+  ): Promise<FeaturePredictionStats> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const { content, warnings = [] } = await this.execute<never>("get_prediction_stats", {
+      trainee: trainee.id,
+      ...FeaturePredictionStatsRequestToJSON(request),
+    });
+    return FeaturePredictionStatsFromJSON({ content, warnings });
+  }
+
   /**
    * Get familiarity conviction for features.
    * @param traineeId The trainee identifier.
@@ -718,6 +734,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
 
   /**
    * Get contributions for features.
+   * @deprecated Use getPredictionStats instead.
    * @param traineeId The trainee identifier.
    * @param request The feature contributions request.
    * @returns A map of feature name to contribution value.
@@ -736,6 +753,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
 
   /**
    * Get residuals for features.
+   * @deprecated Use getPredictionStats instead.
    * @param traineeId The trainee identifier.
    * @param request The feature residuals request.
    * @returns A map of feature name to residual value.
@@ -754,6 +772,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
 
   /**
    * Get mean decrease in accuracy for features.
+   * @deprecated Use getPredictionStats instead.
    * @param traineeId The trainee identifier.
    * @param request The feature MDA request.
    * @returns A map of feature name to MDA value.

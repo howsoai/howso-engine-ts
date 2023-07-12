@@ -1,4 +1,4 @@
-import { FeatureAttributes, FeatureDataType } from "diveplane-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "diveplane-openapi-client/models";
 export interface InferFeatureBoundsOptions {
     tightBounds?: boolean | string[];
     modeBounds?: boolean | string[];
@@ -23,7 +23,7 @@ export type AbstractDataType = ArrayData;
 export declare function isArrayData(data: any): data is ArrayData;
 export declare abstract class InferFeatureAttributesBase {
     infer(options?: InferFeatureAttributesOptions): Promise<Record<string, FeatureAttributes>>;
-    protected abstract getFeatureType(featureName: string): Promise<FeatureDataType | undefined>;
+    protected abstract getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined>;
     protected abstract inferBoolean(featureName: string): Promise<FeatureAttributes>;
     protected abstract inferTimedelta(featureName: string): Promise<FeatureAttributes>;
     protected abstract inferDatetime(featureName: string): Promise<FeatureAttributes>;

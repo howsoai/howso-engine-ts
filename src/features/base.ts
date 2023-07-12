@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes, FeatureAttributesTypeEnum, FeatureDataType } from "diveplane-openapi-client/models";
+import { FeatureAttributes, FeatureAttributesTypeEnum, FeatureOriginalType } from "diveplane-openapi-client/models";
 
 export interface InferFeatureBoundsOptions {
   tightBounds?: boolean | string[];
@@ -142,7 +142,7 @@ export abstract class InferFeatureAttributesBase {
   }
 
   /* Feature types */
-  protected abstract getFeatureType(featureName: string): Promise<FeatureDataType | undefined>;
+  protected abstract getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined>;
   protected abstract inferBoolean(featureName: string): Promise<FeatureAttributes>;
   protected abstract inferTimedelta(featureName: string): Promise<FeatureAttributes>;
   protected abstract inferDatetime(featureName: string): Promise<FeatureAttributes>;

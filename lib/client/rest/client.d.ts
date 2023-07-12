@@ -1,4 +1,4 @@
-import type { Cases, CasesRequest, FeatureAttributes, OptimizeRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, ReactGroupRequest, ReactGroupResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, Session, SetAutoOptimizeRequest, TraineeAcquireResourcesRequest, TraineeIdentity, TrainRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest, FeatureContributionsRequest, FeatureMdaRequest } from "diveplane-openapi-client/models";
+import type { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, ReactGroupRequest, ReactGroupResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeAcquireResourcesRequest, TraineeIdentity, TrainRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest, FeatureContributionsRequest, FeatureMdaRequest } from "diveplane-openapi-client/models";
 import { Configuration, ConfigurationParameters } from "diveplane-openapi-client/runtime";
 import { TaskOperationsApi, TraineeManagementApi, SessionManagementApi } from "diveplane-openapi-client/apis";
 import { Trainee } from "../../trainees/index.js";
@@ -26,9 +26,9 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
     deleteTrainee(_traineeId: string): Promise<void>;
     listTrainees(_keywords: string | string[]): Promise<TraineeIdentity[]>;
     train(_traineeId: string, _request: TrainRequest): Promise<void>;
-    optimize(_traineeId: string, _request: OptimizeRequest): Promise<void>;
-    setAutoOptimize(_traineeId: string, _request: SetAutoOptimizeRequest): Promise<void>;
-    autoOptimize(_traineeId: string): Promise<void>;
+    analyze(_traineeId: string, _request: AnalyzeRequest): Promise<void>;
+    setAutoAnalyzeParams(_traineeId: string, _request: SetAutoAnalyzeParamsRequest): Promise<void>;
+    autoAnalyze(_traineeId: string): Promise<void>;
     getCases(_traineeId: string, _request?: CasesRequest | undefined): Promise<Cases>;
     getNumTrainingCases(_traineeId: string): Promise<number>;
     setFeatureAttributes(_traineeId: string, _attributes: Record<string, FeatureAttributes>): Promise<void>;
@@ -38,6 +38,7 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
     reactGroup(_traineeId: string, _request: ReactGroupRequest): Promise<ReactGroupResponse>;
     reactIntoFeatures(_traineeId: string, _request: ReactIntoFeaturesRequest): Promise<ReactIntoFeaturesResponse>;
     reactIntoTrainee(_traineeId: string, _request: ReactIntoTraineeRequest): Promise<ReactIntoTraineeResponse>;
+    getPredictionStats(_traineeId: string, _request: FeaturePredictionStatsRequest): Promise<FeaturePredictionStats>;
     getFeatureConviction(_traineeId: string, _request: FeatureConvictionRequest): Promise<FeatureConviction>;
     getFeatureContributions(_traineeId: string, _request: FeatureContributionsRequest): Promise<Record<string, number>>;
     getFeatureResiduals(_traineeId: string, _request: FeatureResidualsRequest): Promise<Record<string, number>>;

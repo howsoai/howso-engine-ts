@@ -1,4 +1,4 @@
-import { FeatureAttributes, FeatureDataType } from "diveplane-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "diveplane-openapi-client/models";
 import { ArrayData, FeatureSerializerBase, InferFeatureAttributesBase, InferFeatureBoundsOptions, InferFeatureTimeSeriesOptions } from "../base.js";
 export declare class InferFeatureAttributesFromArray extends InferFeatureAttributesBase {
     protected readonly dataset: ArrayData;
@@ -14,7 +14,7 @@ export declare class InferFeatureAttributesFromArray extends InferFeatureAttribu
     inferBounds(attributes: Readonly<FeatureAttributes>, featureName: string, options: InferFeatureBoundsOptions): Promise<FeatureAttributes["bounds"] | undefined>;
     inferTimeSeries(_attributes: Readonly<FeatureAttributes>, _featureName: string, _options: InferFeatureTimeSeriesOptions): Promise<Partial<FeatureAttributes>>;
     protected inferUnique(_featureName: string): Promise<boolean>;
-    protected getFeatureType(featureName: string): Promise<FeatureDataType | undefined>;
+    protected getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined>;
     private findFirstValue;
     getFeatureNames(): Promise<string[]>;
     getNumCases(): Promise<number>;

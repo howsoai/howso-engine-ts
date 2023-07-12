@@ -3,10 +3,12 @@ import type {
   // AsyncActionOutput,
   // AsyncActionFailedOutput,
   // GenericActionOutput,
+  AnalyzeRequest,
   Cases,
   CasesRequest,
   FeatureAttributes,
-  OptimizeRequest,
+  FeaturePredictionStats,
+  FeaturePredictionStatsRequest,
   ReactRequest,
   ReactResponse,
   ReactSeriesRequest,
@@ -18,7 +20,7 @@ import type {
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
   Session,
-  SetAutoOptimizeRequest,
+  SetAutoAnalyzeParamsRequest,
   TraineeAcquireResourcesRequest,
   TraineeIdentity,
   TrainRequest,
@@ -163,15 +165,15 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     throw new Error("Method not implemented.");
   }
 
-  public async optimize(_traineeId: string, _request: OptimizeRequest): Promise<void> {
+  public async analyze(_traineeId: string, _request: AnalyzeRequest): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
-  public async setAutoOptimize(_traineeId: string, _request: SetAutoOptimizeRequest): Promise<void> {
+  public async setAutoAnalyzeParams(_traineeId: string, _request: SetAutoAnalyzeParamsRequest): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
-  public async autoOptimize(_traineeId: string): Promise<void> {
+  public async autoAnalyze(_traineeId: string): Promise<void> {
     throw new Error("Method not implemented.");
   }
 
@@ -214,6 +216,13 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     _traineeId: string,
     _request: ReactIntoTraineeRequest
   ): Promise<ReactIntoTraineeResponse> {
+    throw new Error("Method not implemented.");
+  }
+
+  public async getPredictionStats(
+    _traineeId: string,
+    _request: FeaturePredictionStatsRequest
+  ): Promise<FeaturePredictionStats> {
     throw new Error("Method not implemented.");
   }
 

@@ -1,6 +1,6 @@
 import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "diveplane-amalgam-api/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
-import { Cases, CasesRequest, FeatureAttributes, TrainRequest, OptimizeRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoOptimizeRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "diveplane-openapi-client/models";
+import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "diveplane-openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 import { DiveplaneBaseClient, TraineeBaseCache } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";
@@ -133,22 +133,22 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
      */
     train(traineeId: string, request: TrainRequest): Promise<void>;
     /**
-     * Run an auto optimize on the trainee.
+     * Run an auto analyze on the trainee.
      * @param traineeId The trainee identifier.
      */
-    autoOptimize(traineeId: string): Promise<void>;
+    autoAnalyze(traineeId: string): Promise<void>;
     /**
-     * Set the parameters use by auto optimize.
+     * Set the parameters use by auto analyze.
      * @param traineeId The trainee identifier.
-     * @param request The optimize parameters.
+     * @param request The analysis parameters.
      */
-    setAutoOptimize(traineeId: string, request?: SetAutoOptimizeRequest): Promise<void>;
+    setAutoAnalyzeParams(traineeId: string, request?: SetAutoAnalyzeParamsRequest): Promise<void>;
     /**
-     * Optimize the trainee.
+     * Analyze the trainee.
      * @param traineeId The trainee identifier.
-     * @param request The optimize parameters.
+     * @param request The analysis parameters.
      */
-    optimize(traineeId: string, request?: OptimizeRequest): Promise<void>;
+    analyze(traineeId: string, request?: AnalyzeRequest): Promise<void>;
     /**
      * Retrieve cases from a trainee.
      * @param traineeId The trainee identifier.
@@ -197,6 +197,7 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
      * @returns The react into trainee response.
      */
     reactIntoTrainee(traineeId: string, request: ReactIntoTraineeRequest): Promise<ReactIntoTraineeResponse>;
+    getPredictionStats(traineeId: string, request: FeaturePredictionStatsRequest): Promise<FeaturePredictionStats>;
     /**
      * Get familiarity conviction for features.
      * @param traineeId The trainee identifier.
@@ -206,6 +207,7 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
     getFeatureConviction(traineeId: string, request: FeatureConvictionRequest): Promise<FeatureConviction>;
     /**
      * Get contributions for features.
+     * @deprecated Use getPredictionStats instead.
      * @param traineeId The trainee identifier.
      * @param request The feature contributions request.
      * @returns A map of feature name to contribution value.
@@ -213,6 +215,7 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
     getFeatureContributions(traineeId: string, request: FeatureContributionsRequest): Promise<Record<string, number>>;
     /**
      * Get residuals for features.
+     * @deprecated Use getPredictionStats instead.
      * @param traineeId The trainee identifier.
      * @param request The feature residuals request.
      * @returns A map of feature name to residual value.
@@ -220,6 +223,7 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
     getFeatureResiduals(traineeId: string, request: FeatureResidualsRequest): Promise<Record<string, number>>;
     /**
      * Get mean decrease in accuracy for features.
+     * @deprecated Use getPredictionStats instead.
      * @param traineeId The trainee identifier.
      * @param request The feature MDA request.
      * @returns A map of feature name to MDA value.
