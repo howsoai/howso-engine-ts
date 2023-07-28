@@ -15,6 +15,8 @@ import {
   FeatureAttributes,
   FeaturePredictionStats,
   FeaturePredictionStatsRequest,
+  FeatureMarginalStats,
+  FeatureMarginalStatsRequest,
   TrainRequest,
   TrainResponse,
   ReactRequest,
@@ -42,6 +44,8 @@ import {
   FeatureAttributesFromJSON,
   FeaturePredictionStatsFromJSON,
   FeaturePredictionStatsRequestToJSON,
+  FeatureMarginalStatsFromJSON,
+  FeatureMarginalStatsRequestToJSON,
   SessionToJSON,
   SetAutoAnalyzeParamsRequestToJSON,
   TraineeToJSON,
@@ -705,6 +709,12 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     return ReactIntoTraineeResponseFromJSON({ warnings });
   }
 
+  /**
+   * Get prediction stats of a trainee.
+   * @param traineeId The trainee identifier.
+   * @param request The prediction stats request.
+   * @returns The prediction stats.
+   */
   public async getPredictionStats(
     traineeId: string,
     request: FeaturePredictionStatsRequest
@@ -715,6 +725,24 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
       ...FeaturePredictionStatsRequestToJSON(request),
     });
     return FeaturePredictionStatsFromJSON({ content, warnings });
+  }
+
+  /**
+   * Get marginal stats of a trainee.
+   * @param traineeId The trainee identifier.
+   * @param request The marginal stats request.
+   * @returns The marginal stats.
+   */
+  public async getMarginalStats(
+    traineeId: string,
+    request: FeatureMarginalStatsRequest
+  ): Promise<FeatureMarginalStats> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const { content, warnings = [] } = await this.execute<never>("get_marginal_stats", {
+      trainee: trainee.id,
+      ...FeatureMarginalStatsRequestToJSON(request),
+    });
+    return FeatureMarginalStatsFromJSON({ content, warnings });
   }
 
   /**

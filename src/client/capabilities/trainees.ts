@@ -8,6 +8,8 @@ import type {
   FeatureContributionsRequest,
   FeaturePredictionStats,
   FeaturePredictionStatsRequest,
+  FeatureMarginalStats,
+  FeatureMarginalStatsRequest,
   FeatureResidualsRequest,
   FeatureMdaRequest,
   TrainRequest,
@@ -52,4 +54,5 @@ export interface ITraineeClient {
   getFeatureContributions(traineeId: string, request: FeatureContributionsRequest): Promise<Record<string, number>>;
   getFeatureMda(traineeId: string, request: FeatureMdaRequest): Promise<Record<string, number>>;
   getPredictionStats(traineeId: string, request: FeaturePredictionStatsRequest): Promise<FeaturePredictionStats>;
+  getMarginalStats(traineeId: string, request: FeatureMarginalStatsRequest): Promise<FeatureMarginalStats>;
 }

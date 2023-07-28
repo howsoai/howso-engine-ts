@@ -39,3 +39,5 @@ export class DiveplaneApiError extends DiveplaneError implements ModelError {
 export class ValidationError extends DiveplaneError {}
 
 export class TimeoutError extends DiveplaneError {}
+
+export class RetriableError extends DiveplaneError {}

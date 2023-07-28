@@ -1,4 +1,4 @@
-import type { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeatureConviction, FeatureConvictionRequest, FeatureContributionsRequest, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureResidualsRequest, FeatureMdaRequest, TrainRequest, ReactRequest, ReactResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactGroupRequest, ReactGroupResponse, ReactSeriesRequest, ReactSeriesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, SetAutoAnalyzeParamsRequest, TraineeIdentity } from "diveplane-openapi-client/models";
+import type { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeatureConviction, FeatureConvictionRequest, FeatureContributionsRequest, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, FeatureResidualsRequest, FeatureMdaRequest, TrainRequest, ReactRequest, ReactResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactGroupRequest, ReactGroupResponse, ReactSeriesRequest, ReactSeriesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, SetAutoAnalyzeParamsRequest, TraineeIdentity } from "diveplane-openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 export interface ITraineeClient {
     acquireTraineeResources(traineeId: string): Promise<void>;
@@ -26,4 +26,5 @@ export interface ITraineeClient {
     getFeatureContributions(traineeId: string, request: FeatureContributionsRequest): Promise<Record<string, number>>;
     getFeatureMda(traineeId: string, request: FeatureMdaRequest): Promise<Record<string, number>>;
     getPredictionStats(traineeId: string, request: FeaturePredictionStatsRequest): Promise<FeaturePredictionStats>;
+    getMarginalStats(traineeId: string, request: FeatureMarginalStatsRequest): Promise<FeatureMarginalStats>;
 }

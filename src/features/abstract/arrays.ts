@@ -1,10 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  FeatureAttributes,
-  FeatureAttributesTypeEnum,
-  FeatureAttributesDataTypeEnum,
-  FeatureOriginalType,
-} from "diveplane-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "diveplane-openapi-client/models";
 import {
   ArrayData,
   FeatureSerializerBase,
@@ -30,33 +25,33 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
 
   protected async inferBoolean(_featureName: string): Promise<FeatureAttributes> {
     return {
-      type: FeatureAttributesTypeEnum.Nominal,
-      data_type: FeatureAttributesDataTypeEnum.Boolean,
+      type: "nominal",
+      data_type: "boolean",
     };
   }
 
   protected async inferTimedelta(_featureName: string): Promise<FeatureAttributes> {
     return {
-      type: FeatureAttributesTypeEnum.Continuous,
+      type: "continuous",
     };
   }
 
   protected async inferTime(_featureName: string): Promise<FeatureAttributes> {
     return {
-      type: FeatureAttributesTypeEnum.Continuous,
+      type: "continuous",
     };
   }
 
   protected async inferDate(_featureName: string): Promise<FeatureAttributes> {
     return {
-      type: FeatureAttributesTypeEnum.Continuous,
+      type: "continuous",
       date_time_format: "%Y-%m-%d",
     };
   }
 
   protected async inferDatetime(_featureName: string): Promise<FeatureAttributes> {
     return {
-      type: FeatureAttributesTypeEnum.Continuous,
+      type: "continuous",
       date_time_format: "%Y-%m-%dT%H:%M:%SZ",
     };
   }
@@ -93,13 +88,13 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
 
     if (asNominal) {
       return {
-        type: FeatureAttributesTypeEnum.Nominal,
-        data_type: FeatureAttributesDataTypeEnum.Number,
+        type: "nominal",
+        data_type: "number",
         decimal_places,
       };
     } else {
       return {
-        type: FeatureAttributesTypeEnum.Continuous,
+        type: "continuous",
         decimal_places,
       };
     }
@@ -107,7 +102,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
 
   protected async inferString(_featureName: string): Promise<FeatureAttributes> {
     return {
-      type: FeatureAttributesTypeEnum.Nominal,
+      type: "nominal",
     };
   }
 
@@ -133,7 +128,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
       return result;
     }, []);
 
-    if (attributes.type === FeatureAttributesTypeEnum.Continuous) {
+    if (attributes.type === "continuous") {
       column.sort((a, b) => a - b || Number(isNaN(a)) - Number(isNaN(b)));
       let minValue = column[0];
       let maxValue = column[column.length - 1];
@@ -282,17 +277,5 @@ export class FeatureSerializerArrayData extends FeatureSerializerBase {
       data: deserialized,
     };
     return result;
-  }
-
-  protected deserializeCell(value: any, attributes: FeatureAttributes): any {
-    switch (attributes.original_type?.data_type) {
-      case "date":
-      case "datetime":
-        if (typeof value === "string") {
-          return new Date(value);
-        }
-        break;
-    }
-    return value;
   }
 }

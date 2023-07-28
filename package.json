@@ -39,6 +39,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

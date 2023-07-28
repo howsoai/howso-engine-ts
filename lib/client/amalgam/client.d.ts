@@ -1,6 +1,6 @@
 import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "diveplane-amalgam-api/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
-import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "diveplane-openapi-client/models";
+import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "diveplane-openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 import { DiveplaneBaseClient, TraineeBaseCache } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";
@@ -197,7 +197,20 @@ export declare class DiveplaneClient extends DiveplaneBaseClient implements ITra
      * @returns The react into trainee response.
      */
     reactIntoTrainee(traineeId: string, request: ReactIntoTraineeRequest): Promise<ReactIntoTraineeResponse>;
+    /**
+     * Get prediction stats of a trainee.
+     * @param traineeId The trainee identifier.
+     * @param request The prediction stats request.
+     * @returns The prediction stats.
+     */
     getPredictionStats(traineeId: string, request: FeaturePredictionStatsRequest): Promise<FeaturePredictionStats>;
+    /**
+     * Get marginal stats of a trainee.
+     * @param traineeId The trainee identifier.
+     * @param request The marginal stats request.
+     * @returns The marginal stats.
+     */
+    getMarginalStats(traineeId: string, request: FeatureMarginalStatsRequest): Promise<FeatureMarginalStats>;
     /**
      * Get familiarity conviction for features.
      * @param traineeId The trainee identifier.

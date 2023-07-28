@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type * as base from "./base.js";
 
-import { isArrayData } from "./base.js";
+import { isArrayData, isParsedArrayData } from "./base.js";
 import { FeatureAttributes } from "diveplane-openapi-client/models";
 import { DiveplaneError } from "../client/errors.js";
 import { FeatureSerializerArrayData } from "./abstract/arrays.js";
+import { FeatureSerializerParsedArrayData } from "./abstract/parsed.js";
 
-export type FeatureSerializerFormat = "unknown" | "array";
+export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
 
 export type FeatureSerializerDataType<T extends FeatureSerializerFormat> = T extends "array"
   ? base.ArrayData
+  : T extends "parsed"
+  ? base.ParsedArrayData
   : T extends "excel"
   ? number
   : never;
@@ -17,6 +20,9 @@ export type FeatureSerializerDataType<T extends FeatureSerializerFormat> = T ext
 function detectFormat(data: base.AbstractDataType): FeatureSerializerFormat {
   if (isArrayData(data)) {
     return "array";
+  }
+  if (isParsedArrayData(data)) {
+    return "parsed";
   }
   return "unknown";
 }
@@ -26,6 +32,9 @@ export function getFeatureSerializer(format: FeatureSerializerFormat): base.Feat
   switch (format) {
     case "array":
       svc = new FeatureSerializerArrayData();
+      break;
+    case "parsed":
+      svc = new FeatureSerializerParsedArrayData();
       break;
     default:
       throw new DiveplaneError("Unexpected data format.");

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes, FeatureAttributesTypeEnum, FeatureOriginalType } from "diveplane-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "diveplane-openapi-client/models";
 
 export interface InferFeatureBoundsOptions {
   tightBounds?: boolean | string[];
@@ -13,7 +13,6 @@ export interface InferFeatureTimeSeriesOptions {
 
 export interface InferFeatureAttributesOptions {
   defaults?: Record<string, FeatureAttributes>;
-  dropna?: boolean | string[];
   inferBounds?: boolean | InferFeatureBoundsOptions;
   timeSeries?: InferFeatureTimeSeriesOptions;
   ordinalFeatureValues?: Record<string, string[]>;
@@ -25,10 +24,18 @@ export interface ArrayData {
   readonly data: any[][];
 }
 
-export type AbstractDataType = ArrayData;
+export interface ParsedArrayData<T extends Record<string, any> = object> extends Array<T> {
+  readonly columns: Array<keyof T>;
+}
+
+export type AbstractDataType = ArrayData | ParsedArrayData;
 
 export function isArrayData(data: any): data is ArrayData {
-  return data?.columns != null && data?.data != null;
+  return Array.isArray(data?.columns) && Array.isArray(data?.data);
+}
+
+export function isParsedArrayData(data: any): data is ParsedArrayData {
+  return Array.isArray(data?.columns) && Array.isArray(data) && !Array.isArray(data[0]);
 }
 
 export abstract class InferFeatureAttributesBase {
@@ -51,7 +58,7 @@ export abstract class InferFeatureAttributesBase {
       // Explicitly declared ordinals
       if (feature in ordinalFeatureValues) {
         attributes[feature] = {
-          type: FeatureAttributesTypeEnum.Ordinal,
+          type: "ordinal",
           bounds: { allowed: ordinalFeatureValues[feature] },
         };
       } else if (featureType != null) {
@@ -108,17 +115,6 @@ export abstract class InferFeatureAttributesBase {
         attributes[feature].dependent_features = dependentFeatures[feature];
       }
 
-      // Set dropna flag
-      if (options.dropna && attributes[feature].dropna == null) {
-        if (Array.isArray(options.dropna)) {
-          if (options.dropna.indexOf(feature) != -1) {
-            attributes[feature].dropna = true;
-          }
-        } else {
-          attributes[feature].dropna = true;
-        }
-      }
-
       // Infer bounds
       const { inferBounds = true } = options;
       if (inferBounds && attributes[feature].bounds == null) {
@@ -152,7 +148,7 @@ export abstract class InferFeatureAttributesBase {
   protected abstract inferInteger(featureName: string): Promise<FeatureAttributes>;
   protected abstract inferFloat(featureName: string): Promise<FeatureAttributes>;
   protected async inferUnknown(_featureName: string): Promise<FeatureAttributes> {
-    return { type: FeatureAttributesTypeEnum.Nominal };
+    return { type: "nominal" };
   }
 
   /* Feature properties */
@@ -181,4 +177,16 @@ export abstract class FeatureSerializerBase {
     columns: string[],
     features: Record<string, FeatureAttributes>
   ): Promise<AbstractDataType>;
+
+  protected deserializeCell(value: any, attributes: FeatureAttributes): any {
+    switch (attributes.original_type?.data_type) {
+      case "date":
+      case "datetime":
+        if (typeof value === "string") {
+          return new Date(value);
+        }
+        break;
+    }
+    return value;
+  }
 }

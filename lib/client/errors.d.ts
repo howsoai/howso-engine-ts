@@ -16,3 +16,5 @@ export declare class ValidationError extends DiveplaneError {
 }
 export declare class TimeoutError extends DiveplaneError {
 }
+export declare class RetriableError extends DiveplaneError {
+}

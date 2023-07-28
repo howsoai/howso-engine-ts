@@ -9,7 +9,6 @@ export interface InferFeatureTimeSeriesOptions {
 }
 export interface InferFeatureAttributesOptions {
     defaults?: Record<string, FeatureAttributes>;
-    dropna?: boolean | string[];
     inferBounds?: boolean | InferFeatureBoundsOptions;
     timeSeries?: InferFeatureTimeSeriesOptions;
     ordinalFeatureValues?: Record<string, string[]>;
@@ -19,8 +18,12 @@ export interface ArrayData {
     readonly columns: string[];
     readonly data: any[][];
 }
-export type AbstractDataType = ArrayData;
+export interface ParsedArrayData<T extends Record<string, any> = object> extends Array<T> {
+    readonly columns: Array<keyof T>;
+}
+export type AbstractDataType = ArrayData | ParsedArrayData;
 export declare function isArrayData(data: any): data is ArrayData;
+export declare function isParsedArrayData(data: any): data is ParsedArrayData;
 export declare abstract class InferFeatureAttributesBase {
     infer(options?: InferFeatureAttributesOptions): Promise<Record<string, FeatureAttributes>>;
     protected abstract getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined>;
@@ -43,4 +46,5 @@ export declare abstract class InferFeatureAttributesBase {
 export declare abstract class FeatureSerializerBase {
     abstract serialize(data: AbstractDataType, features: Record<string, FeatureAttributes>): Promise<any[][]>;
     abstract deserialize(data: any[][], columns: string[], features: Record<string, FeatureAttributes>): Promise<AbstractDataType>;
+    protected deserializeCell(value: any, attributes: FeatureAttributes): any;
 }
