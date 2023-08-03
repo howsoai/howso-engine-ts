@@ -25,7 +25,7 @@ import type {
   ReactIntoTraineeResponse,
   SetAutoAnalyzeParamsRequest,
   TraineeIdentity,
-} from "diveplane-openapi-client/models";
+} from "howso-openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 
 export interface ITraineeClient {

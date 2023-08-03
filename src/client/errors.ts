@@ -1,6 +1,6 @@
-import { ModelError, ModelErrorFromJSON } from "diveplane-openapi-client/models";
+import { ModelError, ModelErrorFromJSON } from "howso-openapi-client/models";
 
-export class DiveplaneError extends Error {
+export class ProblemError extends Error {
   public readonly code?: string;
 
   constructor(message?: string, code?: string) {
@@ -9,7 +9,7 @@ export class DiveplaneError extends Error {
   }
 }
 
-export class DiveplaneApiError extends DiveplaneError implements ModelError {
+export class ApiError extends ProblemError implements ModelError {
   constructor(private readonly problem: ModelError) {
     super(problem?.detail, problem?.code);
   }
@@ -30,14 +30,14 @@ export class DiveplaneApiError extends DiveplaneError implements ModelError {
     return this.problem.detail;
   }
 
-  static fromJson(json: unknown): DiveplaneApiError {
+  static fromJson(json: unknown): ApiError {
     const error = ModelErrorFromJSON(json);
-    return new DiveplaneApiError(error);
+    return new ApiError(error);
   }
 }
 
-export class ValidationError extends DiveplaneError {}
+export class ValidationError extends ProblemError {}
 
-export class TimeoutError extends DiveplaneError {}
+export class TimeoutError extends ProblemError {}
 
-export class RetriableError extends DiveplaneError {}
+export class RetriableError extends ProblemError {}

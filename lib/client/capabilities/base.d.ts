@@ -13,7 +13,7 @@ export interface Capabilities {
 export interface TraineeBaseCache {
     trainee: Trainee;
 }
-export declare abstract class DiveplaneBaseClient {
+export declare abstract class BaseClient {
     protected abstract readonly traineeCache: CacheMap<TraineeBaseCache>;
     static readonly capabilities: Readonly<Capabilities>;
     abstract setup(): Promise<void>;

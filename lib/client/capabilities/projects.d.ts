@@ -1,4 +1,4 @@
-import type { Project, ProjectIdentity } from "diveplane-openapi-client/models";
+import type { Project, ProjectIdentity } from "howso-openapi-client/models";
 export interface IProjectClient {
     createProject(project: Required<Pick<Project, "name">>): Promise<Project>;
     updateProject(project: Required<Pick<Project, "name" | "id">>): Promise<Project>;

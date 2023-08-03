@@ -35,7 +35,7 @@ import type {
   FeatureMarginalStatsRequest,
   TraineeRequest,
   TraineeCreateRequest,
-} from "diveplane-openapi-client/models";
+} from "howso-openapi-client/models";
 import {
   TaskOperationsApi,
   TraineeManagementApi,
@@ -43,23 +43,17 @@ import {
   TraineeOperationsApi,
   TraineeFeatureOperationsApi,
   TraineeCaseOperationsApi,
-} from "diveplane-openapi-client/apis";
-import { Configuration, ConfigurationParameters } from "diveplane-openapi-client/runtime";
+} from "howso-openapi-client/apis";
+import { Configuration, ConfigurationParameters } from "howso-openapi-client/runtime";
 
 import { Trainee } from "../../trainees/index.js";
-import { DiveplaneError, DiveplaneApiError, RetriableError } from "../errors.js";
-import {
-  Capabilities,
-  DiveplaneBaseClient,
-  TraineeBaseCache,
-  ITraineeClient,
-  ISessionClient,
-} from "../capabilities/index.js";
+import { ProblemError, ApiError, RetriableError } from "../errors.js";
+import { Capabilities, BaseClient, TraineeBaseCache, ITraineeClient, ISessionClient } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";
 
 type InitOverrides = RequestInit;
 
-export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClient, ISessionClient {
+export class PlatformClient extends BaseClient implements ITraineeClient, ISessionClient {
   public static readonly capabilities: Capabilities = {
     supportsAuthentication: true,
     // supportsAccounts: true,
@@ -106,7 +100,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     options?: { signal?: AbortSignal | null | undefined; onFailWait?: () => Promise<void> }
   ): Promise<T> {
     if (!action.action_id) {
-      throw new DiveplaneError("Invalid async response received from server.");
+      throw new ProblemError("Invalid async response received from server.");
     }
     const basePath = this.config.basePath.replace(new RegExp("/v2$"), "/v3");
     let retries = 0;
@@ -131,7 +125,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
             return; // Successfully opened
           } else if (retries >= 5 || (response.status >= 400 && response.status < 500 && response.status !== 429)) {
             // client-side errors are usually non-retriable:
-            throw new DiveplaneApiError({
+            throw new ApiError({
               status: response.status,
               detail: `Failed to wait for action: ${action.operation_type}`,
             });
@@ -184,14 +178,14 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
         break;
       case "pending": // TODO: attempt retries before raising timed out
       case "expired":
-        throw new DiveplaneError(`The operation '${state.operation_type}' timed out.`);
+        throw new ProblemError(`The operation '${state.operation_type}' timed out.`);
       case "cancelled":
-        throw new DiveplaneError(`The operation '${state.operation_type}' was cancelled before it could be completed.`);
+        throw new ProblemError(`The operation '${state.operation_type}' was cancelled before it could be completed.`);
       case "failed": {
-        throw DiveplaneApiError.fromJson((state as AsyncActionFailedOutput).output);
+        throw ApiError.fromJson((state as AsyncActionFailedOutput).output);
       }
       default:
-        throw new DiveplaneError("Unexpected async action status received.");
+        throw new ProblemError("Unexpected async action status received.");
     }
     return (state as AsyncActionCompleteOutput).output;
   }

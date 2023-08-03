@@ -1,29 +1,29 @@
-import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "diveplane-amalgam-api/worker";
+import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
-import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "diveplane-openapi-client/models";
+import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "howso-openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
-import { DiveplaneBaseClient, TraineeBaseCache } from "../capabilities/index.js";
+import { BaseClient, TraineeBaseCache } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";
 import { FileSystemClient } from "./files.js";
 export interface TraineeCache extends TraineeBaseCache {
     entityId: string;
 }
-interface DiveplaneClientOptions {
+interface ClientOptions {
     trace?: boolean;
     migrationsUri?: string | URL;
-    diveplaneCoreUri?: string | URL;
-    traineeTemplateUri?: string | URL;
-    diveplaneLibPath?: string;
+    coreEntityUri?: string | URL;
+    traineeEntityUri?: string | URL;
+    libPath?: string;
 }
-export declare class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClient, ISessionClient {
+export declare class WasmClient extends BaseClient implements ITraineeClient, ISessionClient {
     protected readonly worker: Worker;
-    protected readonly options: DiveplaneClientOptions;
+    protected readonly options: ClientOptions;
     static readonly capabilities: Readonly<Capabilities>;
     readonly fs: FileSystemClient;
     protected readonly traineeCache: CacheMap<TraineeCache>;
     protected readonly handle: string;
     protected activeSession?: Session;
-    constructor(worker: Worker, options: DiveplaneClientOptions);
+    constructor(worker: Worker, options: ClientOptions);
     /**
      * Execute a core entity request.
      * @param label The core label.

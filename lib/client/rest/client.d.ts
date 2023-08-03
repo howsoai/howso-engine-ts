@@ -1,11 +1,11 @@
-import type { AsyncActionAccepted, AsyncActionCompleteOutput, AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, ReactGroupRequest, ReactGroupResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeAcquireResourcesRequest, TraineeIdentity, TrainRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest, FeatureContributionsRequest, FeatureMdaRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TraineeCreateRequest } from "diveplane-openapi-client/models";
-import { TaskOperationsApi, TraineeManagementApi, SessionManagementApi, TraineeOperationsApi, TraineeFeatureOperationsApi, TraineeCaseOperationsApi } from "diveplane-openapi-client/apis";
-import { Configuration, ConfigurationParameters } from "diveplane-openapi-client/runtime";
+import type { AsyncActionAccepted, AsyncActionCompleteOutput, AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, ReactGroupRequest, ReactGroupResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeAcquireResourcesRequest, TraineeIdentity, TrainRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest, FeatureContributionsRequest, FeatureMdaRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TraineeCreateRequest } from "howso-openapi-client/models";
+import { TaskOperationsApi, TraineeManagementApi, SessionManagementApi, TraineeOperationsApi, TraineeFeatureOperationsApi, TraineeCaseOperationsApi } from "howso-openapi-client/apis";
+import { Configuration, ConfigurationParameters } from "howso-openapi-client/runtime";
 import { Trainee } from "../../trainees/index.js";
-import { Capabilities, DiveplaneBaseClient, TraineeBaseCache, ITraineeClient, ISessionClient } from "../capabilities/index.js";
+import { Capabilities, BaseClient, TraineeBaseCache, ITraineeClient, ISessionClient } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";
 type InitOverrides = RequestInit;
-export declare class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClient, ISessionClient {
+export declare class PlatformClient extends BaseClient implements ITraineeClient, ISessionClient {
     static readonly capabilities: Capabilities;
     protected readonly traineeCache: CacheMap<TraineeBaseCache>;
     protected readonly config: Configuration;

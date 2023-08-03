@@ -4,7 +4,7 @@ import type {
   FileSystemRequest,
   FileSystemResponse,
   FileSystemResponseBody,
-} from "diveplane-amalgam-api/worker";
+} from "amalgam-lang/worker";
 import { isNode } from "../utilities/detectors.js";
 
 export class FileSystemClient implements IFileSystem {

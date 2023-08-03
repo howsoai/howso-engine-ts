@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes, FeatureOriginalType } from "diveplane-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "howso-openapi-client/models";
 import {
   ArrayData,
   FeatureSerializerBase,
@@ -206,7 +206,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     const dataType = typeof value;
     switch (dataType) {
       case "bigint":
-        throw TypeError("BigInt is not supported by Diveplane.");
+        throw TypeError("BigInt is not supported.");
       case "number":
         return { data_type: "numeric", size: 8 };
       case "boolean":

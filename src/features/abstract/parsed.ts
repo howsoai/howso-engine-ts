@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes } from "diveplane-openapi-client/models";
+import { FeatureAttributes } from "howso-openapi-client/models";
 import { ArrayData, ParsedArrayData, FeatureSerializerBase } from "../base.js";
 import { InferFeatureAttributesFromArray } from "./arrays.js";
 

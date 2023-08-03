@@ -1,12 +1,7 @@
-import type {
-  AmalgamRequest,
-  AmalgamResponseBody,
-  AmalgamCommand,
-  AmalgamCoreResponse,
-} from "diveplane-amalgam-api/worker";
+import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
 
-import { AmalgamOptions } from "diveplane-amalgam-api/wasm";
+import { AmalgamOptions } from "amalgam-lang/wasm";
 import {
   AnalyzeRequest,
   Cases,
@@ -67,13 +62,13 @@ import {
   FeatureMdaRequestToJSON,
   AnalyzeRequestToJSON,
   ReactGroupResponseContent,
-} from "diveplane-openapi-client/models";
-import { RequiredError, mapValues } from "diveplane-openapi-client/runtime";
+} from "howso-openapi-client/models";
+import { RequiredError, mapValues } from "howso-openapi-client/runtime";
 import { v4 as uuid } from "uuid";
 
 import { Trainee } from "../../trainees/index.js";
-import { DiveplaneBaseClient, TraineeBaseCache } from "../capabilities/index.js";
-import { DiveplaneError } from "../errors.js";
+import { BaseClient, TraineeBaseCache } from "../capabilities/index.js";
+import { ProblemError } from "../errors.js";
 import { CacheMap, isNode, batcher, BatchOptions } from "../utilities/index.js";
 import { FileSystemClient } from "./files.js";
 
@@ -81,17 +76,17 @@ export interface TraineeCache extends TraineeBaseCache {
   entityId: string;
 }
 
-interface DiveplaneClientOptions {
+interface ClientOptions {
   trace?: boolean;
   // Browser only
   migrationsUri?: string | URL;
-  diveplaneCoreUri?: string | URL;
-  traineeTemplateUri?: string | URL;
+  coreEntityUri?: string | URL;
+  traineeEntityUri?: string | URL;
   // Node only
-  diveplaneLibPath?: string;
+  libPath?: string;
 }
 
-export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClient, ISessionClient {
+export class WasmClient extends BaseClient implements ITraineeClient, ISessionClient {
   public static readonly capabilities: Readonly<Capabilities> = {
     supportsTrainees: true,
     supportsSessions: true,
@@ -101,19 +96,19 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
   public readonly fs: FileSystemClient;
 
   protected readonly traineeCache: CacheMap<TraineeCache>;
-  protected readonly handle: string = "dp";
+  protected readonly handle: string = "handle";
   protected activeSession?: Session;
 
-  constructor(protected readonly worker: Worker, protected readonly options: DiveplaneClientOptions) {
+  constructor(protected readonly worker: Worker, protected readonly options: ClientOptions) {
     super();
     if (worker == null) {
-      throw new RequiredError("worker", "A worker is required to instantiate a DiveplaneClient.");
+      throw new RequiredError("worker", "A worker is required to instantiate a client.");
     }
     if (options == null) {
-      throw new RequiredError("options", "Client options are required to instantiate a DiveplaneClient.");
+      throw new RequiredError("options", "Client options are required.");
     }
     this.traineeCache = new CacheMap<TraineeCache>();
-    this.fs = new FileSystemClient(this.worker, options?.diveplaneLibPath);
+    this.fs = new FileSystemClient(this.worker, options?.libPath);
   }
 
   /**
@@ -131,7 +126,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     })) as AmalgamCoreResponse<R>;
     if (throwErrors) {
       for (const err of response.errors) {
-        throw new DiveplaneError(err?.message || "An unknown Diveplane core error occurred.", err?.code);
+        throw new ProblemError(err?.message || "An unknown error occurred.", err?.code);
       }
     }
     return response;
@@ -176,7 +171,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     }
     const cached = this.traineeCache.get(traineeId);
     if (cached == null) {
-      throw new DiveplaneError(`Trainee "${traineeId}" not found.`);
+      throw new ProblemError(`Trainee "${traineeId}" not found.`);
     }
     return cached.trainee;
   }
@@ -214,7 +209,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { content: metadata } = await this.execute<Partial<Trainee> | null>("get_metadata", { trainee: traineeId });
     if (metadata == null) {
-      throw new DiveplaneError(`Trainee ${traineeId} not found.`);
+      throw new ProblemError(`Trainee ${traineeId} not found.`);
     }
     const { content: features = {} } = await this.execute("get_feature_attributes", { trainee: traineeId });
     return TraineeFromJSON({
@@ -246,17 +241,13 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
       // Prepare the core files
       if (isNode) {
         // NodeJS
-        if (this.options.diveplaneLibPath == null) {
-          throw new DiveplaneError(
-            "Setup Failed - The Diveplane client requires a file path to the diveplane library files."
-          );
+        if (this.options.libPath == null) {
+          throw new ProblemError("Setup Failed - The client requires a file path to the library files.");
         }
       } else {
         // Browsers
-        if (this.options.diveplaneCoreUri == null || this.options.traineeTemplateUri == null) {
-          throw new DiveplaneError(
-            "Setup Failed - The Diveplane client requires a URI for the diveplane.caml and trainee_template.caml files."
-          );
+        if (this.options.coreEntityUri == null || this.options.traineeEntityUri == null) {
+          throw new ProblemError("Setup Failed - The client requires a URI for the entity files.");
         }
 
         await this.fs.mkdir(this.fs.libDir);
@@ -272,31 +263,25 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
             false
           );
         }
-        await this.fs.createLazyFile(
-          this.fs.libDir,
-          "diveplane.caml",
-          String(this.options.diveplaneCoreUri),
-          true,
-          false
-        );
+        await this.fs.createLazyFile(this.fs.libDir, "howso.caml", String(this.options.coreEntityUri), true, false);
         await this.fs.createLazyFile(
           this.fs.libDir,
           "trainee_template.caml",
-          String(this.options.traineeTemplateUri),
+          String(this.options.traineeEntityUri),
           true,
           false
         );
       }
 
-      // Load the Diveplane entity
+      // Load the core entity
       // TODO - Call getEntities to check if loaded or not
       const loaded = await this.dispatch({
         type: "request",
         command: "loadEntity",
-        parameters: [this.handle, this.fs.join(this.fs.libDir, "diveplane.caml")],
+        parameters: [this.handle, this.fs.join(this.fs.libDir, "howso.caml")],
       });
       if (!loaded) {
-        throw new DiveplaneError("Failed to load the Diveplane core.");
+        throw new ProblemError("Failed to load the amalgam entities.");
       }
     }
 
@@ -359,7 +344,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
    */
   public async releaseTraineeResources(traineeId: string): Promise<void> {
     if (traineeId == null) {
-      throw new DiveplaneError("A trainee id is required.");
+      throw new ProblemError("A trainee id is required.");
     }
 
     // Check if trainee already loaded
@@ -373,7 +358,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
           filepath: this.fs.traineeDir,
         });
       } else if (cached.trainee.persistence == "never") {
-        throw new DiveplaneError(
+        throw new ProblemError(
           "Trainees set to never persist may not have their resources released. Delete the trainee instead."
         );
       }
@@ -398,7 +383,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
       file_extension: "caml",
     });
     if (!created) {
-      throw new DiveplaneError(
+      throw new ProblemError(
         `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`
       );
     }
@@ -522,7 +507,7 @@ export class DiveplaneClient extends DiveplaneBaseClient implements ITraineeClie
 
     // Batch scale the requests
     await batcher(
-      async function* (this: DiveplaneClient, size: number) {
+      async function* (this: WasmClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
           const response = await this.execute<TrainResponse | null>("train", {

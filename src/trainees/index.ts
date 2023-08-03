@@ -1,4 +1,4 @@
-import { Trainee as BaseTrainee, FeatureAttributes } from "diveplane-openapi-client/models";
+import { Trainee as BaseTrainee, FeatureAttributes } from "howso-openapi-client/models";
 
 export interface Trainee extends BaseTrainee {
   id: string;

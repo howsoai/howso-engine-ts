@@ -2,8 +2,8 @@
 import type * as base from "./base.js";
 
 import { isArrayData, isParsedArrayData } from "./base.js";
-import { FeatureAttributes } from "diveplane-openapi-client/models";
-import { DiveplaneError } from "../client/errors.js";
+import { FeatureAttributes } from "howso-openapi-client/models";
+import { ProblemError } from "../client/errors.js";
 import { FeatureSerializerArrayData } from "./abstract/arrays.js";
 import { FeatureSerializerParsedArrayData } from "./abstract/parsed.js";
 
@@ -37,7 +37,7 @@ export function getFeatureSerializer(format: FeatureSerializerFormat): base.Feat
       svc = new FeatureSerializerParsedArrayData();
       break;
     default:
-      throw new DiveplaneError("Unexpected data format.");
+      throw new ProblemError("Unexpected data format.");
   }
   return svc;
 }

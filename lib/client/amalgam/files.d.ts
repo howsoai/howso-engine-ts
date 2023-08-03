@@ -1,4 +1,4 @@
-import type { IFileSystem, FileSystemOperation, FileSystemRequest, FileSystemResponseBody } from "diveplane-amalgam-api/worker";
+import type { IFileSystem, FileSystemOperation, FileSystemRequest, FileSystemResponseBody } from "amalgam-lang/worker";
 export declare class FileSystemClient implements IFileSystem {
     private readonly worker;
     protected readonly baseDir: string;
