@@ -22,5 +22,5 @@ export declare class InferFeatureAttributesFromArray extends InferFeatureAttribu
 }
 export declare class FeatureSerializerArrayData extends FeatureSerializerBase {
     serialize(data: ArrayData, _features: Record<string, FeatureAttributes>): Promise<any[][]>;
-    deserialize(data: any[][], columns: string[], features: Record<string, FeatureAttributes>): Promise<ArrayData>;
+    deserialize(data: any[][], columns: string[], features?: Record<string, FeatureAttributes>): Promise<ArrayData>;
 }

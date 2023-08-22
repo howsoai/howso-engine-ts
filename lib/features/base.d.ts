@@ -14,9 +14,9 @@ export interface InferFeatureAttributesOptions {
     ordinalFeatureValues?: Record<string, string[]>;
     dependentFeatures?: Record<string, string[]>;
 }
-export interface ArrayData {
-    readonly columns: string[];
-    readonly data: any[][];
+export interface ArrayData<T = any, C extends string = string> {
+    readonly columns: C[];
+    readonly data: Array<Array<T>>;
 }
 export interface ParsedArrayData<T extends Record<string, any> = object> extends Array<T> {
     readonly columns: Array<keyof T>;
@@ -45,6 +45,6 @@ export declare abstract class InferFeatureAttributesBase {
 }
 export declare abstract class FeatureSerializerBase {
     abstract serialize(data: AbstractDataType, features: Record<string, FeatureAttributes>): Promise<any[][]>;
-    abstract deserialize(data: any[][], columns: string[], features: Record<string, FeatureAttributes>): Promise<AbstractDataType>;
-    protected deserializeCell(value: any, attributes: FeatureAttributes): any;
+    abstract deserialize(data: any[][], columns: string[], features?: Record<string, FeatureAttributes>): Promise<AbstractDataType>;
+    protected deserializeCell(value: any, attributes?: FeatureAttributes): any;
 }

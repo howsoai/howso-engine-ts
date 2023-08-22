@@ -1,6 +1,6 @@
 import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
-import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "howso-openapi-client/models";
+import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SessionIdentity, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "howso-openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";
@@ -78,10 +78,17 @@ export declare class WasmClient extends BaseClient implements ITraineeClient, IS
      */
     beginSession(name?: string, metadata?: Record<string, unknown>): Promise<Session>;
     /**
+     * Get all sessions in use by trainee.
+     * @param traineeId The trainee identifier.
+     * @returns The list of session identities.
+     */
+    getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]>;
+    /**
      * Acquire resources for a trainee.
      * @param traineeId The trainee identifier.
+     * @param uri A URI to the trainee file.
      */
-    acquireTraineeResources(traineeId: string): Promise<void>;
+    acquireTraineeResources(traineeId: string, uri?: string): Promise<void>;
     /**
      * Releases resources for a trainee.
      * @param traineeId The trainee identifier.

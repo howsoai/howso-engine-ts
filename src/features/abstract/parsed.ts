@@ -34,7 +34,7 @@ export class FeatureSerializerParsedArrayData extends FeatureSerializerBase {
   public async deserialize<T extends Record<string, any> = object>(
     data: any[][],
     columns: Array<keyof T>,
-    features: Record<string, FeatureAttributes>
+    features?: Record<string, FeatureAttributes>
   ): Promise<ParsedArrayData<T>> {
     const deserialized: ParsedArrayData<T> = Object.assign([], { columns });
 
@@ -44,7 +44,7 @@ export class FeatureSerializerParsedArrayData extends FeatureSerializerBase {
         let index = 0;
         for (const cell of row) {
           const col = columns[index];
-          deserializedRow[col] = this.deserializeCell(cell, features[col as string]);
+          deserializedRow[col] = this.deserializeCell(cell, features?.[col as string]);
           index++;
         }
         deserialized.push(deserializedRow);

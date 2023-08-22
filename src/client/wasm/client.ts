@@ -21,6 +21,7 @@ import {
   ReactSeriesResponse,
   ReactSeriesResponseContent,
   Session,
+  SessionIdentity,
   SetAutoAnalyzeParamsRequest,
   TraineeIdentity,
   ReactGroupRequest,
@@ -313,13 +314,33 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
+   * Get all sessions in use by trainee.
+   * @param traineeId The trainee identifier.
+   * @returns The list of session identities.
+   */
+  public async getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const { content } = await this.execute<Required<SessionIdentity>[]>("get_sessions", {
+      trainee: trainee.id,
+      attributes: ["id", "name"],
+    });
+    return content ?? [];
+  }
+
+  /**
    * Acquire resources for a trainee.
    * @param traineeId The trainee identifier.
+   * @param uri A URI to the trainee file.
    */
-  public async acquireTraineeResources(traineeId: string): Promise<void> {
+  public async acquireTraineeResources(traineeId: string, uri?: string): Promise<void> {
     if (this.traineeCache.has(traineeId)) {
       // Already acquired
       return;
+    }
+
+    if (uri) {
+      // Prepare the file on the virtual file system
+      await this.fs.createLazyFile(this.fs.traineeDir, `${this.fs.sanitizeFilename(traineeId)}.caml`, uri, true, false);
     }
 
     // Load trainee only if entity not already in core

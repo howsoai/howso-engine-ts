@@ -255,7 +255,7 @@ export class FeatureSerializerArrayData extends FeatureSerializerBase {
   public async deserialize(
     data: any[][],
     columns: string[],
-    features: Record<string, FeatureAttributes>
+    features?: Record<string, FeatureAttributes>
   ): Promise<ArrayData> {
     const deserialized: any[][] = [];
     for (const row of data) {
@@ -263,7 +263,7 @@ export class FeatureSerializerArrayData extends FeatureSerializerBase {
       if (Array.isArray(row) && row.length === columns.length) {
         let index = 0;
         for (const cell of row) {
-          deserializedRow.push(this.deserializeCell(cell, features[columns[index]]));
+          deserializedRow.push(this.deserializeCell(cell, features?.[columns[index]]));
           index++;
         }
         deserialized.push(deserializedRow);

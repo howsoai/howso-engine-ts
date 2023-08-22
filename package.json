@@ -25,7 +25,7 @@
     ".": {
       "default": "./lib/index.js"
     },
-    "./amalgam": "./lib/client/amalgam/index.js",
+    "./wasm": "./lib/client/wasm/index.js",
     "./rest": "./lib/client/rest/index.js",
     "./capabilities": "./lib/client/capabilities/index.js",
     "./utilities": "./lib/utilities.js",

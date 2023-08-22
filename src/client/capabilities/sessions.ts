@@ -8,5 +8,6 @@ export interface ISessionManagementClient {
 
 export interface ISessionClient {
   getActiveSession(): Promise<Readonly<Session>>;
+  getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]>;
   beginSession(name?: string, metadata?: Record<string, unknown>): Promise<Session>;
 }

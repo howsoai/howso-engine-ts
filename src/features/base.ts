@@ -19,9 +19,9 @@ export interface InferFeatureAttributesOptions {
   dependentFeatures?: Record<string, string[]>;
 }
 
-export interface ArrayData {
-  readonly columns: string[];
-  readonly data: any[][];
+export interface ArrayData<T = any, C extends string = string> {
+  readonly columns: C[];
+  readonly data: Array<Array<T>>;
 }
 
 export interface ParsedArrayData<T extends Record<string, any> = object> extends Array<T> {
@@ -175,11 +175,11 @@ export abstract class FeatureSerializerBase {
   public abstract deserialize(
     data: any[][],
     columns: string[],
-    features: Record<string, FeatureAttributes>
+    features?: Record<string, FeatureAttributes>
   ): Promise<AbstractDataType>;
 
-  protected deserializeCell(value: any, attributes: FeatureAttributes): any {
-    switch (attributes.original_type?.data_type) {
+  protected deserializeCell(value: any, attributes?: FeatureAttributes): any {
+    switch (attributes?.original_type?.data_type) {
       case "date":
       case "datetime":
         if (typeof value === "string") {

@@ -6,5 +6,5 @@ export declare class InferFeatureAttributesFromParsedArray extends InferFeatureA
 }
 export declare class FeatureSerializerParsedArrayData extends FeatureSerializerBase {
     serialize(data: ParsedArrayData, _features: Record<string, FeatureAttributes>): Promise<any[][]>;
-    deserialize<T extends Record<string, any> = object>(data: any[][], columns: Array<keyof T>, features: Record<string, FeatureAttributes>): Promise<ParsedArrayData<T>>;
+    deserialize<T extends Record<string, any> = object>(data: any[][], columns: Array<keyof T>, features?: Record<string, FeatureAttributes>): Promise<ParsedArrayData<T>>;
 }

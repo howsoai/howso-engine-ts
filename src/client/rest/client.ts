@@ -21,6 +21,7 @@ import type {
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
   Session,
+  SessionIdentity,
   SetAutoAnalyzeParamsRequest,
   TraineeAcquireResourcesRequest,
   TraineeIdentity,
@@ -43,6 +44,7 @@ import {
   TraineeOperationsApi,
   TraineeFeatureOperationsApi,
   TraineeCaseOperationsApi,
+  TraineeSessionManagementApi,
 } from "howso-openapi-client/apis";
 import { Configuration, ConfigurationParameters } from "howso-openapi-client/runtime";
 
@@ -70,6 +72,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
     readonly traineeOperations: TraineeOperationsApi;
     readonly traineeCases: TraineeCaseOperationsApi;
     readonly traineeFeatures: TraineeFeatureOperationsApi;
+    readonly traineeSession: TraineeSessionManagementApi;
     readonly session: SessionManagementApi;
   };
   protected activeSession?: Session;
@@ -86,6 +89,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
       traineeOperations: new TraineeOperationsApi(this.config),
       traineeCases: new TraineeCaseOperationsApi(this.config),
       traineeFeatures: new TraineeFeatureOperationsApi(this.config),
+      traineeSession: new TraineeSessionManagementApi(this.config),
       session: new SessionManagementApi(this.config),
     };
   }
@@ -207,6 +211,17 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
     initOverrides?: InitOverrides
   ): Promise<Session> {
     return await this.api.session.beginSession({ name, metadata }, initOverrides);
+  }
+
+  public async getTraineeSessions(
+    traineeId: string,
+    initOverrides?: InitOverrides
+  ): Promise<Required<SessionIdentity>[]> {
+    const sessions = (await this.api.traineeSession.getTraineeSessions(
+      traineeId,
+      initOverrides
+    )) as Required<SessionIdentity>[];
+    return sessions ?? [];
   }
 
   public async acquireTraineeResources(
