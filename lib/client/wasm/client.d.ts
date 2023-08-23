@@ -1,6 +1,6 @@
-import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "amalgam-lang/worker";
+import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "@howso/amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
-import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SessionIdentity, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "howso-openapi-client/models";
+import { AnalyzeRequest, Cases, CasesRequest, FeatureAttributes, FeaturePredictionStats, FeaturePredictionStatsRequest, FeatureMarginalStats, FeatureMarginalStatsRequest, TrainRequest, ReactRequest, ReactResponse, ReactSeriesRequest, ReactSeriesResponse, Session, SessionIdentity, SetAutoAnalyzeParamsRequest, TraineeIdentity, ReactGroupRequest, ReactGroupResponse, ReactIntoFeaturesRequest, ReactIntoFeaturesResponse, ReactIntoTraineeRequest, ReactIntoTraineeResponse, FeatureContributionsRequest, FeatureMdaRequest, FeatureConviction, FeatureConvictionRequest, FeatureResidualsRequest } from "@howso/openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index.js";
 import { CacheMap } from "../utilities/index.js";

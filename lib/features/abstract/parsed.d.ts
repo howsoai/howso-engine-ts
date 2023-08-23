@@ -1,4 +1,4 @@
-import { FeatureAttributes } from "howso-openapi-client/models";
+import { FeatureAttributes } from "@howso/openapi-client/models";
 import { ParsedArrayData, FeatureSerializerBase } from "../base.js";
 import { InferFeatureAttributesFromArray } from "./arrays.js";
 export declare class InferFeatureAttributesFromParsedArray extends InferFeatureAttributesFromArray {

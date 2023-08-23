@@ -4,7 +4,7 @@ import type {
   FileSystemRequest,
   FileSystemResponse,
   FileSystemResponseBody,
-} from "amalgam-lang/worker";
+} from "@howso/amalgam-lang/worker";
 import { isNode } from "../utilities/detectors.js";
 
 export class FileSystemClient implements IFileSystem {

@@ -1,4 +1,4 @@
-import { ModelError } from "howso-openapi-client/models";
+import { ModelError } from "@howso/openapi-client/models";
 export declare class ProblemError extends Error {
     readonly code?: string;
     constructor(message?: string, code?: string);

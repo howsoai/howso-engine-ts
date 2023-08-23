@@ -2,7 +2,7 @@
 import type * as base from "./base.js";
 
 import { isArrayData, isParsedArrayData } from "./base.js";
-import { FeatureAttributes } from "howso-openapi-client/models";
+import { FeatureAttributes } from "@howso/openapi-client/models";
 import { ProblemError } from "../client/errors.js";
 import { FeatureSerializerArrayData } from "./abstract/arrays.js";
 import { FeatureSerializerParsedArrayData } from "./abstract/parsed.js";

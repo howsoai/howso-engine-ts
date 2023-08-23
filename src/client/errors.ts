@@ -1,4 +1,4 @@
-import { ModelError, ModelErrorFromJSON } from "howso-openapi-client/models";
+import { ModelError, ModelErrorFromJSON } from "@howso/openapi-client/models";
 
 export class ProblemError extends Error {
   public readonly code?: string;

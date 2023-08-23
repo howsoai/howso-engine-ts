@@ -1,4 +1,4 @@
-import type { Session, SessionIdentity } from "howso-openapi-client/models";
+import type { Session, SessionIdentity } from "@howso/openapi-client/models";
 
 export interface ISessionManagementClient {
   updateSession(session: Required<Pick<Session, "id" | "metadata">>): Promise<Session>;

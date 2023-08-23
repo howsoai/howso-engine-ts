@@ -1,5 +1,5 @@
 import type * as base from "./base.js";
-import { FeatureAttributes } from "howso-openapi-client/models";
+import { FeatureAttributes } from "@howso/openapi-client/models";
 export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
 export type FeatureSerializerDataType<T extends FeatureSerializerFormat> = T extends "array" ? base.ArrayData : T extends "parsed" ? base.ParsedArrayData : T extends "excel" ? number : never;
 export declare function getFeatureSerializer(format: FeatureSerializerFormat): base.FeatureSerializerBase;

@@ -1,7 +1,12 @@
-import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand, AmalgamCoreResponse } from "amalgam-lang/worker";
+import type {
+  AmalgamRequest,
+  AmalgamResponseBody,
+  AmalgamCommand,
+  AmalgamCoreResponse,
+} from "@howso/amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
 
-import { AmalgamOptions } from "amalgam-lang/wasm";
+import { AmalgamOptions } from "@howso/amalgam-lang/wasm";
 import {
   AnalyzeRequest,
   Cases,
@@ -63,8 +68,8 @@ import {
   FeatureMdaRequestToJSON,
   AnalyzeRequestToJSON,
   ReactGroupResponseContent,
-} from "howso-openapi-client/models";
-import { RequiredError, mapValues } from "howso-openapi-client/runtime";
+} from "@howso/openapi-client/models";
+import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
 
 import { Trainee } from "../../trainees/index.js";

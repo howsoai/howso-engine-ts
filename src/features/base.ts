@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes, FeatureOriginalType } from "howso-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "@howso/openapi-client/models";
 
 export interface InferFeatureBoundsOptions {
   tightBounds?: boolean | string[];

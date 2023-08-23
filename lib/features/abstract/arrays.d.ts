@@ -1,4 +1,4 @@
-import { FeatureAttributes, FeatureOriginalType } from "howso-openapi-client/models";
+import { FeatureAttributes, FeatureOriginalType } from "@howso/openapi-client/models";
 import { ArrayData, FeatureSerializerBase, InferFeatureAttributesBase, InferFeatureBoundsOptions, InferFeatureTimeSeriesOptions } from "../base.js";
 export declare class InferFeatureAttributesFromArray extends InferFeatureAttributesBase {
     protected readonly dataset: ArrayData;

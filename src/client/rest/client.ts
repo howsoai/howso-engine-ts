@@ -36,7 +36,7 @@ import type {
   FeatureMarginalStatsRequest,
   TraineeRequest,
   TraineeCreateRequest,
-} from "howso-openapi-client/models";
+} from "@howso/openapi-client/models";
 import {
   TaskOperationsApi,
   TraineeManagementApi,
@@ -45,8 +45,8 @@ import {
   TraineeFeatureOperationsApi,
   TraineeCaseOperationsApi,
   TraineeSessionManagementApi,
-} from "howso-openapi-client/apis";
-import { Configuration, ConfigurationParameters } from "howso-openapi-client/runtime";
+} from "@howso/openapi-client/apis";
+import { Configuration, ConfigurationParameters } from "@howso/openapi-client/runtime";
 
 import { Trainee } from "../../trainees/index.js";
 import { ProblemError, ApiError, RetriableError } from "../errors.js";
