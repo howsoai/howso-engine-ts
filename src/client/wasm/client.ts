@@ -151,8 +151,14 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       channel.port1.onmessage = (ev: MessageEvent) => {
         if (ev.data?.success) {
           resolve(ev.data.body);
+        } else if (ev.data) {
+          const error = ev.data.error;
+          if (error instanceof Error && ev.data.body?.name) {
+            error.name = ev.data.body.name;
+          }
+          reject(error);
         } else {
-          reject(ev.data?.error);
+          reject();
         }
       };
       if (isNode) {
