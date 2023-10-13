@@ -82,7 +82,7 @@ export interface TraineeCache extends TraineeBaseCache {
   entityId: string;
 }
 
-interface ClientOptions {
+export interface ClientOptions {
   trace?: boolean;
   // Browser only
   migrationsUri?: string | URL;

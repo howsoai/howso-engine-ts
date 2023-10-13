@@ -8,7 +8,7 @@ import { FileSystemClient } from "./files.js";
 export interface TraineeCache extends TraineeBaseCache {
     entityId: string;
 }
-interface ClientOptions {
+export interface ClientOptions {
     trace?: boolean;
     migrationsUri?: string | URL;
     coreEntityUri?: string | URL;
@@ -256,4 +256,3 @@ export declare class WasmClient extends BaseClient implements ITraineeClient, IS
      */
     private preprocessReactRequest;
 }
-export {};
