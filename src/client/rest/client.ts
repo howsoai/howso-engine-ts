@@ -106,7 +106,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
     if (!action.action_id) {
       throw new ProblemError("Invalid async response received from server.");
     }
-    const basePath = this.config.basePath.replace(new RegExp("/v2$"), "/v3");
+    const basePath = this.config.basePath;
     let retries = 0;
 
     // Subscribe to action events
@@ -116,7 +116,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
 
     try {
       const accessToken = this.config.accessToken ? await this.config.accessToken() : "";
-      await fetchEventSource(`${basePath}/operations/actions/${action.action_id}/subscribe/`, {
+      await fetchEventSource(`${basePath}/v3/operations/actions/${action.action_id}/subscribe/`, {
         // openWhenHidden: true, // TODO: Support last event id retry in API
         credentials: "include",
         headers: {
