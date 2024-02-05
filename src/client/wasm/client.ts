@@ -105,7 +105,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   protected readonly handle: string = "handle";
   protected activeSession?: Session;
 
-  constructor(protected readonly worker: Worker, protected readonly options: ClientOptions) {
+  constructor(
+    protected readonly worker: Worker,
+    protected readonly options: ClientOptions,
+  ) {
     super();
     if (worker == null) {
       throw new RequiredError("worker", "A worker is required to instantiate a client.");
@@ -144,7 +147,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The operation response.
    */
   protected dispatch<T extends AmalgamCommand = AmalgamCommand>(
-    request: AmalgamRequest<T>
+    request: AmalgamRequest<T>,
   ): Promise<AmalgamResponseBody<T>> {
     return new Promise((resolve, reject) => {
       const channel = new MessageChannel();
@@ -272,7 +275,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
             "migrations.caml",
             String(this.options.migrationsUri),
             true,
-            false
+            false,
           );
         }
         await this.fs.createLazyFile(this.fs.libDir, "howso.caml", String(this.options.coreEntityUri), true, false);
@@ -281,7 +284,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
           "trainee_template.caml",
           String(this.options.traineeEntityUri),
           true,
-          false
+          false,
         );
       }
 
@@ -391,7 +394,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
         });
       } else if (cached.trainee.persistence == "never") {
         throw new ProblemError(
-          "Trainees set to never persist may not have their resources released. Delete the trainee instead."
+          "Trainees set to never persist may not have their resources released. Delete the trainee instead.",
         );
       }
     }
@@ -416,7 +419,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     });
     if (!created) {
       throw new ProblemError(
-        `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`
+        `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`,
       );
     }
     const { features = {}, ...props } = TraineeToJSON(trainee);
@@ -555,7 +558,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
           size = yield;
         }
       }.bind(this),
-      batchOptions
+      batchOptions,
     );
 
     await this.autoPersistTrainee(trainee.id);
@@ -698,7 +701,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async reactIntoFeatures(
     traineeId: string,
-    request: ReactIntoFeaturesRequest
+    request: ReactIntoFeaturesRequest,
   ): Promise<ReactIntoFeaturesResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { warnings = [] } = await this.execute<never>("react_into_features", {
@@ -716,7 +719,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async reactIntoTrainee(
     traineeId: string,
-    request: ReactIntoTraineeRequest
+    request: ReactIntoTraineeRequest,
   ): Promise<ReactIntoTraineeResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { warnings = [] } = await this.execute<never>("react_into_trainee", {
@@ -734,7 +737,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getPredictionStats(
     traineeId: string,
-    request: FeaturePredictionStatsRequest
+    request: FeaturePredictionStatsRequest,
   ): Promise<FeaturePredictionStats> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { content, warnings = [] } = await this.execute<never>("get_prediction_stats", {
@@ -752,7 +755,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getMarginalStats(
     traineeId: string,
-    request: FeatureMarginalStatsRequest
+    request: FeatureMarginalStatsRequest,
   ): Promise<FeatureMarginalStats> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { content, warnings = [] } = await this.execute<never>("get_marginal_stats", {
@@ -786,7 +789,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getFeatureContributions(
     traineeId: string,
-    request: FeatureContributionsRequest
+    request: FeatureContributionsRequest,
   ): Promise<Record<string, number>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { content } = await this.execute<Record<string, number>>("get_feature_contributions", {
@@ -805,7 +808,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getFeatureResiduals(
     traineeId: string,
-    request: FeatureResidualsRequest
+    request: FeatureResidualsRequest,
   ): Promise<Record<string, number>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { content } = await this.execute<Record<string, number>>("get_feature_residuals", {

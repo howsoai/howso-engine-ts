@@ -83,7 +83,7 @@ export async function batcher(process: BatchProcessor, options: BatchOptions = {
 export function accumulateRecords<T = unknown>(
   accumulator: Record<string, T[]>,
   item: Record<string, T[]>,
-  onceKeys: string[] = []
+  onceKeys: string[] = [],
 ) {
   for (const [key, value] of Object.entries(item)) {
     if (onceKeys.indexOf(key) !== -1) {

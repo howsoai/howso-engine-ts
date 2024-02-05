@@ -20,7 +20,7 @@ export function getFeatureAttributesInferrer(data: base.AbstractDataType): base.
 
 export async function inferFeatureAttributes(
   data: base.AbstractDataType,
-  options?: base.InferFeatureAttributesOptions
+  options?: base.InferFeatureAttributesOptions,
 ): Promise<{ [key: string]: FeatureAttributes }> {
   const svc = getFeatureAttributesInferrer(data);
   return await svc.infer(options);

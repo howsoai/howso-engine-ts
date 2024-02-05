@@ -101,7 +101,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
    */
   protected async waitForAction<T = AsyncActionCompleteOutput["output"]>(
     action: AsyncActionAccepted,
-    options?: { signal?: AbortSignal | null | undefined; onFailWait?: () => Promise<void> }
+    options?: { signal?: AbortSignal | null | undefined; onFailWait?: () => Promise<void> },
   ): Promise<T> {
     if (!action.action_id) {
       throw new ProblemError("Invalid async response received from server.");
@@ -208,18 +208,18 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async beginSession(
     name = "default",
     metadata?: Record<string, unknown>,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<Session> {
     return await this.api.session.beginSession({ name, metadata }, initOverrides);
   }
 
   public async getTraineeSessions(
     traineeId: string,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<Required<SessionIdentity>[]> {
     const sessions = (await this.api.traineeSession.getTraineeSessions(
       traineeId,
-      initOverrides
+      initOverrides,
     )) as Required<SessionIdentity>[];
     return sessions ?? [];
   }
@@ -227,7 +227,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async acquireTraineeResources(
     traineeId: string,
     request?: TraineeAcquireResourcesRequest,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<void> {
     const action = await this.api.trainee.acquireTraineeResources(traineeId, request, initOverrides);
     await this.waitForAction(action, { signal: initOverrides?.signal });
@@ -240,7 +240,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async createTrainee(
     trainee: Omit<Trainee, "id">,
     options: Omit<TraineeCreateRequest, "trainee"> = {},
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<Trainee> {
     const request = { trainee: trainee as TraineeRequest, ...options };
     const response = await this.api.trainee.createTrainee(request, initOverrides);
@@ -293,7 +293,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async setAutoAnalyzeParams(
     traineeId: string,
     request: SetAutoAnalyzeParamsRequest,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<void> {
     await this.api.traineeOperations.setAutoAnalyzeParams(traineeId, request, initOverrides);
   }
@@ -317,14 +317,14 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async setFeatureAttributes(
     traineeId: string,
     attributes: Record<string, FeatureAttributes>,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<void> {
     await this.api.traineeFeatures.setFeatureAttributes(traineeId, attributes, initOverrides);
   }
 
   public async getFeatureAttributes(
     traineeId: string,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<Record<string, FeatureAttributes>> {
     return await this.api.traineeFeatures.getFeatureAttributes(traineeId, initOverrides);
   }
@@ -341,7 +341,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async reactSeries(
     _traineeId: string,
     _request: ReactSeriesRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<ReactSeriesResponse> {
     throw new Error("Method not implemented.");
   }
@@ -349,7 +349,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async reactGroup(
     _traineeId: string,
     _request: ReactGroupRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<ReactGroupResponse> {
     throw new Error("Method not implemented.");
   }
@@ -357,7 +357,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async reactIntoFeatures(
     _traineeId: string,
     _request: ReactIntoFeaturesRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<ReactIntoFeaturesResponse> {
     throw new Error("Method not implemented.");
   }
@@ -365,7 +365,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async reactIntoTrainee(
     _traineeId: string,
     _request: ReactIntoTraineeRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<ReactIntoTraineeResponse> {
     throw new Error("Method not implemented.");
   }
@@ -373,7 +373,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async getPredictionStats(
     traineeId: string,
     request: FeaturePredictionStatsRequest,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<FeaturePredictionStats> {
     const response = await this.api.traineeFeatures.getPredictionStats(traineeId, request, initOverrides);
     if (isAsyncAcceptedResponse(response)) {
@@ -385,7 +385,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async getMarginalStats(
     traineeId: string,
     request: FeatureMarginalStatsRequest,
-    initOverrides?: InitOverrides
+    initOverrides?: InitOverrides,
   ): Promise<FeatureMarginalStats> {
     return await this.api.traineeFeatures.getMarginalStats(traineeId, request, initOverrides);
   }
@@ -393,7 +393,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async getFeatureConviction(
     _traineeId: string,
     _request: FeatureConvictionRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<FeatureConviction> {
     throw new Error("Method not implemented.");
   }
@@ -401,7 +401,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async getFeatureContributions(
     _traineeId: string,
     _request: FeatureContributionsRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<Record<string, number>> {
     throw new Error("Method not implemented.");
   }
@@ -409,7 +409,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async getFeatureResiduals(
     _traineeId: string,
     _request: FeatureResidualsRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<Record<string, number>> {
     throw new Error("Method not implemented.");
   }
@@ -417,7 +417,7 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
   public async getFeatureMda(
     _traineeId: string,
     _request: FeatureMdaRequest,
-    _initOverrides?: InitOverrides
+    _initOverrides?: InitOverrides,
   ): Promise<Record<string, number>> {
     throw new Error("Method not implemented.");
   }
@@ -428,8 +428,12 @@ export class PlatformClient extends BaseClient implements ITraineeClient, ISessi
  * @param response The response object.
  * @returns True if response is an AsyncActionAccepted response object.
  */
-function isAsyncAcceptedResponse(obj: any): obj is AsyncActionAccepted {
-  if (typeof obj?.action_id === "string" && typeof obj?.operation_type === "string") {
+function isAsyncAcceptedResponse(obj: unknown): obj is AsyncActionAccepted {
+  if (
+    obj != null &&
+    typeof (obj as AsyncActionAccepted)?.action_id === "string" &&
+    typeof (obj as AsyncActionAccepted)?.operation_type === "string"
+  ) {
     return true;
   }
   return false;

@@ -11,7 +11,10 @@ export class FileSystemClient implements IFileSystem {
   protected readonly baseDir: string;
   public readonly entityExt = "caml";
 
-  constructor(private readonly worker: Worker, baseDir?: string) {
+  constructor(
+    private readonly worker: Worker,
+    baseDir?: string,
+  ) {
     this.baseDir = baseDir || "/app/";
   }
 
@@ -45,7 +48,7 @@ export class FileSystemClient implements IFileSystem {
   }
 
   protected dispatch<T extends FileSystemOperation = FileSystemOperation>(
-    request: FileSystemRequest<T>
+    request: FileSystemRequest<T>,
   ): Promise<FileSystemResponseBody<T>> {
     return new Promise((resolve, reject) => {
       const channel = new MessageChannel();
@@ -69,7 +72,7 @@ export class FileSystemClient implements IFileSystem {
     name: string,
     url: string,
     canRead = true,
-    canWrite = true
+    canWrite = true,
   ): Promise<void> {
     await this.dispatch({
       type: "request",

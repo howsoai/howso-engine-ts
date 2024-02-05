@@ -16,7 +16,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
       for (const row of dataset.data) {
         if (row?.length !== dataset.columns.length) {
           throw new RangeError(
-            "The shape of the dataset's rows and columns do not match. Ensure the length of each row matches the number of columns."
+            "The shape of the dataset's rows and columns do not match. Ensure the length of each row matches the number of columns.",
           );
         }
       }
@@ -109,7 +109,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
   public async inferBounds(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
-    options: InferFeatureBoundsOptions
+    options: InferFeatureBoundsOptions,
   ): Promise<FeatureAttributes["bounds"] | undefined> {
     let hasNull = false;
     let isDate = false;
@@ -190,7 +190,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
   public async inferTimeSeries(
     _attributes: Readonly<FeatureAttributes>,
     _featureName: string,
-    _options: InferFeatureTimeSeriesOptions
+    _options: InferFeatureTimeSeriesOptions,
   ): Promise<Partial<FeatureAttributes>> {
     // TODO - infer time series
     throw new Error("Method not implemented.");
@@ -255,7 +255,7 @@ export class FeatureSerializerArrayData extends FeatureSerializerBase {
   public async deserialize(
     data: any[][],
     columns: string[],
-    features?: Record<string, FeatureAttributes>
+    features?: Record<string, FeatureAttributes>,
   ): Promise<ArrayData> {
     const deserialized: any[][] = [];
     for (const row of data) {

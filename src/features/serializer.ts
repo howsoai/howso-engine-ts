@@ -12,10 +12,10 @@ export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
 export type FeatureSerializerDataType<T extends FeatureSerializerFormat> = T extends "array"
   ? base.ArrayData
   : T extends "parsed"
-  ? base.ParsedArrayData
-  : T extends "excel"
-  ? number
-  : never;
+    ? base.ParsedArrayData
+    : T extends "excel"
+      ? number
+      : never;
 
 function detectFormat(data: base.AbstractDataType): FeatureSerializerFormat {
   if (isArrayData(data)) {
@@ -50,7 +50,7 @@ export function getFeatureSerializer(format: FeatureSerializerFormat): base.Feat
  */
 export async function serializeCases(
   data: base.AbstractDataType,
-  features: Record<string, FeatureAttributes>
+  features: Record<string, FeatureAttributes>,
 ): Promise<any[][]> {
   const svc = getFeatureSerializer(detectFormat(data));
   return await svc.serialize(data, features);
@@ -66,7 +66,7 @@ export async function deserializeCases<T extends FeatureSerializerFormat>(
   format: T,
   data: any[][],
   columns: string[],
-  features: Record<string, FeatureAttributes>
+  features: Record<string, FeatureAttributes>,
 ): Promise<FeatureSerializerDataType<typeof format>> {
   const svc = getFeatureSerializer(format);
   const result = await svc.deserialize(data, columns, features);

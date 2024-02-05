@@ -121,7 +121,7 @@ export abstract class InferFeatureAttributesBase {
         const bounds = await this.inferBounds(
           attributes[feature],
           feature,
-          typeof inferBounds === "boolean" ? {} : inferBounds
+          typeof inferBounds === "boolean" ? {} : inferBounds,
         );
         if (bounds != null) {
           attributes[feature].bounds = bounds;
@@ -156,12 +156,12 @@ export abstract class InferFeatureAttributesBase {
   public abstract inferBounds(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
-    options: InferFeatureBoundsOptions
+    options: InferFeatureBoundsOptions,
   ): Promise<FeatureAttributes["bounds"] | undefined>;
   public abstract inferTimeSeries(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
-    options: InferFeatureTimeSeriesOptions
+    options: InferFeatureTimeSeriesOptions,
   ): Promise<Partial<FeatureAttributes>>;
 
   /* Descriptive operations */
@@ -175,7 +175,7 @@ export abstract class FeatureSerializerBase {
   public abstract deserialize(
     data: any[][],
     columns: string[],
-    features?: Record<string, FeatureAttributes>
+    features?: Record<string, FeatureAttributes>,
   ): Promise<AbstractDataType>;
 
   protected deserializeCell(value: any, attributes?: FeatureAttributes): any {
