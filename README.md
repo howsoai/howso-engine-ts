@@ -2,11 +2,26 @@
 TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
 
 # Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+
+## Install dependencies:
+
+```bash
+npm install
+```
+
+#### Link dependencies:
+
+A few packages will be required that are not a part of published packages at this time:
+
+- https://diveplane.visualstudio.com/dp/_git/howso-engine-ts
+- https://diveplane.visualstudio.com/dp/_git/amalgam-lang-ts
+
+Then link those packages for use:
+
+```bash
+npm link @howso/amalgam-lang @howso/openapi-client
+```
+
 
 # Build and Test
 TODO: Describe and show how to build your code and run the tests. 
