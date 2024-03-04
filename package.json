@@ -1,6 +1,6 @@
 {
   "name": "@howso/engine",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "license": "AGPL-3.0-only",
   "author": {
@@ -12,7 +12,8 @@
   "scripts": {
     "prebuild": "rimraf ./lib",
     "build": "tsc --build",
-    "lint": "eslint 'src/**'"
+    "lint": "tsc --noEmit && eslint 'src/**'",
+    "lint:fix": "eslint --fix 'src/**'"
   },
   "files": [
     "LICENSE.txt",

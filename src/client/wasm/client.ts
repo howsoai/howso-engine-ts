@@ -1,10 +1,6 @@
-import type {
-  AmalgamRequest,
-  AmalgamResponseBody,
-  AmalgamCommand,
-  AmalgamCoreResponse,
-} from "@howso/amalgam-lang/worker";
+import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand } from "@howso/amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
+import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
 
 import { AmalgamOptions } from "@howso/amalgam-lang/wasm";
 import {
@@ -128,17 +124,18 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The core response object.
    */
   protected async execute<R, D = unknown>(label: string, data: D, throwErrors = true): Promise<AmalgamCoreResponse<R>> {
-    const response = (await this.dispatch({
+    const response = await this.dispatch({
       type: "request",
       command: "executeEntityJson",
-      parameters: [this.handle, label, data],
-    })) as AmalgamCoreResponse<R>;
+      parameters: [this.handle, label, prepareCoreRequest(data)],
+    });
+    const result = prepareCoreResponse<R>(response);
     if (throwErrors) {
-      for (const err of response.errors) {
+      for (const err of result.errors) {
         throw new ProblemError(err?.message || "An unknown error occurred.", err?.code);
       }
     }
-    return response;
+    return result;
   }
 
   /**
@@ -472,7 +469,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     const filename = this.fs.sanitizeFilename(traineeId);
     this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}.${this.fs.entityExt}`));
-    this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}Version.txt`));
   }
 
   /**
