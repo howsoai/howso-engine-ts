@@ -10,18 +10,6 @@ TODO: Give a short introduction of your project. Let this section explain the ob
 npm install
 ```
 
-#### Link dependencies
-
-A few packages will be required that are not a part of published packages at this time:
-
-- https://diveplane.visualstudio.com/dp/_git/howso-openapi-client-ts
-
-Then link those packages for use:
-
-```bash
-npm link @howso/openapi-client
-```
-
 ## Build and Test
 
 TODO: Describe and show how to build your code and run the tests.
