@@ -17,8 +17,6 @@ import type {
   ReactResponse,
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
-  ReactGroupRequest,
-  ReactGroupResponse,
   ReactSeriesRequest,
   ReactSeriesResponse,
   ReactIntoTraineeRequest,
@@ -42,7 +40,6 @@ export interface ITraineeClient {
   setAutoAnalyzeParams(traineeId: string, request: SetAutoAnalyzeParamsRequest): Promise<void>;
   react(traineeId: string, request: ReactRequest): Promise<ReactResponse>;
   reactSeries(traineeId: string, request: ReactSeriesRequest): Promise<ReactSeriesResponse>;
-  reactGroup(traineeId: string, request: ReactGroupRequest): Promise<ReactGroupResponse>;
   reactIntoTrainee(traineeId: string, request: ReactIntoTraineeRequest): Promise<ReactIntoTraineeResponse>;
   reactIntoFeatures(traineeId: string, request: ReactIntoFeaturesRequest): Promise<ReactIntoFeaturesResponse>;
   getCases(traineeId: string, request?: CasesRequest): Promise<Cases>;
