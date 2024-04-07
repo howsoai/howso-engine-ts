@@ -1,6 +1,6 @@
 {
   "name": "@howso/engine",
-  "version": "0.0.3",
+  "version": "0.0.0",
   "type": "module",
   "license": "AGPL-3.0-only",
   "author": {
@@ -35,10 +35,13 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@howso/amalgam-lang": "^0.0.4",
+    "@howso/openapi-client": "^0.0.4",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/emscripten": "^1.39.10",
     "@types/node": "^18.15.2",
     "@types/uuid": "^9.0.1",
     "@typescript-eslint/eslint-plugin": "^6.20.0",

@@ -25,8 +25,6 @@ import {
   SessionIdentity,
   SetAutoAnalyzeParamsRequest,
   TraineeIdentity,
-  ReactGroupRequest,
-  ReactGroupResponse,
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
   ReactIntoTraineeRequest,
@@ -52,8 +50,6 @@ import {
   ReactResponseFromJSON,
   ReactSeriesRequestToJSON,
   ReactSeriesResponseFromJSON,
-  ReactGroupRequestToJSON,
-  ReactGroupResponseFromJSON,
   ReactIntoFeaturesRequestToJSON,
   ReactIntoFeaturesResponseFromJSON,
   ReactIntoTraineeRequestToJSON,
@@ -63,7 +59,6 @@ import {
   FeatureResidualsRequestToJSON,
   FeatureMdaRequestToJSON,
   AnalyzeRequestToJSON,
-  ReactGroupResponseContent,
 } from "@howso/openapi-client/models";
 import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
@@ -666,27 +661,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       ...rest,
     });
     return ReactSeriesResponseFromJSON({ warnings, content });
-  }
-
-  /**
-   * Compute metrics for different set(s) of cases.
-   * @param traineeId The trainee identifier.
-   * @param request The react group request.
-   * @returns The metric results for each set of cases.
-   */
-  public async reactGroup(traineeId: string, request: ReactGroupRequest): Promise<ReactGroupResponse> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    if (Array.isArray(request?.trainees_to_compare)) {
-      // Ensure all trainees being compared are available
-      for (const otherTraineeId of request.trainees_to_compare) {
-        await this.autoResolveTrainee(otherTraineeId);
-      }
-    }
-    const { warnings = [], content } = await this.execute<ReactGroupResponseContent>("batch_react_group", {
-      trainee: trainee.id,
-      ...ReactGroupRequestToJSON(request),
-    });
-    return ReactGroupResponseFromJSON({ warnings, content });
   }
 
   /**
