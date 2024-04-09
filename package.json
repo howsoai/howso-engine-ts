@@ -35,7 +35,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@howso/amalgam-lang": "^0.0.4",
+    "@howso/amalgam-lang": "^0.0.5",
     "@howso/openapi-client": "^0.0.4",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
