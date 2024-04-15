@@ -1,6 +1,6 @@
 # Introduction
 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project.
+An interface around the caml files produced by the `howso-client` releases.
 
 ## Getting Started
 
@@ -10,16 +10,38 @@ TODO: Give a short introduction of your project. Let this section explain the ob
 npm install
 ```
 
+## Updating caml files
+
+All python commands must be run in `engine` directory.
+
+Install requirements:
+
+```bash
+pip install -r requirements.in
+```
+
+To update the engine camls from the installed python howso-engine:
+
+```bash
+python -m generator update
+```
+
+## Adding new scenario
+
+Create a module in `trainee_gen.scenarios` and import it in `__init__.py`.
+In your new module import the generator module and register a function as your scenario generator.
+
+```python
+    @generator.register("scenario-name")
+    def generate():
+        ...
+
+```
+
 ## Build and Test
 
 TODO: Describe and show how to build your code and run the tests.
 
-## Contribute
+## Publishing
 
-TODO: Explain how other users and developers can contribute to make your code better.
-
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+An action is available on GitHub to release.
