@@ -1,6 +1,6 @@
 # Introduction
 
-An interface around the caml files produced by the `howso-client` releases.
+An interface around the caml files produced by the `howso-engine` releases.
 
 ## Getting Started
 
