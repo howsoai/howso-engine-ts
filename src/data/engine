@@ -1,0 +1,10 @@
+{
+  "version": "78.1.0",
+  "dependencies": {
+    "amalgam": "50.0.1"
+  },
+  "display_title": "",
+  "build_date": "",
+  "sha": "4b76aac8edcb27330951253cf73135ad70991876",
+  "url": "https://github.com/howsoai/howso-engine/releases/tag/78.1.0"
+}
