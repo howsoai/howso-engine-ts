@@ -16,8 +16,8 @@ class Generator:
         binaries_dir = Path(
             Path(engine.__file__).parent, "..", "howso-engine").resolve()
         for file in binaries_dir.rglob("*.caml"):
-            shutil.copy(file, Path(self.data_dir, "engine"))
-        shutil.copy(binaries_dir / "version.json", Path(self.data_dir, "engine"))
+            shutil.copy(file, Path(self.data_dir))
+        shutil.copy(binaries_dir / "version.json", Path(self.data_dir))
         return
     
 generator = Generator()
