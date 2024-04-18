@@ -1,7 +1,6 @@
 import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand } from "@howso/amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
 import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
-
 import { AmalgamOptions } from "@howso/amalgam-lang/wasm";
 import {
   AnalyzeRequest,
@@ -62,7 +61,6 @@ import {
 } from "@howso/openapi-client/models";
 import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
-
 import { Trainee } from "../../trainees/index.js";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index.js";
 import { ProblemError } from "../errors.js";
@@ -199,15 +197,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Retrieve the trainees that are currently loaded in core.
-   * @returns List of trainee identifiers.
-   */
-  protected async loadedTrainees(): Promise<string[]> {
-    const { content = [] } = await this.execute<string[]>("get_loaded_trainees", {});
-    return content;
-  }
-
-  /**
    * Constructs trainee object from it's core metadata.
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
@@ -271,13 +260,13 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
           );
         }
         await this.fs.createLazyFile(this.fs.libDir, "howso.caml", String(this.options.coreEntityUri), true, false);
-        await this.fs.createLazyFile(
-          this.fs.libDir,
-          "trainee_template.caml",
-          String(this.options.traineeEntityUri),
-          true,
-          false,
-        );
+        // await this.fs.createLazyFile(
+        //   this.fs.libDir,
+        //   "trainee_template.caml",
+        //   String(this.options.traineeEntityUri),
+        //   true,
+        //   false,
+        // );
       }
 
       // Load the core entity
@@ -285,7 +274,20 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       const loaded = await this.dispatch({
         type: "request",
         command: "loadEntity",
-        parameters: [this.handle, this.fs.join(this.fs.libDir, "howso.caml")],
+        parameters: [
+          this.handle,
+          this.fs.join(this.fs.libDir, "howso.caml"),
+          // More params
+          false, // persist
+          true, // load_contained
+          false, // escape_filename
+          false, // escape_contained_filenames
+          // "", // write_log
+          // "", // print_log
+        ],
+        //         status = self.amlg.load_entity(
+        // handle=trainee_id,
+        // amlg_path=str(self.howso_fully_qualified_path),
       });
       if (!loaded) {
         throw new ProblemError("Failed to load the amalgam entities.");
@@ -398,43 +400,44 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * Create a new trainee.
    * @param trainee The trainee identifier.
    * @returns The new trainee object.
+   * @deprecated No longer applies
    */
-  public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
-    const traineeId = trainee.name || uuid();
+  // public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
+  //   const traineeId = trainee.name || uuid();
 
-    // Create the trainee entity
-    const created = await this.execute<boolean>("create_trainee", {
-      trainee: traineeId,
-      filepath: this.fs.libDir,
-      trainee_template_filename: "trainee_template",
-      file_extension: "caml",
-    });
-    if (!created) {
-      throw new ProblemError(
-        `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`,
-      );
-    }
-    const { features = {}, ...props } = TraineeToJSON(trainee);
+  //   // Create the trainee entity
+  //   const created = await this.execute<boolean>("create_trainee", {
+  //     trainee: traineeId,
+  //     filepath: this.fs.libDir,
+  //     trainee_template_filename: "trainee_template",
+  //     file_extension: "caml",
+  //   });
+  //   if (!created) {
+  //     throw new ProblemError(
+  //       `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`,
+  //     );
+  //   }
+  //   const { features = {}, ...props } = TraineeToJSON(trainee);
 
-    // Set trainee metadata
-    const metadata = {
-      name: props.name,
-      metadata: props.metadata,
-      default_context_features: props.default_context_features,
-      default_action_features: props.default_action_features,
-      persistence: props.persistence || "allow",
-    };
-    await this.execute("set_metadata", { trainee: traineeId, metadata });
+  //   // Set trainee metadata
+  //   const metadata = {
+  //     name: props.name,
+  //     metadata: props.metadata,
+  //     default_context_features: props.default_context_features,
+  //     default_action_features: props.default_action_features,
+  //     persistence: props.persistence || "allow",
+  //   };
+  //   await this.execute("set_metadata", { trainee: traineeId, metadata });
 
-    // Set the feature attributes
-    await this.execute("set_feature_attributes", { trainee: traineeId, features });
-    const { content: allFeatures = features } = await this.execute("get_feature_attributes", { trainee: traineeId });
+  //   // Set the feature attributes
+  //   await this.execute("set_feature_attributes", { trainee: traineeId, features });
+  //   const { content: allFeatures = features } = await this.execute("get_feature_attributes", { trainee: traineeId });
 
-    // Build, cache and return new trainee object
-    const newTrainee: Trainee = TraineeFromJSON({ ...metadata, id: traineeId, features: allFeatures }) as Trainee;
-    this.traineeCache.set(traineeId, { trainee: newTrainee, entityId: this.handle });
-    return newTrainee;
-  }
+  //   // Build, cache and return new trainee object
+  //   const newTrainee: Trainee = TraineeFromJSON({ ...metadata, id: traineeId, features: allFeatures }) as Trainee;
+  //   this.traineeCache.set(traineeId, { trainee: newTrainee, entityId: this.handle });
+  //   return newTrainee;
+  // }
 
   /**
    * Update a trainee's properties.
