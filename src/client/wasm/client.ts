@@ -42,7 +42,6 @@ import {
   FeatureMarginalStatsRequestToJSON,
   SessionToJSON,
   SetAutoAnalyzeParamsRequestToJSON,
-  TraineeToJSON,
   TraineeFromJSON,
   TrainRequestToJSON,
   ReactRequestToJSON,
@@ -339,6 +338,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * Acquire resources for a trainee.
    * @param traineeId The trainee identifier.
    * @param uri A URI to the trainee file.
+   * @deprecated The trainee is the same thing...?
    */
   public async acquireTraineeResources(traineeId: string, uri?: string): Promise<void> {
     if (this.traineeCache.has(traineeId)) {
@@ -351,17 +351,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       await this.fs.createLazyFile(this.fs.traineeDir, `${this.fs.sanitizeFilename(traineeId)}.caml`, uri, true, false);
     }
 
-    // Load trainee only if entity not already in core
-    const loaded = await this.loadedTrainees();
-    if (loaded.indexOf(traineeId) == -1) {
-      // Only call load if not already loaded
-      await this.execute("load", {
-        trainee: traineeId,
-        filename: this.fs.sanitizeFilename(traineeId),
-        filepath: this.fs.traineeDir,
-      });
-    }
-
     // Cache the trainee
     const trainee = await this.getTraineeFromCore(traineeId);
     this.traineeCache.set(traineeId, { trainee, entityId: this.handle });
@@ -370,6 +359,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Releases resources for a trainee.
    * @param traineeId The trainee identifier.
+   * @deprecated The trainee is the same thing...?
    */
   public async releaseTraineeResources(traineeId: string): Promise<void> {
     if (traineeId == null) {
@@ -440,17 +430,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   // }
 
   /**
-   * Update a trainee's properties.
-   * @param _trainee The trainee identifier.
-   */
-  public async updateTrainee(_trainee: Trainee): Promise<Trainee> {
-    throw new Error("Method not implemented.");
-  }
-
-  /**
    * Retrieve a trainee.
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
+   * @deprecated The trainee is the same thing...?
    */
   public async getTrainee(traineeId: string): Promise<Trainee> {
     await this.autoResolveTrainee(traineeId);
@@ -460,6 +443,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Deletes a trainee.
    * @param traineeId The trainee identifier.
+   * @deprecated The trainee is the same thing...?
    */
   public async deleteTrainee(traineeId: string): Promise<void> {
     await this.execute("delete", { trainee: traineeId });
@@ -467,14 +451,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     const filename = this.fs.sanitizeFilename(traineeId);
     this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}.${this.fs.entityExt}`));
-  }
-
-  /**
-   * List existing trainees.
-   * @param _keywords Keywords to filter the list of trainees by.
-   */
-  public async listTrainees(_keywords: string | string[]): Promise<TraineeIdentity[]> {
-    throw new Error("Method not implemented.");
   }
 
   /**

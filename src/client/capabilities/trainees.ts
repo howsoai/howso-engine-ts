@@ -27,13 +27,14 @@ import type {
 import { Trainee } from "../../trainees/index.js";
 
 export interface ITraineeClient {
+  /** @deprecated */
   acquireTraineeResources(traineeId: string): Promise<void>;
+  /** @deprecated */
   releaseTraineeResources(traineeId: string): Promise<void>;
-  createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee>;
-  updateTrainee(trainee: Trainee): Promise<Trainee>;
+  /** @deprecated */
   getTrainee(traineeId: string): Promise<Trainee>;
+  /** @deprecated */
   deleteTrainee(traineeId: string): Promise<void>;
-  listTrainees(keywords: string | string[]): Promise<TraineeIdentity[]>;
   train(traineeId: string, request: TrainRequest): Promise<void>;
   analyze(traineeId: string, request: AnalyzeRequest): Promise<void>;
   autoAnalyze(traineeId: string): Promise<void>;
