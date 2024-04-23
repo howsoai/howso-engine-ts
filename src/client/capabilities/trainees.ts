@@ -22,7 +22,6 @@ import type {
   ReactIntoTraineeRequest,
   ReactIntoTraineeResponse,
   SetAutoAnalyzeParamsRequest,
-  TraineeIdentity,
 } from "@howso/openapi-client/models";
 import { Trainee } from "../../trainees/index.js";
 

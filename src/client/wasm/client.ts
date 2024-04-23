@@ -23,7 +23,6 @@ import {
   Session,
   SessionIdentity,
   SetAutoAnalyzeParamsRequest,
-  TraineeIdentity,
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
   ReactIntoTraineeRequest,
