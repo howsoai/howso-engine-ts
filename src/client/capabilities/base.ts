@@ -1,6 +1,3 @@
-import { Trainee } from "../../trainees/index.js";
-import type { CacheMap } from "../utilities/cache.js";
-
 export interface Capabilities {
   supportsTrainees?: boolean;
   supportsProjects?: boolean;
@@ -12,12 +9,7 @@ export interface Capabilities {
   supportsTrace?: boolean;
 }
 
-export interface TraineeBaseCache {
-  trainee: Trainee;
-}
-
 export abstract class BaseClient {
-  protected abstract readonly traineeCache: CacheMap<TraineeBaseCache>;
   public static readonly capabilities: Readonly<Capabilities> = {};
   public abstract setup(): Promise<void>;
 }
