@@ -84,6 +84,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   public readonly fs: FileSystemClient;
 
   protected readonly handle: string = "handle";
+  protected readonly camlFile = "trainee.caml";
   protected activeSession?: Session;
 
   constructor(
@@ -159,7 +160,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const trainee = await this.getTrainee();
     if (trainee?.persistence == "always") {
       await this.execute("save", {
-        filename: this.fs.join(this.fs.libDir, "trainee.caml"),
+        filename: this.fs.join(this.fs.libDir, this.camlFile),
         filepath: this.fs.libDir,
       });
     }
@@ -225,14 +226,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
             false,
           );
         }
-        await this.fs.createLazyFile(this.fs.libDir, "trainee.caml", String(this.options.camlUri), true, false);
-        // await this.fs.createLazyFile(
-        //   this.fs.libDir,
-        //   "trainee_template.caml",
-        //   String(this.options.traineeEntityUri),
-        //   true,
-        //   false,
-        // );
+        await this.fs.createLazyFile(this.fs.libDir, this.camlFile, String(this.options.camlUri), true, false);
       }
 
       // Load the trainee entity
@@ -241,7 +235,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
         command: "loadEntity",
         parameters: [
           this.handle,
-          this.fs.join(this.fs.libDir, "trainee.caml"),
+          this.fs.join(this.fs.libDir, this.camlFile),
           // More params
           false, // persist
           true, // load_contained
