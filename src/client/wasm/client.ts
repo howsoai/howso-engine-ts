@@ -239,8 +239,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
           // More params
           false, // persist
           true, // load_contained
-          false, // escape_filename
-          false, // escape_contained_filenames
           // "", // write_log
           // "", // print_log
         ],
