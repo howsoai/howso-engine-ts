@@ -203,7 +203,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const cached = this.traineeCache.get(traineeId);
     if (cached?.trainee?.persistence == "always") {
       await this.execute(traineeId, "save", {
-        trainee: traineeId,
         filename: this.fs.sanitizeFilename(traineeId),
         filepath: this.fs.traineeDir,
       });
@@ -341,9 +340,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The list of session identities.
    */
   public async getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]> {
-    const trainee = await this.autoResolveTrainee(traineeId);
+    await this.autoResolveTrainee(traineeId);
+
     const { content } = await this.execute<Required<SessionIdentity>[]>(traineeId, "get_sessions", {
-      trainee: trainee.id,
       attributes: ["id", "name"],
     });
     return content ?? [];
@@ -490,7 +489,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    */
   public async deleteTrainee(traineeId: string): Promise<void> {
-    await this.execute(traineeId, "delete", { trainee: traineeId });
+    await this.execute(traineeId, "delete", {});
     this.traineeCache.discard(traineeId);
 
     const filename = this.fs.sanitizeFilename(traineeId);
@@ -582,7 +581,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     // Add session metadata to trainee
     await this.execute(traineeId, "set_session_metadata", {
-      trainee: trainee.id,
       session: session.id,
       metadata: SessionToJSON(session),
     });
@@ -600,7 +598,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
         let offset = 0;
         while (offset < cases.length) {
           const response = await this.execute<TrainResponse | null>(traineeId, "train", {
-            trainee: trainee.id,
             input_cases: cases.slice(offset, offset + size),
             session: session.id,
             ...rest,
