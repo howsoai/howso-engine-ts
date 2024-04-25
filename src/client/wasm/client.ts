@@ -489,9 +489,14 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    */
   public async deleteTrainee(traineeId: string): Promise<void> {
-    await this.execute(traineeId, "delete", {});
-    this.traineeCache.discard(traineeId);
+    const trainee = await this.autoResolveTrainee(traineeId);
 
+    await this.dispatch({
+      type: "request",
+      command: "destroyEntity",
+      parameters: [trainee.id],
+    });
+    this.traineeCache.discard(traineeId);
     const filename = this.fs.sanitizeFilename(traineeId);
     this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}.${this.fs.entityExt}`));
   }
