@@ -94,7 +94,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   public readonly fs: FileSystemClient;
 
   protected readonly traineeCache: CacheMap<TraineeCache>;
-  protected readonly handle: string = "handle";
   protected activeSession?: Session;
 
   constructor(
@@ -119,11 +118,16 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param throwErrors If core errors should be thrown or returned.
    * @returns The core response object.
    */
-  protected async execute<R, D = unknown>(label: string, data: D, throwErrors = true): Promise<AmalgamCoreResponse<R>> {
+  protected async execute<R, D = unknown>(
+    traineeId: string,
+    label: string,
+    data: D,
+    throwErrors = true,
+  ): Promise<AmalgamCoreResponse<R>> {
     const response = await this.dispatch({
       type: "request",
       command: "executeEntityJson",
-      parameters: [this.handle, label, prepareCoreRequest(data)],
+      parameters: [traineeId, label, prepareCoreRequest(data)],
     });
     try {
       const result = prepareCoreResponse<R>(response);
@@ -200,7 +204,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   protected async autoPersistTrainee(traineeId: string): Promise<void> {
     const cached = this.traineeCache.get(traineeId);
     if (cached?.trainee?.persistence == "always") {
-      await this.execute("save", {
+      await this.execute(traineeId, "save", {
         trainee: traineeId,
         filename: this.fs.sanitizeFilename(traineeId),
         filepath: this.fs.traineeDir,
@@ -239,7 +243,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The trainee object.
    */
   protected async _getTraineeFromCore(traineeId: string): Promise<Trainee> {
-    const [metadata, features] = await Promise.all([this._getMetadata(traineeId), this._getFeatureAttributes()]);
+    const [metadata, features] = await Promise.all([
+      this._getMetadata(traineeId),
+      this._getFeatureAttributes(traineeId),
+    ]);
 
     return TraineeFromJSON({
       features,
@@ -331,7 +338,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Required<SessionIdentity>[]>("get_sessions", {
+    const { content } = await this.execute<Required<SessionIdentity>[]>(traineeId, "get_sessions", {
       trainee: trainee.id,
       attributes: ["id", "name"],
     });
@@ -362,14 +369,14 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       await this.dispatch({
         type: "request",
         command: "loadEntity",
-        parameters: [this.handle, this.fs.join(this.fs.traineeDir, filename)],
+        parameters: [traineeId, this.fs.join(this.fs.traineeDir, filename)],
       });
     }
 
     // Get trainee details. Use the internal method to prevent auto resolution loops.
     const trainee = await this._getTraineeFromCore(traineeId);
     // Cache the trainee
-    this.traineeCache.set(traineeId, { trainee, entityId: this.handle });
+    this.traineeCache.set(traineeId, { trainee, entityId: traineeId });
   }
 
   /**
@@ -383,11 +390,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     // Check if trainee already loaded
     const cached = this.traineeCache.get(traineeId);
-    if (cached?.entityId == this.handle) {
+    if (cached?.entityId == traineeId) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
         // Auto save the trainee
-        await this.execute("save", {
-          trainee: traineeId,
+        await this.execute(traineeId, "save", {
           filename: this.fs.sanitizeFilename(traineeId),
           filepath: this.fs.traineeDir,
         });
@@ -398,7 +404,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       }
     }
     this.traineeCache.discard(traineeId);
-    await this.execute("delete", { trainee: traineeId });
+    await this.execute(traineeId, "delete", { trainee: traineeId });
   }
 
   /**
@@ -407,20 +413,19 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The new trainee object.
    */
   public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
+    const traineeId = trainee.name || uuid();
     // Load the core entity
     const loaded = await this.dispatch({
       type: "request",
       command: "loadEntity",
-      parameters: [this.handle, this.fs.join(this.fs.libDir, "howso.caml")],
+      parameters: [traineeId, this.fs.join(this.fs.libDir, "howso.caml")],
     });
     if (!loaded) {
       throw new ProblemError("Failed to load the amalgam entities.");
     }
 
-    const traineeId = trainee.name || uuid();
-
     // Create the trainee entity
-    const created = await this.execute<boolean>("create_trainee", {
+    const created = await this.execute<boolean>(traineeId, "create_trainee", {
       trainee: traineeId,
       filepath: this.fs.libDir,
       trainee_template_filename: "trainee_template",
@@ -441,15 +446,17 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       default_action_features: props.default_action_features,
       persistence: props.persistence || "allow",
     };
-    await this.execute("set_metadata", { trainee: traineeId, metadata });
+    await this.execute(traineeId, "set_metadata", { trainee: traineeId, metadata });
 
     // Set the feature attributes
-    await this.execute("set_feature_attributes", { trainee: traineeId, features });
-    const { content: allFeatures = features } = await this.execute("get_feature_attributes", { trainee: traineeId });
+    await this.execute(traineeId, "set_feature_attributes", { trainee: traineeId, features });
+    const { content: allFeatures = features } = await this.execute(traineeId, "get_feature_attributes", {
+      trainee: traineeId,
+    });
 
     // Build, cache and return new trainee object
     const newTrainee: Trainee = TraineeFromJSON({ ...metadata, id: traineeId, features: allFeatures }) as Trainee;
-    this.traineeCache.set(traineeId, { trainee: newTrainee, entityId: this.handle });
+    this.traineeCache.set(traineeId, { trainee: newTrainee, entityId: traineeId });
     return newTrainee;
   }
 
@@ -476,7 +483,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    */
   public async deleteTrainee(traineeId: string): Promise<void> {
-    await this.execute("delete", { trainee: traineeId });
+    await this.execute(traineeId, "delete", { trainee: traineeId });
     this.traineeCache.discard(traineeId);
 
     const filename = this.fs.sanitizeFilename(traineeId);
@@ -501,12 +508,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     if (attributes == null) {
       throw new TypeError("Cannot set feature attributes to null.");
     }
+
     const features = mapValues(attributes, FeatureAttributesToJSON);
-    await this.execute("set_feature_attributes", { trainee: trainee.id, features });
-    const { content = features } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {
-      trainee: trainee.id,
-    });
-    trainee.features = mapValues(content, FeatureAttributesFromJSON);
+    await this.execute(traineeId, "set_feature_attributes", { features });
+    trainee.features = await this._getFeatureAttributes(traineeId);
   }
 
   /**
@@ -527,7 +532,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The feature metadata object.
    */
   protected async _getMetadata(traineeId: string): Promise<NonNullable<Trainee["metadata"]>> {
-    const { content } = await this.execute<Record<string, Record<string, unknown>>>("get_metadata", {});
+    const { content } = await this.execute<Record<string, Record<string, unknown>>>(traineeId, "get_metadata", {});
     if (content == null) {
       throw new ProblemError(`Trainee ${traineeId} not found.`);
     }
@@ -542,7 +547,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>> {
     await this.autoResolveTrainee(traineeId);
-    return this._getFeatureAttributes();
+    return this._getFeatureAttributes(traineeId);
   }
 
   /**
@@ -551,8 +556,8 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    * @returns The feature attributes object.
    */
-  protected async _getFeatureAttributes(): Promise<Record<string, FeatureAttributes>> {
-    const { content } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {});
+  protected async _getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>> {
+    const { content } = await this.execute<Record<string, FeatureAttributes>>(traineeId, "get_feature_attributes", {});
     return mapValues(content, FeatureAttributesFromJSON);
   }
 
@@ -569,7 +574,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const { cases = [], ...rest } = TrainRequestToJSON(request);
 
     // Add session metadata to trainee
-    await this.execute("set_session_metadata", {
+    await this.execute(traineeId, "set_session_metadata", {
       trainee: trainee.id,
       session: session.id,
       metadata: SessionToJSON(session),
@@ -587,7 +592,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       async function* (this: WasmClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          const response = await this.execute<TrainResponse | null>("train", {
+          const response = await this.execute<TrainResponse | null>(traineeId, "train", {
             trainee: trainee.id,
             input_cases: cases.slice(offset, offset + size),
             session: session.id,
@@ -615,7 +620,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async autoAnalyze(traineeId: string): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("auto_analyze", { trainee: trainee.id });
+    await this.execute(traineeId, "auto_analyze", {});
     await this.autoPersistTrainee(trainee.id);
   }
 
@@ -626,9 +631,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async setAutoAnalyzeParams(traineeId: string, request: SetAutoAnalyzeParamsRequest = {}): Promise<void> {
     const { experimental_options, ...rest } = request;
-    const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("set_auto_analyze_params", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    await this.execute(traineeId, "set_auto_analyze_params", {
       ...SetAutoAnalyzeParamsRequestToJSON(rest),
       ...experimental_options,
     });
@@ -642,9 +647,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async analyze(traineeId: string, request: AnalyzeRequest = {}): Promise<void> {
     const { experimental_options, ...rest } = request;
-    const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("analyze", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    await this.execute(traineeId, "analyze", {
       ...AnalyzeRequestToJSON(rest),
       ...experimental_options,
     });
@@ -657,9 +662,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The cases response.
    */
   public async getCases(traineeId: string, request?: CasesRequest): Promise<Cases> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Cases>("get_cases", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Cases>(traineeId, "get_cases", {
       ...CasesRequestToJSON(request),
     });
     return content;
@@ -671,8 +676,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The number of trained cases.
    */
   public async getNumTrainingCases(traineeId: string): Promise<number> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<CaseCountResponse>("get_num_training_cases", { trainee: trainee.id });
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<CaseCountResponse>(traineeId, "get_num_training_cases", {});
     return content?.count || 0;
   }
 
@@ -684,10 +690,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async react(traineeId: string, request: ReactRequest): Promise<ReactResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
+
     this.preprocessReactRequest(trainee, request);
     const { actions, contexts, ...rest } = ReactRequestToJSON(request);
-    const { warnings = [], content } = await this.execute<ReactResponseContent>("batch_react", {
-      trainee: trainee.id,
+    const { warnings = [], content } = await this.execute<ReactResponseContent>(traineeId, "batch_react", {
       action_values: actions,
       context_values: contexts,
       ...rest,
@@ -703,10 +709,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async reactSeries(traineeId: string, request: ReactSeriesRequest): Promise<ReactSeriesResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
+
     this.preprocessReactRequest(trainee, request);
     const { actions, contexts, ...rest } = ReactSeriesRequestToJSON(request);
-    const { warnings = [], content } = await this.execute<ReactSeriesResponseContent>("batch_react_series", {
-      trainee: trainee.id,
+    const { warnings = [], content } = await this.execute<ReactSeriesResponseContent>(traineeId, "batch_react_series", {
       action_values: actions,
       context_values: contexts,
       ...rest,
@@ -724,9 +730,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: ReactIntoFeaturesRequest,
   ): Promise<ReactIntoFeaturesResponse> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { warnings = [] } = await this.execute<never>("react_into_features", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { warnings = [] } = await this.execute<never>(traineeId, "react_into_features", {
       ...ReactIntoFeaturesRequestToJSON(request),
     });
     return ReactIntoFeaturesResponseFromJSON({ warnings });
@@ -742,9 +748,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: ReactIntoTraineeRequest,
   ): Promise<ReactIntoTraineeResponse> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { warnings = [] } = await this.execute<never>("react_into_trainee", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { warnings = [] } = await this.execute<never>(traineeId, "react_into_trainee", {
       ...ReactIntoTraineeRequestToJSON(request),
     });
     return ReactIntoTraineeResponseFromJSON({ warnings });
@@ -760,9 +766,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeaturePredictionStatsRequest,
   ): Promise<FeaturePredictionStats> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content, warnings = [] } = await this.execute<never>("get_prediction_stats", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content, warnings = [] } = await this.execute<never>(traineeId, "get_prediction_stats", {
       ...FeaturePredictionStatsRequestToJSON(request),
     });
     return FeaturePredictionStatsFromJSON({ content, warnings });
@@ -778,9 +784,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeatureMarginalStatsRequest,
   ): Promise<FeatureMarginalStats> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content, warnings = [] } = await this.execute<never>("get_marginal_stats", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content, warnings = [] } = await this.execute<never>(traineeId, "get_marginal_stats", {
       ...FeatureMarginalStatsRequestToJSON(request),
     });
     return FeatureMarginalStatsFromJSON({ content, warnings });
@@ -793,9 +799,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns A map of metric name to value.
    */
   public async getFeatureConviction(traineeId: string, request: FeatureConvictionRequest): Promise<FeatureConviction> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("compute_conviction_of_features", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "compute_conviction_of_features", {
       ...FeatureConvictionRequestToJSON(request),
     });
     return content;
@@ -812,9 +818,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeatureContributionsRequest,
   ): Promise<Record<string, number>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("get_feature_contributions", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_contributions", {
       ...FeatureContributionsRequestToJSON(request),
     });
     return content;
@@ -831,9 +837,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeatureResidualsRequest,
   ): Promise<Record<string, number>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("get_feature_residuals", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_residuals", {
       ...FeatureResidualsRequestToJSON(request),
     });
     return content;
@@ -847,9 +853,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns A map of feature name to MDA value.
    */
   public async getFeatureMda(traineeId: string, request: FeatureMdaRequest): Promise<Record<string, number>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("get_feature_mda", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_mda", {
       ...FeatureMdaRequestToJSON(request),
     });
     return content;
