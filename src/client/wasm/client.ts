@@ -201,14 +201,23 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   protected async autoPersistTrainee(traineeId: string): Promise<void> {
     const cached = this.traineeCache.get(traineeId);
-    if (cached?.trainee?.persistence == "always") {
-      await this.execute(traineeId, "save", {
-        filename: this.fs.sanitizeFilename(traineeId),
-        filepath: this.fs.traineeDir,
-      });
+    if (cached?.trainee?.persistence === "always") {
+      await this.persistTrainee(traineeId);
     }
   }
 
+  /**
+   * Persist trainee object
+   * @param traineeId The trainee identifier.
+   */
+  protected async persistTrainee(traineeId: string): Promise<void> {
+    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.sanitizeFilename(traineeId));
+    await this.dispatch({
+      type: "request",
+      command: "storeEntity",
+      parameters: [traineeId, fileUri],
+    });
+  }
   /**
    * Retrieve the trainees that are currently loaded in core.
    * @returns List of trainee identifiers.
@@ -396,11 +405,8 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const cached = this.traineeCache.get(trainee.id);
     if (cached) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
-        // Auto save the trainee
-        await this.execute(traineeId, "save", {
-          filename: this.fs.sanitizeFilename(traineeId),
-          filepath: this.fs.traineeDir,
-        });
+        // Auto persist the trainee
+        await this.persistTrainee(traineeId);
       } else if (cached.trainee.persistence == "never") {
         throw new ProblemError(
           "Trainees set to never persist may not have their resources released. Delete the trainee instead.",
