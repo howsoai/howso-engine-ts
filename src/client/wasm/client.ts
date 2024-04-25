@@ -535,17 +535,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Retrieve the trainee's metadata after attempting automatic resolution.
-   *
-   * @param traineeId The trainee identifier.
-   * @returns The feature metadata object.
-   */
-  public async getMetadata(traineeId: string): Promise<NonNullable<Trainee["metadata"]>> {
-    await this.autoResolveTrainee(traineeId);
-    return this._getMetadata(traineeId);
-  }
-
-  /**
    * Retrieve the trainee's metadata, without attempting automatic resolution.
    *
    * @param traineeId The trainee identifier.
