@@ -70,9 +70,7 @@ import { CacheMap, isNode, batcher, BatchOptions } from "../utilities/index";
 import { FileSystemClient } from "./files";
 import { AmalgamError } from "@howso/amalgam-lang";
 
-export interface TraineeCache extends TraineeBaseCache {
-  entityId: string;
-}
+export interface TraineeCache extends TraineeBaseCache {}
 
 export interface ClientOptions {
   trace?: boolean;
@@ -376,7 +374,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     // Get trainee details. Use the internal method to prevent auto resolution loops.
     const trainee = await this._getTraineeFromCore(traineeId);
     // Cache the trainee
-    this.traineeCache.set(traineeId, { trainee, entityId: traineeId });
+    this.traineeCache.set(traineeId, { trainee });
   }
 
   /**
@@ -389,8 +387,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     }
 
     // Check if trainee already loaded
-    const cached = this.traineeCache.get(traineeId);
-    if (cached?.entityId == traineeId) {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const cached = this.traineeCache.get(trainee.id);
+    if (cached) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
         // Auto save the trainee
         await this.execute(traineeId, "save", {
@@ -402,9 +401,14 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
           "Trainees set to never persist may not have their resources released. Delete the trainee instead.",
         );
       }
+      this.traineeCache.discard(traineeId);
     }
-    this.traineeCache.discard(traineeId);
-    await this.execute(traineeId, "delete", { trainee: traineeId });
+
+    await this.dispatch({
+      type: "request",
+      command: "destroyEntity",
+      parameters: [traineeId],
+    });
   }
 
   /**
@@ -449,13 +453,11 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     // Set the feature attributes
     await this.execute(traineeId, "set_feature_attributes", { features });
-    const { content: allFeatures = features } = await this.execute(traineeId, "get_feature_attributes", {
-      trainee: traineeId,
-    });
+    const allFeatures = await this._getFeatureAttributes(traineeId);
 
     // Build, cache and return new trainee object
     const newTrainee: Trainee = TraineeFromJSON({ ...metadata, id: traineeId, features: allFeatures }) as Trainee;
-    this.traineeCache.set(traineeId, { trainee: newTrainee, entityId: traineeId });
+    this.traineeCache.set(traineeId, { trainee: newTrainee });
     return newTrainee;
   }
 
