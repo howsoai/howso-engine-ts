@@ -401,7 +401,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
     // Load the core entity
-    // TODO - Call getEntities to check if loaded or not
     const loaded = await this.dispatch({
       type: "request",
       command: "loadEntity",
