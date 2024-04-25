@@ -296,13 +296,19 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
         await this.fs.mkdir(this.fs.migrationsDir);
         await this.fs.createLazyFile(
           this.fs.migrationsDir,
-          "migrations.caml",
+          `migrations.${this.fs.entityExt}`,
           String(this.options.migrationsUrl),
           true,
           false,
         );
       }
-      await this.fs.createLazyFile(this.fs.libDir, "howso.caml", String(this.options.howsoUrl), true, false);
+      await this.fs.createLazyFile(
+        this.fs.libDir,
+        `howso.${this.fs.entityExt}`,
+        String(this.options.howsoUrl),
+        true,
+        false,
+      );
     }
   }
 
@@ -354,7 +360,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       return;
     }
 
-    const filename = `${this.fs.sanitizeFilename(traineeId)}.caml`;
+    const filename = `${this.fs.sanitizeFilename(traineeId)}.${this.fs.entityExt}`;
     if (url) {
       // Prepare the file on the virtual file system
       await this.fs.createLazyFile(this.fs.traineeDir, filename, url, true, false);
@@ -419,7 +425,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
     const traineeId = trainee.name || uuid();
     // Load the core entity
-    const howsoPath = this.fs.join(this.fs.libDir, "howso.caml");
+    const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
     const loaded = await this.dispatch({
       type: "request",
       command: "loadEntity",
