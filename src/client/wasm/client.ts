@@ -222,18 +222,24 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Constructs trainee object from it's core metadata.
+   * Constructs trainee object from it's core metadata after attempting automatic resolution.
+   *
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
    */
-  protected async getTraineeFromCore(
-    traineeId: string,
-    options: { autoResolve?: boolean } = { autoResolve: true },
-  ): Promise<Trainee> {
-    const [metadata, features] = await Promise.all([
-      this.getMetadata(traineeId, { autoResolve: options.autoResolve }),
-      this.getFeatureAttributes(traineeId, { autoResolve: options.autoResolve }),
-    ]);
+  protected async getTraineeFromCore(traineeId: string): Promise<Trainee> {
+    await this.autoResolveTrainee(traineeId);
+    return this._getTraineeFromCore(traineeId);
+  }
+
+  /**
+   * Constructs trainee object from it's core metadata without attempting automatic resolution.
+   *
+   * @param traineeId The trainee identifier.
+   * @returns The trainee object.
+   */
+  protected async _getTraineeFromCore(traineeId: string): Promise<Trainee> {
+    const [metadata, features] = await Promise.all([this._getMetadata(traineeId), this._getFeatureAttributes()]);
 
     return TraineeFromJSON({
       features,
@@ -360,8 +366,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       });
     }
 
+    // Get trainee details. Use the internal method to prevent auto resolution loops.
+    const trainee = await this._getTraineeFromCore(traineeId);
     // Cache the trainee
-    const trainee = await this.getTraineeFromCore(traineeId, { autoResolve: false });
     this.traineeCache.set(traineeId, { trainee, entityId: this.handle });
   }
 
@@ -461,7 +468,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getTrainee(traineeId: string): Promise<Trainee> {
     await this.autoResolveTrainee(traineeId);
-    return await this.getTraineeFromCore(traineeId, { autoResolve: false });
+    return await this.getTraineeFromCore(traineeId);
   }
 
   /**
@@ -503,20 +510,23 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Retrieve the trainee's metadata.
+   * Retrieve the trainee's metadata after attempting automatic resolution.
+   *
    * @param traineeId The trainee identifier.
    * @returns The feature metadata object.
    */
-  protected async getMetadata(
-    traineeId: string,
-    options: {
-      autoResolve?: boolean;
-    } = { autoResolve: true },
-  ): Promise<NonNullable<Trainee["metadata"]>> {
-    if (options.autoResolve) {
-      await this.autoResolveTrainee(traineeId);
-    }
+  public async getMetadata(traineeId: string): Promise<NonNullable<Trainee["metadata"]>> {
+    await this.autoResolveTrainee(traineeId);
+    return this._getMetadata(traineeId);
+  }
 
+  /**
+   * Retrieve the trainee's metadata, without attempting automatic resolution.
+   *
+   * @param traineeId The trainee identifier.
+   * @returns The feature metadata object.
+   */
+  protected async _getMetadata(traineeId: string): Promise<NonNullable<Trainee["metadata"]>> {
     const { content } = await this.execute<Record<string, Record<string, unknown>>>("get_metadata", {});
     if (content == null) {
       throw new ProblemError(`Trainee ${traineeId} not found.`);
@@ -525,20 +535,23 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Retrieve the trainee's feature attributes.
+   * Retrieve the trainee's feature attributes after attempting automatic resolution.
+   *
    * @param traineeId The trainee identifier.
    * @returns The feature attributes object.
    */
-  public async getFeatureAttributes(
-    traineeId: string,
-    options: {
-      autoResolve?: boolean;
-    } = { autoResolve: true },
-  ): Promise<Record<string, FeatureAttributes>> {
-    if (options.autoResolve) {
-      await this.autoResolveTrainee(traineeId);
-    }
+  public async getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>> {
+    await this.autoResolveTrainee(traineeId);
+    return this._getFeatureAttributes();
+  }
 
+  /**
+   * Retrieve the trainee's feature attributes without attempting automatic resolution.
+   *
+   * @param traineeId The trainee identifier.
+   * @returns The feature attributes object.
+   */
+  protected async _getFeatureAttributes(): Promise<Record<string, FeatureAttributes>> {
     const { content } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {});
     return mapValues(content, FeatureAttributesFromJSON);
   }
