@@ -68,6 +68,7 @@ import { BaseClient, TraineeBaseCache } from "../capabilities/index";
 import { ProblemError } from "../errors";
 import { CacheMap, isNode, batcher, BatchOptions } from "../utilities/index";
 import { FileSystemClient } from "./files";
+import { AmalgamError } from "@howso/amalgam-lang";
 
 export interface TraineeCache extends TraineeBaseCache {
   entityId: string;
@@ -133,6 +134,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       }
       return result;
     } catch (reason) {
+      if (reason instanceof AmalgamError || reason instanceof ProblemError) {
+        throw reason;
+      }
+
       const message = reason instanceof Error ? reason.message : `${reason}`;
       throw new Error(`${message} Label: ${label} Data: ${JSON.stringify(data)}`);
     }
