@@ -1,5 +1,5 @@
-import { Trainee } from "../../trainees/index.js";
-import type { CacheMap } from "../utilities/cache.js";
+import { Trainee } from "../../trainees/index";
+import type { CacheMap } from "../utilities/cache";
 
 export interface Capabilities {
   supportsTrainees?: boolean;

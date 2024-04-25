@@ -64,21 +64,20 @@ import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
 
 import { Trainee } from "../../trainees/index.js";
-import { BaseClient, TraineeBaseCache } from "../capabilities/index.js";
-import { ProblemError } from "../errors.js";
-import { CacheMap, isNode, batcher, BatchOptions } from "../utilities/index.js";
-import { FileSystemClient } from "./files.js";
+import { BaseClient, TraineeBaseCache } from "../capabilities/index";
+import { ProblemError } from "../errors";
+import { CacheMap, isNode, batcher, BatchOptions } from "../utilities/index";
+import { FileSystemClient } from "./files";
+import { AmalgamError } from "@howso/amalgam-lang";
 
-export interface TraineeCache extends TraineeBaseCache {
-  entityId: string;
-}
+export interface TraineeCache extends TraineeBaseCache {}
 
 export interface ClientOptions {
   trace?: boolean;
   // Browser only
-  migrationsUri?: string | URL;
-  coreEntityUri?: string | URL;
-  traineeEntityUri?: string | URL;
+  migrationsUrl?: string | URL;
+  /** Generic howso.caml file. This will not be loaded unless a function requires it such as `createTrainee` */
+  howsoUrl?: string | URL;
   // Node only
   libPath?: string;
 }
@@ -93,7 +92,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   public readonly fs: FileSystemClient;
 
   protected readonly traineeCache: CacheMap<TraineeCache>;
-  protected readonly handle: string = "handle";
   protected activeSession?: Session;
 
   constructor(
@@ -118,19 +116,33 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param throwErrors If core errors should be thrown or returned.
    * @returns The core response object.
    */
-  protected async execute<R, D = unknown>(label: string, data: D, throwErrors = true): Promise<AmalgamCoreResponse<R>> {
+  protected async execute<R, D = unknown>(
+    traineeId: string,
+    label: string,
+    data: D,
+    throwErrors = true,
+  ): Promise<AmalgamCoreResponse<R>> {
     const response = await this.dispatch({
       type: "request",
       command: "executeEntityJson",
-      parameters: [this.handle, label, prepareCoreRequest(data)],
+      parameters: [traineeId, label, prepareCoreRequest(data)],
     });
-    const result = prepareCoreResponse<R>(response);
-    if (throwErrors) {
-      for (const err of result.errors) {
-        throw new ProblemError(err?.message || "An unknown error occurred.", err?.code);
+    try {
+      const result = prepareCoreResponse<R>(response);
+      if (throwErrors) {
+        for (const err of result.errors) {
+          throw new ProblemError(err?.message || "An unknown error occurred.", err?.code);
+        }
       }
+      return result;
+    } catch (reason) {
+      if (reason instanceof AmalgamError || reason instanceof ProblemError) {
+        throw reason;
+      }
+
+      const message = reason instanceof Error ? reason.message : `${reason}`;
+      throw new Error(`${message} Label: ${label} Data: ${JSON.stringify(data)}`);
     }
-    return result;
   }
 
   /**
@@ -166,6 +178,8 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * Automatically resolve a trainee and ensure it is loaded given an identifier.
+   * TODO need to break out autoLoad and autoResolve
+   *
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
    */
@@ -189,36 +203,59 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   protected async autoPersistTrainee(traineeId: string): Promise<void> {
     const cached = this.traineeCache.get(traineeId);
-    if (cached?.trainee?.persistence == "always") {
-      await this.execute("save", {
-        trainee: traineeId,
-        filename: this.fs.sanitizeFilename(traineeId),
-        filepath: this.fs.traineeDir,
-      });
+    if (cached?.trainee?.persistence === "always") {
+      await this.persistTrainee(traineeId);
     }
   }
 
+  /**
+   * Persist trainee object
+   * @param traineeId The trainee identifier.
+   */
+  protected async persistTrainee(traineeId: string): Promise<void> {
+    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.sanitizeFilename(traineeId));
+    await this.dispatch({
+      type: "request",
+      command: "storeEntity",
+      parameters: [traineeId, fileUri],
+    });
+  }
   /**
    * Retrieve the trainees that are currently loaded in core.
    * @returns List of trainee identifiers.
    */
-  protected async loadedTrainees(): Promise<string[]> {
-    const { content = [] } = await this.execute<string[]>("get_loaded_trainees", {});
-    return content;
+  protected async getEntities(): Promise<string[]> {
+    const entities = await this.dispatch({
+      type: "request",
+      command: "getEntities",
+      parameters: [],
+    });
+    return entities;
   }
 
   /**
-   * Constructs trainee object from it's core metadata.
+   * Constructs trainee object from it's core metadata after attempting automatic resolution.
+   *
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
    */
   protected async getTraineeFromCore(traineeId: string): Promise<Trainee> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { content: metadata } = await this.execute<Partial<Trainee> | null>("get_metadata", { trainee: traineeId });
-    if (metadata == null) {
-      throw new ProblemError(`Trainee ${traineeId} not found.`);
-    }
-    const { content: features = {} } = await this.execute("get_feature_attributes", { trainee: traineeId });
+    await this.autoResolveTrainee(traineeId);
+    return this._getTraineeFromCore(traineeId);
+  }
+
+  /**
+   * Constructs trainee object from it's core metadata without attempting automatic resolution.
+   *
+   * @param traineeId The trainee identifier.
+   * @returns The trainee object.
+   */
+  protected async _getTraineeFromCore(traineeId: string): Promise<Trainee> {
+    const [metadata, features] = await Promise.all([
+      this._getMetadata(traineeId),
+      this._getFeatureAttributes(traineeId),
+    ]);
+
     return TraineeFromJSON({
       features,
       id: traineeId,
@@ -233,6 +270,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Setup client.
    * Prepares the file system and initializes the worker.
+   * No trainee is loaded automatically during this process.
    */
   public async setup(): Promise<void> {
     // Initialize the Amalgam runtime
@@ -243,57 +281,45 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       parameters: [options],
     });
 
-    // Ready will be false on first initialize, otherwise worker is already setup
-    if (!ready) {
-      // Prepare the core files
-      if (isNode) {
-        // NodeJS
-        if (this.options.libPath == null) {
-          throw new ProblemError("Setup Failed - The client requires a file path to the library files.");
-        }
-      } else {
-        // Browsers
-        if (this.options.coreEntityUri == null || this.options.traineeEntityUri == null) {
-          throw new ProblemError("Setup Failed - The client requires a URI for the entity files.");
-        }
+    if (ready) {
+      // Initialize the session
+      await this.beginSession();
+      return;
+    }
 
-        await this.fs.mkdir(this.fs.libDir);
-        await this.fs.mkdir(this.fs.traineeDir);
+    // Prepare the core files
+    if (isNode) {
+      // NodeJS
+      if (this.options.libPath == null) {
+        throw new ProblemError("Setup Failed - The client requires a file path to the library files.");
+      }
+    } else {
+      // Browsers
+      if (!this.options.howsoUrl) {
+        throw new ProblemError("Setup Failed - The client requires a URL for the howso.caml.");
+      }
 
-        if (this.options.migrationsUri != null) {
-          await this.fs.mkdir(this.fs.migrationsDir);
-          await this.fs.createLazyFile(
-            this.fs.migrationsDir,
-            "migrations.caml",
-            String(this.options.migrationsUri),
-            true,
-            false,
-          );
-        }
-        await this.fs.createLazyFile(this.fs.libDir, "howso.caml", String(this.options.coreEntityUri), true, false);
+      await this.fs.mkdir(this.fs.libDir);
+      await this.fs.mkdir(this.fs.traineeDir);
+
+      if (this.options.migrationsUrl != null) {
+        await this.fs.mkdir(this.fs.migrationsDir);
         await this.fs.createLazyFile(
-          this.fs.libDir,
-          "trainee_template.caml",
-          String(this.options.traineeEntityUri),
+          this.fs.migrationsDir,
+          `migrations.${this.fs.entityExt}`,
+          String(this.options.migrationsUrl),
           true,
           false,
         );
       }
-
-      // Load the core entity
-      // TODO - Call getEntities to check if loaded or not
-      const loaded = await this.dispatch({
-        type: "request",
-        command: "loadEntity",
-        parameters: [this.handle, this.fs.join(this.fs.libDir, "howso.caml")],
-      });
-      if (!loaded) {
-        throw new ProblemError("Failed to load the amalgam entities.");
-      }
+      await this.fs.createLazyFile(
+        this.fs.libDir,
+        `howso.${this.fs.entityExt}`,
+        String(this.options.howsoUrl),
+        true,
+        false,
+      );
     }
-
-    // Initialize the session
-    await this.beginSession();
   }
 
   /**
@@ -325,9 +351,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The list of session identities.
    */
   public async getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Required<SessionIdentity>[]>("get_sessions", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Required<SessionIdentity>[]>(traineeId, "get_sessions", {
       attributes: ["id", "name"],
     });
     return content ?? [];
@@ -336,33 +362,35 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Acquire resources for a trainee.
    * @param traineeId The trainee identifier.
-   * @param uri A URI to the trainee file.
+   * @param url A URL to the trainee file.
    */
-  public async acquireTraineeResources(traineeId: string, uri?: string): Promise<void> {
+  public async acquireTraineeResources(traineeId: string, url?: string): Promise<void> {
     if (this.traineeCache.has(traineeId)) {
       // Already acquired
       return;
     }
 
-    if (uri) {
+    const filename = `${this.fs.sanitizeFilename(traineeId)}.${this.fs.entityExt}`;
+    if (url) {
       // Prepare the file on the virtual file system
-      await this.fs.createLazyFile(this.fs.traineeDir, `${this.fs.sanitizeFilename(traineeId)}.caml`, uri, true, false);
+      await this.fs.createLazyFile(this.fs.traineeDir, filename, url, true, false);
     }
 
     // Load trainee only if entity not already in core
-    const loaded = await this.loadedTrainees();
+    const loaded = await this.getEntities();
     if (loaded.indexOf(traineeId) == -1) {
       // Only call load if not already loaded
-      await this.execute("load", {
-        trainee: traineeId,
-        filename: this.fs.sanitizeFilename(traineeId),
-        filepath: this.fs.traineeDir,
+      await this.dispatch({
+        type: "request",
+        command: "loadEntity",
+        parameters: [traineeId, this.fs.join(this.fs.traineeDir, filename)],
       });
     }
 
+    // Get trainee details. Use the internal method to prevent auto resolution loops.
+    const trainee = await this._getTraineeFromCore(traineeId);
     // Cache the trainee
-    const trainee = await this.getTraineeFromCore(traineeId);
-    this.traineeCache.set(traineeId, { trainee, entityId: this.handle });
+    this.traineeCache.set(traineeId, { trainee });
   }
 
   /**
@@ -375,23 +403,25 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     }
 
     // Check if trainee already loaded
-    const cached = this.traineeCache.get(traineeId);
-    if (cached?.entityId == this.handle) {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const cached = this.traineeCache.get(trainee.id);
+    if (cached) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
-        // Auto save the trainee
-        await this.execute("save", {
-          trainee: traineeId,
-          filename: this.fs.sanitizeFilename(traineeId),
-          filepath: this.fs.traineeDir,
-        });
+        // Auto persist the trainee
+        await this.persistTrainee(traineeId);
       } else if (cached.trainee.persistence == "never") {
         throw new ProblemError(
           "Trainees set to never persist may not have their resources released. Delete the trainee instead.",
         );
       }
+      this.traineeCache.discard(traineeId);
     }
-    this.traineeCache.discard(traineeId);
-    await this.execute("delete", { trainee: traineeId });
+
+    await this.dispatch({
+      type: "request",
+      command: "destroyEntity",
+      parameters: [traineeId],
+    });
   }
 
   /**
@@ -401,13 +431,21 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
     const traineeId = trainee.name || uuid();
+    // Load the core entity
+    const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
+    const loaded = await this.dispatch({
+      type: "request",
+      command: "loadEntity",
+      parameters: [traineeId, howsoPath],
+    });
+    if (!loaded) {
+      throw new ProblemError("Failed to load the amalgam entities.");
+    }
 
     // Create the trainee entity
-    const created = await this.execute<boolean>("create_trainee", {
-      trainee: traineeId,
-      filepath: this.fs.libDir,
-      trainee_template_filename: "trainee_template",
-      file_extension: "caml",
+    const created = await this.execute<boolean>(traineeId, "initialize", {
+      trainee_id: traineeId,
+      filepath: howsoPath,
     });
     if (!created) {
       throw new ProblemError(
@@ -424,15 +462,15 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       default_action_features: props.default_action_features,
       persistence: props.persistence || "allow",
     };
-    await this.execute("set_metadata", { trainee: traineeId, metadata });
+    await this.execute(traineeId, "set_metadata", { metadata });
 
     // Set the feature attributes
-    await this.execute("set_feature_attributes", { trainee: traineeId, features });
-    const { content: allFeatures = features } = await this.execute("get_feature_attributes", { trainee: traineeId });
+    await this.execute(traineeId, "set_feature_attributes", { features });
+    const allFeatures = await this._getFeatureAttributes(traineeId);
 
     // Build, cache and return new trainee object
     const newTrainee: Trainee = TraineeFromJSON({ ...metadata, id: traineeId, features: allFeatures }) as Trainee;
-    this.traineeCache.set(traineeId, { trainee: newTrainee, entityId: this.handle });
+    this.traineeCache.set(traineeId, { trainee: newTrainee });
     return newTrainee;
   }
 
@@ -459,9 +497,15 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    */
   public async deleteTrainee(traineeId: string): Promise<void> {
-    await this.execute("delete", { trainee: traineeId });
-    this.traineeCache.discard(traineeId);
+    // TODO need to use a someday function of autoResolve that doesn't call autoLoad here
+    // const trainee = await this.autoResolveTrainee(traineeId);
 
+    await this.dispatch({
+      type: "request",
+      command: "destroyEntity",
+      parameters: [traineeId],
+    });
+    this.traineeCache.discard(traineeId);
     const filename = this.fs.sanitizeFilename(traineeId);
     this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}.${this.fs.entityExt}`));
   }
@@ -484,24 +528,45 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     if (attributes == null) {
       throw new TypeError("Cannot set feature attributes to null.");
     }
+
     const features = mapValues(attributes, FeatureAttributesToJSON);
-    await this.execute("set_feature_attributes", { trainee: trainee.id, features });
-    const { content = features } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {
-      trainee: trainee.id,
-    });
-    trainee.features = mapValues(content, FeatureAttributesFromJSON);
+    await this.execute(traineeId, "set_feature_attributes", { features });
+    trainee.features = await this._getFeatureAttributes(traineeId);
   }
 
   /**
-   * Retrieve the trainee's feature attributes.
+   * Retrieve the trainee's metadata, without attempting automatic resolution.
+   *
+   * @param traineeId The trainee identifier.
+   * @returns The feature metadata object.
+   */
+  protected async _getMetadata(traineeId: string): Promise<NonNullable<Trainee["metadata"]>> {
+    const { content } = await this.execute<Record<string, Record<string, unknown>>>(traineeId, "get_metadata", {});
+    if (content == null) {
+      throw new ProblemError(`Trainee ${traineeId} not found.`);
+    }
+    return content;
+  }
+
+  /**
+   * Retrieve the trainee's feature attributes after attempting automatic resolution.
+   *
    * @param traineeId The trainee identifier.
    * @returns The feature attributes object.
    */
   public async getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {
-      trainee: trainee.id,
-    });
+    await this.autoResolveTrainee(traineeId);
+    return this._getFeatureAttributes(traineeId);
+  }
+
+  /**
+   * Retrieve the trainee's feature attributes without attempting automatic resolution.
+   *
+   * @param traineeId The trainee identifier.
+   * @returns The feature attributes object.
+   */
+  protected async _getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>> {
+    const { content } = await this.execute<Record<string, FeatureAttributes>>(traineeId, "get_feature_attributes", {});
     return mapValues(content, FeatureAttributesFromJSON);
   }
 
@@ -518,8 +583,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const { cases = [], ...rest } = TrainRequestToJSON(request);
 
     // Add session metadata to trainee
-    await this.execute("set_session_metadata", {
-      trainee: trainee.id,
+    await this.execute(traineeId, "set_session_metadata", {
       session: session.id,
       metadata: SessionToJSON(session),
     });
@@ -536,8 +600,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       async function* (this: WasmClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          const response = await this.execute<TrainResponse | null>("train", {
-            trainee: trainee.id,
+          const response = await this.execute<TrainResponse | null>(traineeId, "train", {
             input_cases: cases.slice(offset, offset + size),
             session: session.id,
             ...rest,
@@ -564,7 +627,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async autoAnalyze(traineeId: string): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("auto_analyze", { trainee: trainee.id });
+    await this.execute(traineeId, "auto_analyze", {});
     await this.autoPersistTrainee(trainee.id);
   }
 
@@ -575,9 +638,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async setAutoAnalyzeParams(traineeId: string, request: SetAutoAnalyzeParamsRequest = {}): Promise<void> {
     const { experimental_options, ...rest } = request;
-    const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("set_auto_analyze_params", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    await this.execute(traineeId, "set_auto_analyze_params", {
       ...SetAutoAnalyzeParamsRequestToJSON(rest),
       ...experimental_options,
     });
@@ -591,9 +654,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async analyze(traineeId: string, request: AnalyzeRequest = {}): Promise<void> {
     const { experimental_options, ...rest } = request;
-    const trainee = await this.autoResolveTrainee(traineeId);
-    await this.execute("analyze", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    await this.execute(traineeId, "analyze", {
       ...AnalyzeRequestToJSON(rest),
       ...experimental_options,
     });
@@ -606,9 +669,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The cases response.
    */
   public async getCases(traineeId: string, request?: CasesRequest): Promise<Cases> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Cases>("get_cases", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Cases>(traineeId, "get_cases", {
       ...CasesRequestToJSON(request),
     });
     return content;
@@ -620,8 +683,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns The number of trained cases.
    */
   public async getNumTrainingCases(traineeId: string): Promise<number> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<CaseCountResponse>("get_num_training_cases", { trainee: trainee.id });
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<CaseCountResponse>(traineeId, "get_num_training_cases", {});
     return content?.count || 0;
   }
 
@@ -633,10 +697,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async react(traineeId: string, request: ReactRequest): Promise<ReactResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
+
     this.preprocessReactRequest(trainee, request);
     const { actions, contexts, ...rest } = ReactRequestToJSON(request);
-    const { warnings = [], content } = await this.execute<ReactResponseContent>("batch_react", {
-      trainee: trainee.id,
+    const { warnings = [], content } = await this.execute<ReactResponseContent>(traineeId, "batch_react", {
       action_values: actions,
       context_values: contexts,
       ...rest,
@@ -652,10 +716,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async reactSeries(traineeId: string, request: ReactSeriesRequest): Promise<ReactSeriesResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
+
     this.preprocessReactRequest(trainee, request);
     const { actions, contexts, ...rest } = ReactSeriesRequestToJSON(request);
-    const { warnings = [], content } = await this.execute<ReactSeriesResponseContent>("batch_react_series", {
-      trainee: trainee.id,
+    const { warnings = [], content } = await this.execute<ReactSeriesResponseContent>(traineeId, "batch_react_series", {
       action_values: actions,
       context_values: contexts,
       ...rest,
@@ -673,9 +737,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: ReactIntoFeaturesRequest,
   ): Promise<ReactIntoFeaturesResponse> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { warnings = [] } = await this.execute<never>("react_into_features", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { warnings = [] } = await this.execute<never>(traineeId, "react_into_features", {
       ...ReactIntoFeaturesRequestToJSON(request),
     });
     return ReactIntoFeaturesResponseFromJSON({ warnings });
@@ -691,9 +755,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: ReactIntoTraineeRequest,
   ): Promise<ReactIntoTraineeResponse> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { warnings = [] } = await this.execute<never>("react_into_trainee", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { warnings = [] } = await this.execute<never>(traineeId, "react_into_trainee", {
       ...ReactIntoTraineeRequestToJSON(request),
     });
     return ReactIntoTraineeResponseFromJSON({ warnings });
@@ -709,9 +773,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeaturePredictionStatsRequest,
   ): Promise<FeaturePredictionStats> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content, warnings = [] } = await this.execute<never>("get_prediction_stats", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content, warnings = [] } = await this.execute<never>(traineeId, "get_prediction_stats", {
       ...FeaturePredictionStatsRequestToJSON(request),
     });
     return FeaturePredictionStatsFromJSON({ content, warnings });
@@ -727,9 +791,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeatureMarginalStatsRequest,
   ): Promise<FeatureMarginalStats> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content, warnings = [] } = await this.execute<never>("get_marginal_stats", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content, warnings = [] } = await this.execute<never>(traineeId, "get_marginal_stats", {
       ...FeatureMarginalStatsRequestToJSON(request),
     });
     return FeatureMarginalStatsFromJSON({ content, warnings });
@@ -742,9 +806,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns A map of metric name to value.
    */
   public async getFeatureConviction(traineeId: string, request: FeatureConvictionRequest): Promise<FeatureConviction> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("compute_conviction_of_features", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "compute_conviction_of_features", {
       ...FeatureConvictionRequestToJSON(request),
     });
     return content;
@@ -761,9 +825,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeatureContributionsRequest,
   ): Promise<Record<string, number>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("get_feature_contributions", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_contributions", {
       ...FeatureContributionsRequestToJSON(request),
     });
     return content;
@@ -780,9 +844,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     traineeId: string,
     request: FeatureResidualsRequest,
   ): Promise<Record<string, number>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("get_feature_residuals", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_residuals", {
       ...FeatureResidualsRequestToJSON(request),
     });
     return content;
@@ -796,9 +860,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @returns A map of feature name to MDA value.
    */
   public async getFeatureMda(traineeId: string, request: FeatureMdaRequest): Promise<Record<string, number>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, number>>("get_feature_mda", {
-      trainee: trainee.id,
+    await this.autoResolveTrainee(traineeId);
+
+    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_mda", {
       ...FeatureMdaRequestToJSON(request),
     });
     return content;

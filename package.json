@@ -13,7 +13,8 @@
     "prebuild": "rimraf ./lib",
     "build": "tsc --build",
     "lint": "tsc --noEmit && eslint 'src/**'",
-    "lint:fix": "eslint --fix 'src/**'"
+    "lint:fix": "eslint --fix 'src/**'",
+    "prepack": "npm run build"
   },
   "files": [
     "LICENSE.txt",
@@ -35,8 +36,8 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@howso/amalgam-lang": "^0.0.6",
-    "@howso/openapi-client": "^0.0.4",
+    "@howso/amalgam-lang": "^0.0.7",
+    "@howso/openapi-client": "^0.0.5",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
