@@ -178,6 +178,8 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * Automatically resolve a trainee and ensure it is loaded given an identifier.
+   * TODO need to break out autoLoad and autoResolve
+   *
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
    */
@@ -495,12 +497,13 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    */
   public async deleteTrainee(traineeId: string): Promise<void> {
-    const trainee = await this.autoResolveTrainee(traineeId);
+    // TODO need to use a someday function of autoResolve that doesn't call autoLoad here
+    // const trainee = await this.autoResolveTrainee(traineeId);
 
     await this.dispatch({
       type: "request",
       command: "destroyEntity",
-      parameters: [trainee.id],
+      parameters: [traineeId],
     });
     this.traineeCache.discard(traineeId);
     const filename = this.fs.sanitizeFilename(traineeId);
