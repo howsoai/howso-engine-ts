@@ -134,7 +134,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       return result;
     } catch (reason) {
       const message = reason instanceof Error ? reason.message : `${reason}`;
-      throw new Error(`${message}. Data: ${JSON.stringify(data)}`);
+      throw new Error(`${message} Label: ${label} Data: ${JSON.stringify(data)}`);
     }
   }
 
@@ -207,9 +207,13 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * Retrieve the trainees that are currently loaded in core.
    * @returns List of trainee identifiers.
    */
-  protected async loadedTrainees(): Promise<string[]> {
-    const { content = [] } = await this.execute<string[]>("get_loaded_trainees", {});
-    return content;
+  protected async getEntities(): Promise<string[]> {
+    const entities = await this.dispatch({
+      type: "request",
+      command: "getEntities",
+      parameters: [],
+    });
+    return entities;
   }
 
   /**
@@ -217,13 +221,15 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    * @returns The trainee object.
    */
-  protected async getTraineeFromCore(traineeId: string): Promise<Trainee> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { content: metadata } = await this.execute<Partial<Trainee> | null>("get_metadata", { trainee: traineeId });
-    if (metadata == null) {
-      throw new ProblemError(`Trainee ${traineeId} not found.`);
-    }
-    const { content: features = {} } = await this.execute("get_feature_attributes", { trainee: traineeId });
+  protected async getTraineeFromCore(
+    traineeId: string,
+    options: { autoResolve?: boolean } = { autoResolve: true },
+  ): Promise<Trainee> {
+    const [metadata, features] = await Promise.all([
+      this.getMetadata(traineeId, { autoResolve: options.autoResolve }),
+      this.getFeatureAttributes(traineeId, { autoResolve: options.autoResolve }),
+    ]);
+
     return TraineeFromJSON({
       features,
       id: traineeId,
@@ -264,7 +270,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     } else {
       // Browsers
       if (!this.options.howsoUrl) {
-        throw new ProblemError("Setup Failed - The client requires a URI for the entity files.");
+        throw new ProblemError("Setup Failed - The client requires a URL for the howso.caml.");
       }
 
       await this.fs.mkdir(this.fs.libDir);
@@ -324,32 +330,33 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Acquire resources for a trainee.
    * @param traineeId The trainee identifier.
-   * @param uri A URI to the trainee file.
+   * @param url A URL to the trainee file.
    */
-  public async acquireTraineeResources(traineeId: string, uri?: string): Promise<void> {
+  public async acquireTraineeResources(traineeId: string, url?: string): Promise<void> {
     if (this.traineeCache.has(traineeId)) {
       // Already acquired
       return;
     }
 
-    if (uri) {
+    const filename = `${this.fs.sanitizeFilename(traineeId)}.caml`;
+    if (url) {
       // Prepare the file on the virtual file system
-      await this.fs.createLazyFile(this.fs.traineeDir, `${this.fs.sanitizeFilename(traineeId)}.caml`, uri, true, false);
+      await this.fs.createLazyFile(this.fs.traineeDir, filename, url, true, false);
     }
 
     // Load trainee only if entity not already in core
-    const loaded = await this.loadedTrainees();
+    const loaded = await this.getEntities();
     if (loaded.indexOf(traineeId) == -1) {
       // Only call load if not already loaded
-      await this.execute("load", {
-        trainee: traineeId,
-        filename: this.fs.sanitizeFilename(traineeId),
-        filepath: this.fs.traineeDir,
+      await this.dispatch({
+        type: "request",
+        command: "loadEntity",
+        parameters: [this.handle, this.fs.join(this.fs.traineeDir, filename)],
       });
     }
 
     // Cache the trainee
-    const trainee = await this.getTraineeFromCore(traineeId);
+    const trainee = await this.getTraineeFromCore(traineeId, { autoResolve: false });
     this.traineeCache.set(traineeId, { trainee, entityId: this.handle });
   }
 
@@ -450,7 +457,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async getTrainee(traineeId: string): Promise<Trainee> {
     await this.autoResolveTrainee(traineeId);
-    return await this.getTraineeFromCore(traineeId);
+    return await this.getTraineeFromCore(traineeId, { autoResolve: false });
   }
 
   /**
@@ -492,15 +499,43 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
+   * Retrieve the trainee's metadata.
+   * @param traineeId The trainee identifier.
+   * @returns The feature metadata object.
+   */
+  protected async getMetadata(
+    traineeId: string,
+    options: {
+      autoResolve?: boolean;
+    } = { autoResolve: true },
+  ): Promise<NonNullable<Trainee["metadata"]>> {
+    if (options.autoResolve) {
+      await this.autoResolveTrainee(traineeId);
+    }
+
+    const { content } = await this.execute<Record<string, Record<string, unknown>>>("get_metadata", {});
+    if (content == null) {
+      throw new ProblemError(`Trainee ${traineeId} not found.`);
+    }
+    return content;
+  }
+
+  /**
    * Retrieve the trainee's feature attributes.
    * @param traineeId The trainee identifier.
    * @returns The feature attributes object.
    */
-  public async getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { content } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {
-      trainee: trainee.id,
-    });
+  public async getFeatureAttributes(
+    traineeId: string,
+    options: {
+      autoResolve?: boolean;
+    } = { autoResolve: true },
+  ): Promise<Record<string, FeatureAttributes>> {
+    if (options.autoResolve) {
+      await this.autoResolveTrainee(traineeId);
+    }
+
+    const { content } = await this.execute<Record<string, FeatureAttributes>>("get_feature_attributes", {});
     return mapValues(content, FeatureAttributesFromJSON);
   }
 
