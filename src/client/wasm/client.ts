@@ -415,21 +415,20 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
     const traineeId = trainee.name || uuid();
     // Load the core entity
+    const howsoPath = this.fs.join(this.fs.libDir, "howso.caml");
     const loaded = await this.dispatch({
       type: "request",
       command: "loadEntity",
-      parameters: [traineeId, this.fs.join(this.fs.libDir, "howso.caml")],
+      parameters: [traineeId, howsoPath],
     });
     if (!loaded) {
       throw new ProblemError("Failed to load the amalgam entities.");
     }
 
     // Create the trainee entity
-    const created = await this.execute<boolean>(traineeId, "create_trainee", {
-      trainee: traineeId,
-      filepath: this.fs.libDir,
-      trainee_template_filename: "trainee_template",
-      file_extension: "caml",
+    const created = await this.execute<boolean>(traineeId, "initialize", {
+      trainee_id: traineeId,
+      filepath: howsoPath,
     });
     if (!created) {
       throw new ProblemError(
@@ -446,10 +445,10 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       default_action_features: props.default_action_features,
       persistence: props.persistence || "allow",
     };
-    await this.execute(traineeId, "set_metadata", { trainee: traineeId, metadata });
+    await this.execute(traineeId, "set_metadata", { metadata });
 
     // Set the feature attributes
-    await this.execute(traineeId, "set_feature_attributes", { trainee: traineeId, features });
+    await this.execute(traineeId, "set_feature_attributes", { features });
     const { content: allFeatures = features } = await this.execute(traineeId, "get_feature_attributes", {
       trainee: traineeId,
     });
