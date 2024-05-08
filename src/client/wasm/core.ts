@@ -9,21 +9,10 @@ export class AmalgamCoreError extends AmalgamError {
   }
 }
 
-export class AmalgamCoreWarning {
-  constructor(
-    public readonly detail: string = "",
-    public readonly code?: string,
-  ) {}
-
-  get message(): string {
-    return this.detail;
-  }
-}
-
 export interface AmalgamCoreResponse<R = unknown> {
   content: R;
   errors: AmalgamCoreError[];
-  warnings: AmalgamCoreWarning[];
+  warnings: string[];
 }
 
 /**
@@ -63,33 +52,39 @@ export function prepareCoreResponse<R = unknown>(
     throw new AmalgamError("Null or empty response received from core.");
   }
 
-  if (data?.constructor == Object) {
+  if (Array.isArray(data) && data.length == 2) {
     const errors: AmalgamCoreError[] = [];
-    const warnings: AmalgamCoreWarning[] = [];
+    const warnings: string[] = [];
+    const isSuccess = data[0];
+    const value = data[1];
 
-    // Collect warnings
-    if (data.warnings?.length > 0) {
-      for (const w of data.warnings) {
-        warnings.push(new AmalgamCoreWarning(w?.detail, w?.code));
-      }
-    }
-
-    // Collect errors
-    if (data.status !== "ok") {
-      if (data.errors?.length > 0) {
-        for (const e of data.errors) {
-          errors.push(new AmalgamCoreError(e?.detail, e?.code));
+    if (isSuccess) {
+      // Collect warnings
+      if (Array.isArray(value?.warnings)) {
+        for (const msg of value.warnings) {
+          if (msg != null) warnings.push(msg);
         }
-      } else {
+      }
+    } else {
+      // Collect errors
+      if (value?.detail) {
+        if (Array.isArray(value.detail)) {
+          for (const msg of value.detail) {
+            errors.push(new AmalgamCoreError(msg, value.code));
+          }
+        } else {
+          errors.push(new AmalgamCoreError(value.detail, value.code));
+        }
+      }
+      if (errors.length == 0) {
         errors.push(new AmalgamCoreError("An unknown error occurred."));
       }
-      return { errors, warnings, content: data.payload };
     }
 
     return {
       errors,
       warnings,
-      content: data.payload,
+      content: isSuccess ? value?.payload : undefined,
     };
   } else if (["string", "number", "bigint", "boolean"].indexOf(typeof data) != -1) {
     return { errors: [], warnings: [], content: data };
