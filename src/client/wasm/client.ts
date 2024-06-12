@@ -262,8 +262,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       name: metadata.name,
       persistence: metadata.persistence,
       metadata: metadata.metadata,
-      default_action_features: metadata.default_action_features || [],
-      default_context_features: metadata.default_context_features || [],
     }) as Trainee;
   }
 
@@ -458,8 +456,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const metadata = {
       name: props.name,
       metadata: props.metadata,
-      default_context_features: props.default_context_features,
-      default_action_features: props.default_action_features,
       persistence: props.persistence || "allow",
     };
     await this.execute(traineeId, "set_metadata", { metadata });
@@ -872,15 +868,8 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * Preprocess a request for react or react series.
    * @param trainee The trainee identifier.
    * @param request The react request.
+   *
+   * Currently non-operational, but retained as a hook for future development
    */
-  private preprocessReactRequest(trainee: Trainee, request: ReactRequest | ReactSeriesRequest): void {
-    if (request.desired_conviction == null) {
-      if (request.action_features == null) {
-        request.action_features = trainee.default_action_features;
-      }
-      if (request.context_features == null) {
-        request.context_features = trainee.default_context_features;
-      }
-    }
-  }
+  private preprocessReactRequest(trainee: Trainee, request: ReactRequest | ReactSeriesRequest): void {}
 }
