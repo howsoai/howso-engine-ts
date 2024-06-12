@@ -868,8 +868,13 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * Preprocess a request for react or react series.
    * @param trainee The trainee identifier.
    * @param request The react request.
-   *
-   * Currently non-operational, but retained as a hook for future development
    */
-  private preprocessReactRequest(trainee: Trainee, request: ReactRequest | ReactSeriesRequest): void {}
+  private preprocessReactRequest(trainee: Trainee, request: ReactRequest | ReactSeriesRequest): void {
+    if (!trainee) {
+      throw new Error("trainee is undefined");
+    }
+    if (!request) {
+      throw new Error("request is undefined");
+    }
+  }
 }
