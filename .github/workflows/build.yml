@@ -23,8 +23,10 @@ jobs:
     with:
       build-type: ${{ inputs.build-type }}
       optional-release-tag: ${{ inputs.optional-release-tag }}
-      
-  # Add NPM test here when the time is right
+
+  npm-test:
+    uses: howsoai/.github/.github/workflows/npm-test.yml@main
+    secrets: inherit
 
   release:
     needs:
