@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@howso/amalgam-lang": "^0.0.11",
-    "@howso/openapi-client": "file:../howso-openapi-client-ts/howso-openapi-client-0.0.0.tgz",
+    "@howso/openapi-client": "^2.0.0",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
