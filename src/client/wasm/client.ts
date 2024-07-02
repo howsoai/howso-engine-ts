@@ -48,6 +48,7 @@ import {
   ReactAggregateRequest,
   ReactAggregateResponseContent,
   ReactAggregateResponseFromJSON,
+  ReactAggregateRequestToJSON,
 } from "@howso/openapi-client/models";
 import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
@@ -701,10 +702,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async reactAggregate(traineeId: string, request: ReactAggregateRequest): Promise<ReactAggregateResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
-
     this.preprocessReactRequest(trainee, request);
-    const { actions, contexts, ...rest } = ReactRequestToJSON(request);
-    const { warnings = [], content } = await this.execute<ReactAggregateResponseContent>(traineeId, "batch_react", {
+    const { actions, contexts, ...rest } = ReactAggregateRequestToJSON(request);
+    const { warnings = [], content } = await this.execute<ReactAggregateResponseContent>(traineeId, "react_aggregate", {
       action_values: actions,
       context_values: contexts,
       ...rest,
