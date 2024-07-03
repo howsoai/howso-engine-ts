@@ -49,10 +49,12 @@ import {
   ReactAggregateResponseContent,
   ReactAggregateResponseFromJSON,
   ReactAggregateRequestToJSON,
+  TraineeWorkflowAttributesRequest,
+  TraineeWorkflowAttributesFromJSON,
+  TraineeWorkflowAttributesRequestToJSON,
 } from "@howso/openapi-client/models";
 import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
-
 import { Trainee } from "../../trainees/index.js";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index";
 import { ProblemError } from "../errors";
@@ -615,6 +617,20 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     const trainee = await this.autoResolveTrainee(traineeId);
     await this.execute(traineeId, "auto_analyze", {});
     await this.autoPersistTrainee(trainee.id);
+  }
+
+  /**
+   * Set the parameters use by auto analyze.
+   */
+  public async getInternalParams(traineeId: string, request: TraineeWorkflowAttributesRequest = {}) {
+    await this.autoResolveTrainee(traineeId);
+
+    const response = this.execute(
+      traineeId,
+      "get_internal_parameters",
+      TraineeWorkflowAttributesRequestToJSON(request),
+    );
+    return TraineeWorkflowAttributesFromJSON(response);
   }
 
   /**

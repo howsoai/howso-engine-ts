@@ -16,6 +16,8 @@ import type {
   ReactSeriesResponse,
   SetAutoAnalyzeParamsRequest,
   TraineeIdentity,
+  TraineeWorkflowAttributesRequest,
+  TraineeWorkflowAttributes,
 } from "@howso/openapi-client/models";
 import { Trainee } from "../../trainees/index";
 
@@ -35,6 +37,7 @@ export interface ITraineeClient {
   reactSeries(traineeId: string, request: ReactSeriesRequest): Promise<ReactSeriesResponse>;
   reactIntoFeatures(traineeId: string, request: ReactIntoFeaturesRequest): Promise<ReactIntoFeaturesResponse>;
   getCases(traineeId: string, request?: CasesRequest): Promise<Cases>;
+  getInternalParams(traineeId: string, request: TraineeWorkflowAttributesRequest): Promise<TraineeWorkflowAttributes>;
   getNumTrainingCases(traineeId: string): Promise<number>;
   setFeatureAttributes(traineeId: string, attributes: Record<string, FeatureAttributes>): Promise<void>;
   getFeatureAttributes(traineeId: string): Promise<Record<string, FeatureAttributes>>;
