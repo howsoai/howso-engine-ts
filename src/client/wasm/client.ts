@@ -1,7 +1,6 @@
 import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand } from "@howso/amalgam-lang/worker";
 import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
 import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
-
 import { AmalgamOptions } from "@howso/amalgam-lang/wasm";
 import {
   AnalyzeRequest,
@@ -9,8 +8,6 @@ import {
   CasesRequest,
   CaseCountResponse,
   FeatureAttributes,
-  FeaturePredictionStats,
-  FeaturePredictionStatsRequest,
   FeatureMarginalStats,
   FeatureMarginalStatsRequest,
   TrainRequest,
@@ -27,18 +24,11 @@ import {
   TraineeIdentity,
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
-  ReactIntoTraineeRequest,
-  ReactIntoTraineeResponse,
-  FeatureContributionsRequest,
-  FeatureMdaRequest,
   FeatureConviction,
   FeatureConvictionRequest,
-  FeatureResidualsRequest,
   CasesRequestToJSON,
   FeatureAttributesToJSON,
   FeatureAttributesFromJSON,
-  FeaturePredictionStatsFromJSON,
-  FeaturePredictionStatsRequestToJSON,
   FeatureMarginalStatsFromJSON,
   FeatureMarginalStatsRequestToJSON,
   SessionToJSON,
@@ -52,17 +42,19 @@ import {
   ReactSeriesResponseFromJSON,
   ReactIntoFeaturesRequestToJSON,
   ReactIntoFeaturesResponseFromJSON,
-  ReactIntoTraineeRequestToJSON,
-  ReactIntoTraineeResponseFromJSON,
   FeatureConvictionRequestToJSON,
-  FeatureContributionsRequestToJSON,
-  FeatureResidualsRequestToJSON,
-  FeatureMdaRequestToJSON,
   AnalyzeRequestToJSON,
+  ReactAggregateResponse,
+  ReactAggregateRequest,
+  ReactAggregateResponseContent,
+  ReactAggregateResponseFromJSON,
+  ReactAggregateRequestToJSON,
+  TraineeWorkflowAttributesRequest,
+  TraineeWorkflowAttributesFromJSON,
+  TraineeWorkflowAttributesRequestToJSON,
 } from "@howso/openapi-client/models";
 import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
-
 import { Trainee } from "../../trainees/index.js";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index";
 import { ProblemError } from "../errors";
@@ -629,6 +621,20 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * Set the parameters use by auto analyze.
+   */
+  public async getInternalParams(traineeId: string, request: TraineeWorkflowAttributesRequest = {}) {
+    await this.autoResolveTrainee(traineeId);
+
+    const response = this.execute(
+      traineeId,
+      "get_internal_parameters",
+      TraineeWorkflowAttributesRequestToJSON(request),
+    );
+    return TraineeWorkflowAttributesFromJSON(response);
+  }
+
+  /**
+   * Set the parameters use by auto analyze.
    * @param traineeId The trainee identifier.
    * @param request The analysis parameters.
    */
@@ -705,6 +711,23 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
+   * React to a trainee.
+   * @param traineeId The trainee identifier.
+   * @param request The react parameters.
+   * @returns The react response.
+   */
+  public async reactAggregate(traineeId: string, request: ReactAggregateRequest): Promise<ReactAggregateResponse> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    this.preprocessReactRequest(trainee, request);
+    const { warnings = [], content } = await this.execute<ReactAggregateResponseContent>(
+      traineeId,
+      "react_aggregate",
+      ReactAggregateRequestToJSON(request),
+    );
+    return ReactAggregateResponseFromJSON({ warnings, content });
+  }
+
+  /**
    * React in series to a trainee.
    * @param traineeId The trainee identifier.
    * @param request The react series parameters.
@@ -742,42 +765,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Compute and cache specified feature interpretations.
-   * @param traineeId The trainee identifier.
-   * @param request The react into trainee request.
-   * @returns The react into trainee response.
-   */
-  public async reactIntoTrainee(
-    traineeId: string,
-    request: ReactIntoTraineeRequest,
-  ): Promise<ReactIntoTraineeResponse> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { warnings = [] } = await this.execute<never>(traineeId, "react_into_trainee", {
-      ...ReactIntoTraineeRequestToJSON(request),
-    });
-    return ReactIntoTraineeResponseFromJSON({ warnings });
-  }
-
-  /**
-   * Get prediction stats of a trainee.
-   * @param traineeId The trainee identifier.
-   * @param request The prediction stats request.
-   * @returns The prediction stats.
-   */
-  public async getPredictionStats(
-    traineeId: string,
-    request: FeaturePredictionStatsRequest,
-  ): Promise<FeaturePredictionStats> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content, warnings = [] } = await this.execute<never>(traineeId, "get_prediction_stats", {
-      ...FeaturePredictionStatsRequestToJSON(request),
-    });
-    return FeaturePredictionStatsFromJSON({ content, warnings });
-  }
-
-  /**
    * Get marginal stats of a trainee.
    * @param traineeId The trainee identifier.
    * @param request The marginal stats request.
@@ -806,60 +793,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     const { content } = await this.execute<Record<string, number>>(traineeId, "compute_conviction_of_features", {
       ...FeatureConvictionRequestToJSON(request),
-    });
-    return content;
-  }
-
-  /**
-   * Get contributions for features.
-   * @deprecated Use getPredictionStats instead.
-   * @param traineeId The trainee identifier.
-   * @param request The feature contributions request.
-   * @returns A map of feature name to contribution value.
-   */
-  public async getFeatureContributions(
-    traineeId: string,
-    request: FeatureContributionsRequest,
-  ): Promise<Record<string, number>> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_contributions", {
-      ...FeatureContributionsRequestToJSON(request),
-    });
-    return content;
-  }
-
-  /**
-   * Get residuals for features.
-   * @deprecated Use getPredictionStats instead.
-   * @param traineeId The trainee identifier.
-   * @param request The feature residuals request.
-   * @returns A map of feature name to residual value.
-   */
-  public async getFeatureResiduals(
-    traineeId: string,
-    request: FeatureResidualsRequest,
-  ): Promise<Record<string, number>> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_residuals", {
-      ...FeatureResidualsRequestToJSON(request),
-    });
-    return content;
-  }
-
-  /**
-   * Get mean decrease in accuracy for features.
-   * @deprecated Use getPredictionStats instead.
-   * @param traineeId The trainee identifier.
-   * @param request The feature MDA request.
-   * @returns A map of feature name to MDA value.
-   */
-  public async getFeatureMda(traineeId: string, request: FeatureMdaRequest): Promise<Record<string, number>> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<Record<string, number>>(traineeId, "get_feature_mda", {
-      ...FeatureMdaRequestToJSON(request),
     });
     return content;
   }

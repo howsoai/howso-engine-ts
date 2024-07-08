@@ -14,7 +14,8 @@
     "build": "tsc --build",
     "lint": "tsc --noEmit && eslint 'src/**'",
     "lint:fix": "eslint --fix 'src/**'",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "test": "tsc --noEmit && eslint 'src/**'"
   },
   "files": [
     "LICENSE.txt",
@@ -36,8 +37,8 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@howso/amalgam-lang": "^0.0.10",
-    "@howso/openapi-client": "^1.0.1",
+    "@howso/amalgam-lang": "^0.0.11",
+    "@howso/openapi-client": "^2.0.0",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
@@ -52,7 +53,7 @@
     "eslint-plugin-prettier": "^5.1.3",
     "prettier": "^3.2.5",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.3"
+    "typescript": "^5.5.3"
   },
   "eslintConfig": {
     "root": true,
