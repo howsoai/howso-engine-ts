@@ -1,66 +1,66 @@
-import type { AmalgamRequest, AmalgamResponseBody, AmalgamCommand } from "@howso/amalgam-lang/worker";
-import type { Capabilities, ITraineeClient, ISessionClient } from "../capabilities/index.js";
-import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
-import { AmalgamOptions } from "@howso/amalgam-lang/wasm";
+import type { AmalgamCommand, AmalgamOptions, AmalgamRequest, AmalgamResponseBody } from "@howso/amalgam-lang";
+import { AmalgamError } from "@howso/amalgam-lang";
+import { SetAutoAblationParamsRequest } from "@howso/openapi-client";
 import {
   AnalyzeRequest,
+  AnalyzeRequestToJSON,
+  CaseCountResponse,
   Cases,
   CasesRequest,
-  CaseCountResponse,
+  CasesRequestToJSON,
   FeatureAttributes,
-  FeatureMarginalStats,
-  FeatureMarginalStatsRequest,
-  TrainRequest,
-  TrainResponse,
-  ReactRequest,
-  ReactResponse,
-  ReactResponseContent,
-  ReactSeriesRequest,
-  ReactSeriesResponse,
-  ReactSeriesResponseContent,
-  Session,
-  SessionIdentity,
-  SetAutoAnalyzeParamsRequest,
-  TraineeIdentity,
-  ReactIntoFeaturesRequest,
-  ReactIntoFeaturesResponse,
+  FeatureAttributesFromJSON,
+  FeatureAttributesToJSON,
   FeatureConviction,
   FeatureConvictionRequest,
-  CasesRequestToJSON,
-  FeatureAttributesToJSON,
-  FeatureAttributesFromJSON,
-  FeatureMarginalStatsFromJSON,
-  FeatureMarginalStatsRequestToJSON,
-  SessionToJSON,
-  SetAutoAnalyzeParamsRequestToJSON,
-  TraineeToJSON,
-  TraineeFromJSON,
-  TrainRequestToJSON,
-  ReactRequestToJSON,
-  ReactResponseFromJSON,
-  ReactSeriesRequestToJSON,
-  ReactSeriesResponseFromJSON,
-  ReactIntoFeaturesRequestToJSON,
-  ReactIntoFeaturesResponseFromJSON,
   FeatureConvictionRequestToJSON,
-  AnalyzeRequestToJSON,
-  ReactAggregateResponse,
+  FeatureMarginalStats,
+  FeatureMarginalStatsFromJSON,
+  FeatureMarginalStatsRequest,
+  FeatureMarginalStatsRequestToJSON,
   ReactAggregateRequest,
+  ReactAggregateRequestToJSON,
+  ReactAggregateResponse,
   ReactAggregateResponseContent,
   ReactAggregateResponseFromJSON,
-  ReactAggregateRequestToJSON,
-  TraineeWorkflowAttributesRequest,
+  ReactIntoFeaturesRequest,
+  ReactIntoFeaturesRequestToJSON,
+  ReactIntoFeaturesResponse,
+  ReactIntoFeaturesResponseFromJSON,
+  ReactRequest,
+  ReactRequestToJSON,
+  ReactResponse,
+  ReactResponseContent,
+  ReactResponseFromJSON,
+  ReactSeriesRequest,
+  ReactSeriesRequestToJSON,
+  ReactSeriesResponse,
+  ReactSeriesResponseContent,
+  ReactSeriesResponseFromJSON,
+  Session,
+  SessionIdentity,
+  SessionToJSON,
+  SetAutoAnalyzeParamsRequest,
+  SetAutoAnalyzeParamsRequestToJSON,
+  TraineeFromJSON,
+  TraineeIdentity,
+  TraineeToJSON,
   TraineeWorkflowAttributesFromJSON,
+  TraineeWorkflowAttributesRequest,
   TraineeWorkflowAttributesRequestToJSON,
+  TrainRequest,
+  TrainRequestToJSON,
+  TrainResponse,
 } from "@howso/openapi-client/models";
-import { RequiredError, mapValues } from "@howso/openapi-client/runtime";
+import { mapValues, RequiredError } from "@howso/openapi-client/runtime";
 import { v4 as uuid } from "uuid";
 import { Trainee } from "../../trainees/index.js";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index";
+import type { Capabilities, ISessionClient, ITraineeClient } from "../capabilities/index.js";
 import { ProblemError } from "../errors";
-import { CacheMap, isNode, batcher, BatchOptions } from "../utilities/index";
+import { batcher, BatchOptions, CacheMap, isNode } from "../utilities/index";
+import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
 import { FileSystemClient } from "./files";
-import { AmalgamError } from "@howso/amalgam-lang";
 
 export interface TraineeCache extends TraineeBaseCache {}
 
@@ -631,6 +631,28 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       TraineeWorkflowAttributesRequestToJSON(request),
     );
     return TraineeWorkflowAttributesFromJSON(response);
+  }
+
+  /**
+   * Set the parameters use by auto analyze.
+   * @param traineeId The trainee identifier.
+   * @param request The analysis parameters.
+   */
+  public async setAutoAblationParams(
+    traineeId: string,
+    request: Omit<SetAutoAblationParamsRequest, "trainee_id">,
+  ): Promise<void> {
+    await this.autoResolveTrainee(traineeId);
+
+    await this.execute(
+      traineeId,
+      "set_auto_ablation_params",
+      JSON.stringify({
+        trainee_id: traineeId,
+        ...request,
+      }),
+    );
+    await this.autoPersistTrainee(traineeId);
   }
 
   /**

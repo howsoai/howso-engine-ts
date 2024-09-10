@@ -15,7 +15,7 @@
     "lint": "tsc --noEmit && eslint 'src/**'",
     "lint:fix": "eslint --fix 'src/**'",
     "prepack": "npm run build",
-    "test": "tsc --noEmit && eslint 'src/**'"
+    "test": "tsc --noEmit"
   },
   "files": [
     "LICENSE.txt",
@@ -37,7 +37,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@howso/amalgam-lang": "^54.2.1",
+    "@howso/amalgam-lang": "^54.3.17",
     "@howso/openapi-client": "^2.0.1",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
