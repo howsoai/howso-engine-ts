@@ -45,7 +45,7 @@ import howsoUrl from "@/data/engine/howso.caml?url";
 import migrationsUrl from "@/data/engine/migrations.caml?url";
 import { type ClientOptions, Trainee, WasmClient } from "@howso/engine/wasm";
 
-const getClient = async (): WasmClient => {
+const getClient = async (): Promise<WasmClient> => {
   const worker = new Worker(new URL("@/workers/AmalgamWorker", import.meta.url), { type: "module" });
   const client = new WasmClient(worker, {
     howsoUrl,

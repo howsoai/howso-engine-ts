@@ -1,6 +1,6 @@
 import type { AmalgamCommand, AmalgamOptions, AmalgamRequest, AmalgamResponseBody } from "@howso/amalgam-lang";
 import { AmalgamError } from "@howso/amalgam-lang";
-import { SetAutoAblationParamsRequest } from "@howso/openapi-client";
+import { v4 as uuid } from "uuid";
 import {
   AnalyzeRequest,
   AnalyzeRequestToJSON,
@@ -40,8 +40,10 @@ import {
   Session,
   SessionIdentity,
   SessionToJSON,
+  SetAutoAblationParamsRequest,
   SetAutoAnalyzeParamsRequest,
   SetAutoAnalyzeParamsRequestToJSON,
+  Trainee,
   TraineeFromJSON,
   TraineeIdentity,
   TraineeToJSON,
@@ -51,15 +53,13 @@ import {
   TrainRequest,
   TrainRequestToJSON,
   TrainResponse,
-} from "@howso/openapi-client/models";
-import { mapValues, RequiredError } from "@howso/openapi-client/runtime";
-import { v4 as uuid } from "uuid";
-import { Trainee } from "../../trainees/index.js";
+} from "../../types";
+import { mapValues, RequiredError } from "../../types/runtime";
+import type { Capabilities, ISessionClient, ITraineeClient } from "../capabilities/index";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index";
-import type { Capabilities, ISessionClient, ITraineeClient } from "../capabilities/index.js";
 import { ProblemError } from "../errors";
 import { batcher, BatchOptions, CacheMap, isNode } from "../utilities/index";
-import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
+import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core";
 import { FileSystemClient } from "./files";
 
 export interface TraineeCache extends TraineeBaseCache {}
@@ -394,6 +394,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     // Check if trainee already loaded
     const trainee = await this.autoResolveTrainee(traineeId);
+    if (!trainee.id) {
+      throw new Error(`trainee.id is undefined`);
+    }
     const cached = this.traineeCache.get(trainee.id);
     if (cached) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
@@ -565,6 +568,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async train(traineeId: string, request: TrainRequest): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
+    if (!trainee.id) {
+      throw new Error(`trainee.id is undefined`);
+    }
     const session = await this.getActiveSession();
     let autoAnalyze = false;
 
@@ -615,6 +621,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async autoAnalyze(traineeId: string): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
+    if (!trainee.id) {
+      throw new Error(`trainee.id is undefined`);
+    }
     await this.execute(traineeId, "auto_analyze", {});
     await this.autoPersistTrainee(trainee.id);
   }

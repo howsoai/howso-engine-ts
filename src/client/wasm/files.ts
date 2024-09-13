@@ -5,7 +5,7 @@ import type {
   FileSystemResponseBody,
   IFileSystem,
 } from "@howso/amalgam-lang";
-import { isNode } from "../utilities/detectors.js";
+import { isNode } from "../utilities/detectors";
 
 export class FileSystemClient implements IFileSystem {
   protected readonly baseDir: string;

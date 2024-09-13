@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes, FeatureOriginalType } from "@howso/openapi-client/models";
+import type { FeatureAttributes, FeatureOriginalType } from "../../types";
 import {
   ArrayData,
   FeatureSerializerBase,
   InferFeatureAttributesBase,
   InferFeatureBoundsOptions,
   InferFeatureTimeSeriesOptions,
-} from "../base.js";
-import * as utils from "../utils.js";
+} from "../base";
+import * as utils from "../utils";
 
 export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase {
   constructor(protected readonly dataset: ArrayData) {

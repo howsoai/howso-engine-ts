@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes } from "@howso/openapi-client/models";
-import { ArrayData, ParsedArrayData, FeatureSerializerBase } from "../base.js";
-import { InferFeatureAttributesFromArray } from "./arrays.js";
+import type { FeatureAttributes } from "../../types";
+import { ArrayData, FeatureSerializerBase, ParsedArrayData } from "../base";
+import { InferFeatureAttributesFromArray } from "./arrays";
 
 /**
  * Reformat array of objects to 2d array of values.

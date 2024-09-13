@@ -7,19 +7,19 @@ import type {
   FeatureConvictionRequest,
   FeatureMarginalStats,
   FeatureMarginalStatsRequest,
-  TrainRequest,
-  ReactRequest,
-  ReactResponse,
   ReactIntoFeaturesRequest,
   ReactIntoFeaturesResponse,
+  ReactRequest,
+  ReactResponse,
   ReactSeriesRequest,
   ReactSeriesResponse,
   SetAutoAnalyzeParamsRequest,
+  Trainee,
   TraineeIdentity,
-  TraineeWorkflowAttributesRequest,
   TraineeWorkflowAttributes,
-} from "@howso/openapi-client/models";
-import { Trainee } from "../../trainees/index";
+  TraineeWorkflowAttributesRequest,
+  TrainRequest,
+} from "../../types";
 
 export interface ITraineeClient {
   acquireTraineeResources(traineeId: string): Promise<void>;

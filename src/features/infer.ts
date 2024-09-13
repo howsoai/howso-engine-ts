@@ -1,10 +1,10 @@
-import type * as base from "./base.js";
+import type * as base from "./base";
 
-import { FeatureAttributes } from "@howso/openapi-client/models";
-import { ProblemError } from "../client/errors.js";
-import { InferFeatureAttributesFromArray } from "./abstract/arrays.js";
-import { InferFeatureAttributesFromParsedArray } from "./abstract/parsed.js";
-import { isArrayData, isParsedArrayData } from "./base.js";
+import { ProblemError } from "../client/errors";
+import type { FeatureAttributes } from "../types";
+import { InferFeatureAttributesFromArray } from "./abstract/arrays";
+import { InferFeatureAttributesFromParsedArray } from "./abstract/parsed";
+import { isArrayData, isParsedArrayData } from "./base";
 
 export * from "./utils";
 

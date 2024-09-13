@@ -1,3 +1,3 @@
-export * from "./infer.js";
-export * from "./base.js";
-export * from "./serializer.js";
+export * from "./base";
+export * from "./infer";
+export * from "./serializer";

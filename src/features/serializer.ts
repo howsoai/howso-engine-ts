@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type * as base from "./base.js";
+import type * as base from "./base";
 
-import { isArrayData, isParsedArrayData } from "./base.js";
-import { FeatureAttributes } from "@howso/openapi-client/models";
-import { ProblemError } from "../client/errors.js";
-import { FeatureSerializerArrayData } from "./abstract/arrays.js";
-import { FeatureSerializerParsedArrayData } from "./abstract/parsed.js";
+import { ProblemError } from "../client/errors";
+import type { FeatureAttributes } from "../types";
+import { FeatureSerializerArrayData } from "./abstract/arrays";
+import { FeatureSerializerParsedArrayData } from "./abstract/parsed";
+import { isArrayData, isParsedArrayData } from "./base";
 
 export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
 
