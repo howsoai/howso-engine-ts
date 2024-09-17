@@ -10,8 +10,6 @@
 import { exists } from "../runtime";
 import type { AccountIdentity } from "./AccountIdentity";
 import { AccountIdentityFromJSON, AccountIdentityToJSON } from "./AccountIdentity";
-import type { ProjectIdentity } from "./ProjectIdentity";
-import { ProjectIdentityFromJSON, ProjectIdentityToJSON } from "./ProjectIdentity";
 
 /**
  *
@@ -31,12 +29,6 @@ export interface TraineeIdentity {
    * @memberof TraineeIdentity
    */
   name?: string;
-  /**
-   *
-   * @type {ProjectIdentity}
-   * @memberof TraineeIdentity
-   */
-  project?: ProjectIdentity;
   /**
    *
    * @type {AccountIdentity}
@@ -65,7 +57,6 @@ export function TraineeIdentityFromJSONTyped(json: any, ignoreDiscriminator: boo
   return {
     id: !exists(json, "id") ? undefined : json["id"],
     name: !exists(json, "name") ? undefined : json["name"],
-    project: !exists(json, "project") ? undefined : ProjectIdentityFromJSON(json["project"]),
     created_by: !exists(json, "created_by") ? undefined : AccountIdentityFromJSON(json["created_by"]),
   };
 }
@@ -80,7 +71,6 @@ export function TraineeIdentityToJSON(value?: TraineeIdentity | null): any {
   return {
     id: value.id,
     name: value.name,
-    project: ProjectIdentityToJSON(value.project),
     created_by: AccountIdentityToJSON(value.created_by),
   };
 }
