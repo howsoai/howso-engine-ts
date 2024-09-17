@@ -1,5 +1,10 @@
-import type { AmalgamCommand, AmalgamOptions, AmalgamRequest, AmalgamResponseBody } from "@howso/amalgam-lang";
-import { AmalgamError } from "@howso/amalgam-lang";
+import {
+  AmalgamError,
+  type AmalgamCommand,
+  type AmalgamOptions,
+  type AmalgamRequest,
+  type AmalgamResponseBody,
+} from "@howso/amalgam-lang";
 import { v4 as uuid } from "uuid";
 import {
   AnalyzeRequest,
@@ -445,7 +450,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
         `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`,
       );
     }
-    const { features = {}, ...props } = TraineeToJSON(trainee);
+    const { features = {}, ...props } = TraineeToJSON({ ...trainee, id: traineeId });
 
     // Set trainee metadata
     const metadata = {

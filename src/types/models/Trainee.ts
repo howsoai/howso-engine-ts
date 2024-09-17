@@ -46,7 +46,7 @@ export interface Trainee {
    * @type {string}
    * @memberof Trainee
    */
-  id?: string;
+  id: string;
   /**
    * Metadata for a trainee. User can specify any key-value pair to store custom metadata for a trainee.
    * @type {{ [key: string]: any; }}
