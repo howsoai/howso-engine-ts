@@ -1,8 +1,11 @@
 {
   "name": "@howso/engine",
   "version": "0.0.0",
-  "type": "module",
   "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "lib/index.cjs.js",
+  "module": "lib/index.esm.js",
+  "types": "lib/index.d.ts",
   "author": {
     "name": "Howso Incorporated"
   },
@@ -11,7 +14,7 @@
   },
   "scripts": {
     "prebuild": "rimraf ./lib",
-    "build": "tsc --build",
+    "build": "rollup --config",
     "lint": "tsc --noEmit && eslint 'src/**'",
     "lint:fix": "eslint --fix 'src/**'",
     "prepack": "npm run build",
@@ -23,11 +26,8 @@
     "README.md",
     "lib"
   ],
-  "main": "lib/index.cjs.js",
-  "module": "lib/index.esm.js",
-  "types": "lib/index.d.ts",
   "dependencies": {
-    "@howso/amalgam-lang": "file:../amalgam-lang-ts/howso-amalgam-lang-0.0.0.tgz",
+    "@howso/amalgam-lang": "^54.3.18",
     "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
