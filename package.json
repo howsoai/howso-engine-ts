@@ -28,7 +28,6 @@
   ],
   "dependencies": {
     "@howso/amalgam-lang": "^54.3.18",
-    "@microsoft/fetch-event-source": "^2.0.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
