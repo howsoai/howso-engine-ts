@@ -26,7 +26,11 @@ export class InferFeatureAttributesFromParsedArray extends InferFeatureAttribute
 }
 
 export class FeatureSerializerParsedArrayData extends FeatureSerializerBase {
-  public async serialize(data: ParsedArrayData, _features: Record<string, FeatureAttributes>): Promise<any[][]> {
+  public async serialize(
+    data: ParsedArrayData,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    features: Record<string, FeatureAttributes>,
+  ): Promise<any[][]> {
     return parsedDataToArrayData(data).data;
   }
 

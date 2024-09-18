@@ -67,6 +67,7 @@ import { batcher, BatchOptions, CacheMap, isNode } from "../utilities/index";
 import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core";
 import { FileSystemClient } from "./files";
 
+/* eslint-disable-next-line @typescript-eslint/no-empty-object-type */
 export interface TraineeCache extends TraineeBaseCache {}
 
 export interface ClientOptions {
@@ -469,9 +470,12 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * Update a trainee's properties.
-   * @param _trainee The trainee identifier.
+   * @param trainee The trainee identifier.
    */
-  public async updateTrainee(_trainee: Trainee): Promise<Trainee> {
+  public async updateTrainee(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    trainee: Trainee,
+  ): Promise<Trainee> {
     throw new Error("Method not implemented.");
   }
 
@@ -505,9 +509,12 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * List existing trainees.
-   * @param _keywords Keywords to filter the list of trainees by.
+   * @param keywords Keywords to filter the list of trainees by.
    */
-  public async listTrainees(_keywords: string | string[]): Promise<TraineeIdentity[]> {
+  public async listTrainees(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    keywords: string | string[],
+  ): Promise<TraineeIdentity[]> {
     throw new Error("Method not implemented.");
   }
 

@@ -146,7 +146,10 @@ export abstract class InferFeatureAttributesBase {
   protected abstract inferString(featureName: string): Promise<FeatureAttributes>;
   protected abstract inferInteger(featureName: string): Promise<FeatureAttributes>;
   protected abstract inferFloat(featureName: string): Promise<FeatureAttributes>;
-  protected async inferUnknown(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferUnknown(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return { type: "nominal" };
   }
 

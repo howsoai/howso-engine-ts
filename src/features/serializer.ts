@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type * as base from "./base";
 
 import { ProblemError } from "../client/errors";
