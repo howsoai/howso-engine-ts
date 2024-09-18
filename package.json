@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "AGPL-3.0-only",
   "type": "module",
-  "main": "lib/index.cjs.js",
+  "main": "lib/index.cjs",
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
   "author": {
