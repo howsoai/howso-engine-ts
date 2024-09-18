@@ -399,9 +399,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
     // Check if trainee already loaded
     const trainee = await this.autoResolveTrainee(traineeId);
-    if (!trainee.id) {
-      throw new Error(`trainee.id is undefined`);
-    }
     const cached = this.traineeCache.get(trainee.id);
     if (cached) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
