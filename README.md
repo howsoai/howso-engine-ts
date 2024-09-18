@@ -43,9 +43,9 @@ You can then create the worker client using a url import:
 ```ts
 import howsoUrl from "@/data/engine/howso.caml?url";
 import migrationsUrl from "@/data/engine/migrations.caml?url";
-import { type ClientOptions, Trainee, WasmClient } from "@howso/engine/wasm";
+import { type ClientOptions, Trainee, WasmClient } from "@howso/engine";
 
-const getClient = async (): WasmClient => {
+const getClient = async (): Promise<WasmClient> => {
   const worker = new Worker(new URL("@/workers/AmalgamWorker", import.meta.url), { type: "module" });
   const client = new WasmClient(worker, {
     howsoUrl,

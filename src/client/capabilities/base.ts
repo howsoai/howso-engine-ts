@@ -1,4 +1,4 @@
-import { Trainee } from "../../trainees/index";
+import { Trainee } from "../../types";
 import type { CacheMap } from "../utilities/cache";
 
 export interface Capabilities {

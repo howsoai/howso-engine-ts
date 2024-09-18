@@ -20,10 +20,7 @@ export interface AmalgamCoreResponse<R = unknown> {
  * @param payload The core payload.
  * @returns The updated core payload.
  */
-export function prepareCoreRequest(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload: any,
-) {
+export function prepareCoreRequest(payload: any) {
   if (!payload) {
     return payload;
   }
@@ -44,10 +41,7 @@ export function prepareCoreRequest(
  * @param data The core response.
  * @returns The updated core response.
  */
-export function prepareCoreResponse<R = unknown>(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any,
-): AmalgamCoreResponse<R> {
+export function prepareCoreResponse<R = unknown>(data: any): AmalgamCoreResponse<R> {
   if (!data) {
     throw new AmalgamError("Null or empty response received from core.");
   }

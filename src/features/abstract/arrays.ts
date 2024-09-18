@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { FeatureAttributes, FeatureOriginalType } from "@howso/openapi-client/models";
+import type { FeatureAttributes, FeatureOriginalType } from "../../types";
 import {
   ArrayData,
   FeatureSerializerBase,
   InferFeatureAttributesBase,
   InferFeatureBoundsOptions,
   InferFeatureTimeSeriesOptions,
-} from "../base.js";
-import * as utils from "../utils.js";
+} from "../base";
+import * as utils from "../utils";
 
 export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase {
   constructor(protected readonly dataset: ArrayData) {
@@ -23,33 +22,48 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     }
   }
 
-  protected async inferBoolean(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferBoolean(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
       type: "nominal",
       data_type: "boolean",
     };
   }
 
-  protected async inferTimedelta(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferTimedelta(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
       type: "continuous",
     };
   }
 
-  protected async inferTime(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferTime(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
       type: "continuous",
     };
   }
 
-  protected async inferDate(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferDate(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
       type: "continuous",
       date_time_format: "%Y-%m-%d",
     };
   }
 
-  protected async inferDatetime(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferDatetime(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
       type: "continuous",
       date_time_format: "%Y-%m-%dT%H:%M:%SZ",
@@ -100,7 +114,10 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     }
   }
 
-  protected async inferString(_featureName: string): Promise<FeatureAttributes> {
+  protected async inferString(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
       type: "nominal",
     };
@@ -188,15 +205,21 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
   }
 
   public async inferTimeSeries(
-    _attributes: Readonly<FeatureAttributes>,
-    _featureName: string,
-    _options: InferFeatureTimeSeriesOptions,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    attributes: Readonly<FeatureAttributes>,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    options: InferFeatureTimeSeriesOptions,
   ): Promise<Partial<FeatureAttributes>> {
     // TODO - infer time series
     throw new Error("Method not implemented.");
   }
 
-  protected async inferUnique(_featureName: string): Promise<boolean> {
+  protected async inferUnique(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<boolean> {
     // Arrays don't support unique constraints
     return false;
   }
@@ -248,7 +271,11 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
 }
 
 export class FeatureSerializerArrayData extends FeatureSerializerBase {
-  public async serialize(data: ArrayData, _features: Record<string, FeatureAttributes>): Promise<any[][]> {
+  public async serialize(
+    data: ArrayData,
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    features: Record<string, FeatureAttributes>,
+  ): Promise<any[][]> {
     return data.data;
   }
 

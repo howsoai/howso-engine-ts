@@ -1,9 +1,15 @@
-import type { AmalgamCommand, AmalgamOptions, AmalgamRequest, AmalgamResponseBody } from "@howso/amalgam-lang";
-import { AmalgamError } from "@howso/amalgam-lang";
-import { SetAutoAblationParamsRequest } from "@howso/openapi-client";
+import {
+  AmalgamError,
+  type AmalgamCommand,
+  type AmalgamOptions,
+  type AmalgamRequest,
+  type AmalgamResponseBody,
+} from "@howso/amalgam-lang";
+import { v4 as uuid } from "uuid";
 import {
   AnalyzeRequest,
   AnalyzeRequestToJSON,
+  AutoAblationParams,
   CaseCountResponse,
   Cases,
   CasesRequest,
@@ -42,6 +48,7 @@ import {
   SessionToJSON,
   SetAutoAnalyzeParamsRequest,
   SetAutoAnalyzeParamsRequestToJSON,
+  Trainee,
   TraineeFromJSON,
   TraineeIdentity,
   TraineeToJSON,
@@ -51,17 +58,16 @@ import {
   TrainRequest,
   TrainRequestToJSON,
   TrainResponse,
-} from "@howso/openapi-client/models";
-import { mapValues, RequiredError } from "@howso/openapi-client/runtime";
-import { v4 as uuid } from "uuid";
-import { Trainee } from "../../trainees/index.js";
+} from "../../types";
+import { mapValues, RequiredError } from "../../types/runtime";
+import type { Capabilities, ISessionClient, ITraineeClient } from "../capabilities/index";
 import { BaseClient, TraineeBaseCache } from "../capabilities/index";
-import type { Capabilities, ISessionClient, ITraineeClient } from "../capabilities/index.js";
 import { ProblemError } from "../errors";
 import { batcher, BatchOptions, CacheMap, isNode } from "../utilities/index";
-import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core.js";
+import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core";
 import { FileSystemClient } from "./files";
 
+/* eslint-disable-next-line @typescript-eslint/no-empty-object-type */
 export interface TraineeCache extends TraineeBaseCache {}
 
 export interface ClientOptions {
@@ -442,7 +448,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
         `Could not create a trainee with id '${traineeId}'. Either the trainee template file was not found or the trainee already exists.`,
       );
     }
-    const { features = {}, ...props } = TraineeToJSON(trainee);
+    const { features = {}, ...props } = TraineeToJSON({ ...trainee, id: traineeId });
 
     // Set trainee metadata
     const metadata = {
@@ -464,9 +470,12 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * Update a trainee's properties.
-   * @param _trainee The trainee identifier.
+   * @param trainee The trainee identifier.
    */
-  public async updateTrainee(_trainee: Trainee): Promise<Trainee> {
+  public async updateTrainee(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    trainee: Trainee,
+  ): Promise<Trainee> {
     throw new Error("Method not implemented.");
   }
 
@@ -500,9 +509,12 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
 
   /**
    * List existing trainees.
-   * @param _keywords Keywords to filter the list of trainees by.
+   * @param keywords Keywords to filter the list of trainees by.
    */
-  public async listTrainees(_keywords: string | string[]): Promise<TraineeIdentity[]> {
+  public async listTrainees(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    keywords: string | string[],
+  ): Promise<TraineeIdentity[]> {
     throw new Error("Method not implemented.");
   }
 
@@ -565,6 +577,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async train(traineeId: string, request: TrainRequest): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
+    if (!trainee.id) {
+      throw new Error(`trainee.id is undefined`);
+    }
     const session = await this.getActiveSession();
     let autoAnalyze = false;
 
@@ -615,6 +630,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    */
   public async autoAnalyze(traineeId: string): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
+    if (!trainee.id) {
+      throw new Error(`trainee.id is undefined`);
+    }
     await this.execute(traineeId, "auto_analyze", {});
     await this.autoPersistTrainee(trainee.id);
   }
@@ -636,12 +654,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Set the parameters use by auto analyze.
    * @param traineeId The trainee identifier.
-   * @param request The analysis parameters.
+   * @param params The analysis parameters.
    */
-  public async setAutoAblationParams(
-    traineeId: string,
-    request: Omit<SetAutoAblationParamsRequest, "trainee_id">,
-  ): Promise<void> {
+  public async setAutoAblationParams(traineeId: string, params: AutoAblationParams): Promise<void> {
     await this.autoResolveTrainee(traineeId);
 
     await this.execute(
@@ -649,7 +664,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       "set_auto_ablation_params",
       JSON.stringify({
         trainee_id: traineeId,
-        ...request,
+        ...params,
       }),
     );
     await this.autoPersistTrainee(traineeId);
