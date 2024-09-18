@@ -9,6 +9,7 @@ import { v4 as uuid } from "uuid";
 import {
   AnalyzeRequest,
   AnalyzeRequestToJSON,
+  AutoAblationParams,
   CaseCountResponse,
   Cases,
   CasesRequest,
@@ -45,7 +46,6 @@ import {
   Session,
   SessionIdentity,
   SessionToJSON,
-  SetAutoAblationParamsRequest,
   SetAutoAnalyzeParamsRequest,
   SetAutoAnalyzeParamsRequestToJSON,
   Trainee,
@@ -650,12 +650,9 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   /**
    * Set the parameters use by auto analyze.
    * @param traineeId The trainee identifier.
-   * @param request The analysis parameters.
+   * @param params The analysis parameters.
    */
-  public async setAutoAblationParams(
-    traineeId: string,
-    request: Omit<SetAutoAblationParamsRequest, "trainee_id">,
-  ): Promise<void> {
+  public async setAutoAblationParams(traineeId: string, params: AutoAblationParams): Promise<void> {
     await this.autoResolveTrainee(traineeId);
 
     await this.execute(
@@ -663,7 +660,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       "set_auto_ablation_params",
       JSON.stringify({
         trainee_id: traineeId,
-        ...request,
+        ...params,
       }),
     );
     await this.autoPersistTrainee(traineeId);
