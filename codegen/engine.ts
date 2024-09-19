@@ -12,7 +12,7 @@ export interface BaseSchema {
   default?: any;
 }
 
-export interface RefSchema extends BaseSchema {
+export interface Ref extends BaseSchema {
   ref: string;
 }
 
@@ -23,14 +23,14 @@ export interface Schema extends BaseSchema {
   max?: number;
   min_length?: number;
   max_length?: number;
-  values?: SchemaType | Schema | RefSchema;
-  indices?: SchemaType | Record<string, SchemaType | Schema | RefSchema>;
-  additional_indices?: SchemaType | Schema | RefSchema;
+  values?: SchemaType | Schema | Ref;
+  indices?: Record<string, SchemaType | Schema | Ref>;
+  additional_indices?: SchemaType | Schema | Ref;
 }
 
 export interface LabelDefinition {
-  parameters: Record<string, Schema | RefSchema> | null;
-  returns?: Schema | RefSchema | null;
+  parameters: Record<string, Schema | Ref> | null;
+  returns?: Schema | Ref | null;
   description?: string | null;
   long_running?: boolean;
   read_only?: boolean;
@@ -80,4 +80,22 @@ export async function getEngineApi(): Promise<EngineApi> {
   } finally {
     amalgam.destroyEntity(handle);
   }
+}
+
+export function isRef(value: SchemaType | Schema | Ref | null | undefined): value is Ref {
+  if (value == null || Array.isArray(value) || typeof value === "string") {
+    return false;
+  }
+  return "ref" in value && value.ref != null;
+}
+
+export function isSchema(value: SchemaType | Schema | Ref | null | undefined): value is Schema {
+  if (value == null || Array.isArray(value) || typeof value === "string") {
+    return false;
+  }
+  return !isRef(value) && "type" in value && typeof value.type === "string";
+}
+
+export function isSchemaOrRef(value: SchemaType | Schema | Ref | null | undefined): value is Schema | Ref {
+  return isRef(value) || isSchema(value);
 }
