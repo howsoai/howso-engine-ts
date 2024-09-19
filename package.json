@@ -9,6 +9,9 @@
   "author": {
     "name": "Howso Incorporated"
   },
+  "repository": {
+    "url": "https://github.com/howsoai/howso-engine-ts"
+  },
   "engines": {
     "node": ">=18"
   },
