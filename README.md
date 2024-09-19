@@ -56,10 +56,11 @@ const getClient = async (): Promise<WasmClient> => {
 };
 ```
 
-## Build and Test
-
-TODO: Describe and show how to build your code and run the tests.
-
 ## Publishing
 
-An action is available on GitHub to release.
+Documentation changes do not require a version publishing.
+For functional changes, follow [SemVer](https://semver.org/)
+standards updating the `package.json` and `package-lock.json`
+files in your pull request.
+
+When you are ready to publish a new version, use the Github Release action.
