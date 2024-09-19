@@ -1,3 +1,4 @@
+import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import pkg from "./package.json" with { type: "json" };
 
@@ -12,7 +13,7 @@ export default {
       noEmitOnError: true,
       tsconfig: "./tsconfig.build.json",
     }),
-    // terser(), // minifies generated bundles
+    terser(), // minifies generated bundles
   ],
   external: [
     ...Object.keys(pkg.dependencies || {}),
