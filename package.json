@@ -10,7 +10,7 @@
     "name": "Howso Incorporated"
   },
   "repository": {
-    "url": "https://github.com/howsoai/howso-engine-ts"
+    "url": "git+https://github.com/howsoai/howso-engine-ts.git"
   },
   "engines": {
     "node": ">=18"
