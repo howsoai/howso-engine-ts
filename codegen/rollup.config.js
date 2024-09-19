@@ -25,7 +25,13 @@ export default {
       ],
     }),
   ],
-  external: ["node:fs", "node:module", ...Object.keys(pkg.dependencies || {})],
+  external: [
+    "node:fs",
+    "node:module",
+    "node:path",
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.devDependencies || {}),
+  ],
   output: [
     {
       file: "codegen/build/index.cjs",

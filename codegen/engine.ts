@@ -30,7 +30,7 @@ export interface Schema extends BaseSchema {
 
 export interface LabelDefinition {
   parameters: Record<string, Schema | Ref> | null;
-  returns?: Schema | Ref | null;
+  returns?: SchemaType | Schema | Ref | null;
   description?: string | null;
   long_running?: boolean;
   read_only?: boolean;
