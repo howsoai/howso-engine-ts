@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
 import { EngineApi, isSchemaOrRef } from "./engine";
+import { registerFilters } from "./filters";
 import { toPascalCase } from "./utils";
 
 export class Generator {
@@ -18,6 +19,7 @@ export class Generator {
     // Setup template engine
     const loader = new nunjucks.FileSystemLoader(path.join(__dirname, "templates"));
     this.env = new nunjucks.Environment(loader, { throwOnUndefined: true });
+    registerFilters(this.env);
   }
 
   public render() {
@@ -37,12 +39,12 @@ export class Generator {
     const allNames = [];
 
     // Clear existing schema files
-    fs.rmSync(this.schemaDir, { recursive: true });
+    fs.rmSync(this.schemaDir, { recursive: true, force: true });
 
     // Render the shared schemas
     for (const [name, schema] of Object.entries(this.doc.schemas)) {
       allNames.push(name);
-      this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", { name, ...schema });
+      this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", { name, schemas: { name: schema } });
     }
 
     // Render label schemas
@@ -51,20 +53,26 @@ export class Generator {
       if (definition.parameters != null) {
         const name = this.getLabelParametersName(label);
         allNames.push(name);
-        this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", { schemas: definition.parameters });
+        this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", {
+          name,
+          description: definition.description,
+          schemas: definition.parameters,
+        });
       }
       // Render returns
       if (isSchemaOrRef(definition.returns)) {
         const name = this.getLabelReturnsName(label);
         allNames.push(name);
         this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", {
+          name,
+          description: definition.description,
           schemas: definition.returns,
         });
       }
     }
 
     // Render package index
-    this.renderFile(this.schemaDir, `index.ts`, "schemas/index.njk", { items: allNames });
+    this.renderFile(this.schemaDir, "index.ts", "schemas/index.njk", { items: allNames });
   }
 
   private renderFile(parent: string, target: string, template: string, context: object) {

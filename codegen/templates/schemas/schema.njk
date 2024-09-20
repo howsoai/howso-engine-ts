@@ -1,0 +1,12 @@
+/**
+ * {{ name }}
+{%- if description %}
+ *
+{{ description | blockComment | safe }}
+{%- endif %}
+ *
+ * NOTE: This file is auto generated, do not modify manually.
+ */
+{% for item in schemas | schemaImports %}
+import { {{ item }} } from "./{{ item }}";
+{%- endfor %}
