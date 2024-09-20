@@ -158,17 +158,30 @@ export type ReactAggregateDetailsContextConditionPrecisionEnum = "exact" | "simi
  * @enum {string}
  */
 export type ReactAggregateDetailsSelectedPredictionStatsEnum =
+  // Returns all the the available prediction stats, including the confusion matrix.
   | "all"
+  // The number of correct predictions divided by the total number of predictions.
   | "accuracy"
+  // A sparse map of actual feature value to a map of predicted feature value to counts.
   | "confusion_matrix"
+  // Mean absolute error. For continuous features, this is calculated as the mean of absolute values of the difference between the actual and predicted values. For nominal features, this is 1 - the average categorical action probability of each case’s correct classes. Categorical action probabilities are the probabilities for each class for the action feature.
   | "mae"
+  // Mean decrease in accuracy when each feature is dropped from the model, applies to all features.
+  | "mda"
+  // Mean decrease in accuracy that used scrambling of feature values instead of dropping each feature, applies to all features.
+  | "feature_mda_permutation_full"
+  // Precision (positive predictive) value for nominal features only.
   | "precision"
+  // The r-squared coefficient of determination, for continuous features only.
   | "r2"
+  // Recall (sensitivity) value for nominal features only.
   | "recall"
+  // Root mean squared error, for continuous features only.
   | "rmse"
+  // Spearman’s rank correlation coefficient, for continuous features only.
   | "spearman_coeff"
-  | "mcc"
-  | "missing_value_accuracy";
+  // Matthews correlation coefficient, for nominal features only.
+  | "mcc";
 
 /**
  * Check if a given object implements the ReactAggregateDetails interface.
