@@ -1,12 +1,4 @@
-/**
- * {{ name }}
-{%- if description %}
- *
-{{ description | blockComment | safe }}
-{%- endif %}
- *
- * NOTE: This file is auto generated, do not modify manually.
- */
-{% for item in schemas | schemaImports %}
-import { {{ item }} } from "./{{ item }}";
-{%- endfor %}
+{%- include "schemas/_header.njk" %}
+{%- from "schemas/_macros.njk" import field %}
+
+export type {{ name | pascalCase }} = {{ field(schema) }};

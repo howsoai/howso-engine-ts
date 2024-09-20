@@ -1,0 +1,17 @@
+{%- include "schemas/_header.njk" %}
+{%- from "schemas/_macros.njk" import field, comment %}
+{% if parameters %}
+export type {{ name }}Request = {
+{%- for key, schema in parameters %}
+  {{ comment(schema) | indent(2) }}
+  {{ key }}{% if schema.optional %}?{% endif %}: {{ field(schema) }};
+{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+};
+{% endif -%}
+
+{%- if returns %}
+export type {{ name }}Response = {{ field(returns) }};
+
+{%- endif %}

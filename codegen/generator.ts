@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
-import { EngineApi, isSchemaOrRef } from "./engine";
+import { EngineApi, isRef, isSchemaOrRef, LabelDefinition, Ref, Schema } from "./engine";
 import { registerFilters } from "./filters";
 import { toPascalCase } from "./utils";
 
@@ -27,14 +27,6 @@ export class Generator {
     this.renderClient();
   }
 
-  public getLabelParametersName(label: string) {
-    return `${toPascalCase(label)}_Request`;
-  }
-
-  public getLabelReturnsName(label: string) {
-    return `${toPascalCase(label)}_Response`;
-  }
-
   private renderSchemas() {
     const allNames = [];
 
@@ -44,29 +36,26 @@ export class Generator {
     // Render the shared schemas
     for (const [name, schema] of Object.entries(this.doc.schemas)) {
       allNames.push(name);
-      this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", { name, schemas: { name: schema } });
+      this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", {
+        name,
+        schema,
+        imports: this.detectSchemaImports(schema),
+      });
     }
 
     // Render label schemas
     for (const [label, definition] of Object.entries(this.doc.labels)) {
-      // Render parameters
-      if (definition.parameters != null) {
-        const name = this.getLabelParametersName(label);
-        allNames.push(name);
-        this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", {
-          name,
+      // Add schemas for label parameters and/or return value if it has any
+      if (definition.parameters != null || definition.returns != null) {
+        const title = toPascalCase(label);
+        allNames.push(title);
+        this.renderFile(this.schemaDir, `${title}.ts`, "schemas/label.njk", {
+          name: title,
+          label: label,
           description: definition.description,
-          schemas: definition.parameters,
-        });
-      }
-      // Render returns
-      if (isSchemaOrRef(definition.returns)) {
-        const name = this.getLabelReturnsName(label);
-        allNames.push(name);
-        this.renderFile(this.schemaDir, `${name}.ts`, "schemas/schema.njk", {
-          name,
-          description: definition.description,
-          schemas: definition.returns,
+          parameters: definition.parameters,
+          returns: definition.returns,
+          imports: this.detectLabelImports(definition),
         });
       }
     }
@@ -86,5 +75,39 @@ export class Generator {
 
   private renderClient() {
     return true;
+  }
+
+  private detectLabelImports(label: LabelDefinition) {
+    const imports: string[] = [];
+    if (label.parameters != null) {
+      for (const schema of Object.values(label.parameters)) {
+        imports.push(...this.detectSchemaImports(schema));
+      }
+    }
+    if (isSchemaOrRef(label.returns)) {
+      imports.push(...this.detectSchemaImports(label.returns));
+    }
+    return imports;
+  }
+
+  private detectSchemaImports(schema: Ref | Schema): string[] {
+    const imports: string[] = [];
+    if (isRef(schema)) {
+      return [schema.ref];
+    }
+    if (isSchemaOrRef(schema.values)) {
+      imports.push(...this.detectSchemaImports(schema.values));
+    }
+    if (isSchemaOrRef(schema.additional_indices)) {
+      imports.push(...this.detectSchemaImports(schema.additional_indices));
+    }
+    if (schema.indices != null) {
+      for (const value of Object.values(schema.indices)) {
+        if (isSchemaOrRef(value)) {
+          imports.push(...this.detectSchemaImports(value));
+        }
+      }
+    }
+    return imports;
   }
 }

@@ -1,0 +1,35 @@
+{%- macro field(schema) %}
+    {%- if schema | isRef -%}
+{{ schema.ref }}
+    {%- elif schema | isSchema -%}
+        {%- if schema.type == "assoc" -%}
+{% include "schemas/types/_assoc.njk" %}
+        {%- elif schema.type == "list" -%}
+{% include "schemas/types/_list.njk" %}
+        {%- elif schema.type == "string" -%}
+{% include "schemas/types/_string.njk" %}
+        {%- elif schema.type == "number" -%}
+{% include "schemas/types/_number.njk" %}
+        {%- elif schema.type == "boolean" -%}
+boolean
+        {%- elif schema.type | isArray -%}
+any[] /* TODO */
+        {%- else -%}
+any
+        {%- endif -%}
+    {%- else -%}
+{{ schema | convertType }}
+    {%- endif -%}
+{%- endmacro %}
+
+
+{%- macro comment(schema) %}
+    {%- if schema.description -%}
+/*
+{{ schema.description | blockComment | safe }}
+{%- if schema.default != null %}
+ * @default {{ schema.default | toJson | safe }}
+{%- endif %}
+ */
+    {%- endif %}
+{%- endmacro %}
