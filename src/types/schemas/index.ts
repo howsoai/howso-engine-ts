@@ -1,3 +1,6 @@
+/**
+ * NOTE: This file is auto generated, do not modify manually.
+ */
 export * from "./FeatureAttributes";
 export * from "./ReactDetails";
 export * from "./CaseIndices";
