@@ -2,7 +2,7 @@
  * {{ name }}
 {%- if description %}
  *
-{{ description | blockComment | safe }}
+{{ description | capitalize | blockComment | safe }}
 {%- endif %}
  *
  * NOTE: This file is auto generated, do not modify manually.

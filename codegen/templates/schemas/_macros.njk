@@ -37,7 +37,7 @@ any
 {%- macro comment(schema) %}
 {%- if schema.description -%}
 /*
-{{ schema.description | blockComment | safe }}
+{{ schema.description | capitalize | blockComment | safe }}
 {%- if schema.default != null %}
  * @default {{ schema.default | toJson | safe }}
 {%- endif %}
