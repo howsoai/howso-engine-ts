@@ -10,6 +10,7 @@ export class Generator {
   env: nunjucks.Environment;
   basePath: string;
   schemaDir: string;
+  clientDir: string;
 
   /**
    * Construct a new Generator.
@@ -18,6 +19,7 @@ export class Generator {
   public constructor(doc: EngineApi) {
     this.basePath = path.resolve(__dirname, "../../src");
     this.schemaDir = path.resolve(this.basePath, "types/schemas");
+    this.clientDir = path.resolve(this.basePath, "client");
     this.doc = doc;
 
     // Setup template engine
@@ -38,7 +40,9 @@ export class Generator {
    * Render all client logic from the API to file.
    */
   private renderClient() {
-    return true;
+    this.renderFile(this.clientDir, "base.ts", "client/base.njk", {
+      labels: this.doc.labels,
+    });
   }
 
   /**
