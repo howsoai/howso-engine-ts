@@ -10,7 +10,7 @@ export function blockComment(content: any) {
   // Add '*' to the beginning of each line
   return str
     .split("\n")
-    .map((line) => ` * ${line.trimStart()}`)
+    .map((line) => ` * ${line.replace(/\t/g, "  ")}`)
     .join("\n")
     .trimEnd();
 }
