@@ -9,6 +9,7 @@ import {
   DetailsResponseDistanceRatioPartsInnerToJSON,
 } from "./DetailsResponseDistanceRatioPartsInner";
 import type { DetailsResponseOutlyingFeatureValuesInnerValue } from "./DetailsResponseOutlyingFeatureValuesInnerValue";
+import { ReactDetailsSelectedPredictionStat } from "./ReactDetails";
 
 /**
  *
@@ -51,7 +52,7 @@ export interface ReactResponseContent {
    * @type {Array<{ [key: string]: any; }>}
    * @memberof ReactResponseContent
    */
-  prediction_stats?: Array<{ [key: string]: any }>;
+  prediction_stats?: Array<ReactResponseContentPredictionStats>;
   /**
    *
    * @type {Array<{ [key: string]: DetailsResponseOutlyingFeatureValuesInnerValue; }>}
@@ -269,6 +270,10 @@ export interface ReactResponseContent {
    */
   action_values?: Array<Array<any>> | null;
 }
+
+export type ReactResponseContentPredictionStats = Partial<
+  Record<ReactDetailsSelectedPredictionStat, { [key: string]: number }>
+>;
 
 /**
  * Check if a given object implements the ReactResponseContent interface.
