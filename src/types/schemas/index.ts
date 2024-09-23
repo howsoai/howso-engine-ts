@@ -35,7 +35,6 @@ export * from "./CreateSubtrainee";
 export * from "./DeleteSession";
 export * from "./UpgradeTrainee";
 export * from "./AddFeature";
-export * from "./Initialize";
 export * from "./Analyze";
 export * from "./GetMarginalStats";
 export * from "./SetParentId";

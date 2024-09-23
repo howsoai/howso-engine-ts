@@ -11,6 +11,7 @@ export class Generator {
   basePath: string;
   schemaDir: string;
   clientDir: string;
+  ignoredLabels: string[];
 
   /**
    * Construct a new Generator.
@@ -21,6 +22,19 @@ export class Generator {
     this.schemaDir = path.resolve(this.basePath, "types/schemas");
     this.clientDir = path.resolve(this.basePath, "client");
     this.doc = doc;
+    this.ignoredLabels = [
+      "root_filepath",
+      "filename",
+      "filepath",
+      "debug_label",
+      "initialize",
+      "initialize_for_deployment",
+      "major_version",
+      "minor_version",
+      "point_version",
+      "version",
+      "get_api",
+    ];
 
     // Setup template engine
     const loader = new nunjucks.FileSystemLoader(path.join(__dirname, "templates"));
@@ -40,8 +54,14 @@ export class Generator {
    * Render all client logic from the API to file.
    */
   private renderClient() {
+    const targetLabels: Record<string, LabelDefinition> = {};
+    for (const [label, value] of Object.entries(this.doc.labels)) {
+      if (!this.ignoredLabels.includes(label)) {
+        targetLabels[label] = value;
+      }
+    }
     this.renderFile(this.clientDir, "base.ts", "client/base.njk", {
-      labels: this.doc.labels,
+      labels: targetLabels,
     });
   }
 
@@ -66,6 +86,7 @@ export class Generator {
 
     // Render label schemas
     for (const [label, definition] of Object.entries(this.doc.labels)) {
+      if (this.ignoredLabels.includes(label)) continue;
       // Add schemas for label parameters and/or return value if it has any
       if (definition.parameters != null || definition.returns != null) {
         const title = toPascalCase(label);
