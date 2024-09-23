@@ -1,1 +1,16 @@
-{}
+{%- from "schemas/_macros.njk" import field %}
+{%- if schema.indices -%}
+{
+    {%- for key, value in schema.indices | dictsort -%}
+  {{ comment(value) | indent(2) }}
+  {{ key }}{% if not value | isSchemaOrRef or value.optional != false %}?{% endif %}: {{ field(value) | indent(2) }};
+    {%- endfor %}
+}
+    {%- if schema.additional_indices %}
+  | Record<string, {{ field(schema.additional_indices) }}>
+    {%- endif %}
+{%- elif schema.additional_indices -%}
+Record<string, {{ field(schema.additional_indices) }}>
+{%- else -%}
+Record<string, any>
+{%- endif %}

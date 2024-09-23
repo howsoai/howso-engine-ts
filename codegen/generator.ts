@@ -87,7 +87,7 @@ export class Generator {
     if (isSchemaOrRef(label.returns)) {
       imports.push(...this.detectSchemaImports(label.returns));
     }
-    return imports;
+    return [...new Set(imports)];
   }
 
   private detectSchemaImports(schema: Ref | Schema): string[] {
@@ -108,6 +108,6 @@ export class Generator {
         }
       }
     }
-    return imports;
+    return [...new Set(imports)];
   }
 }

@@ -23,7 +23,8 @@
     "prepack": "npm run build",
     "test": "jest --passWithNoTests",
     "pregenerate": "rimraf ./codegen/build && rollup --config ./codegen/rollup.config.js",
-    "generate": "node ./codegen/build/index.cjs"
+    "generate": "node ./codegen/build/index.cjs",
+    "postgenerate": "npm run lint:fix"
   },
   "files": [
     "LICENSE.txt",

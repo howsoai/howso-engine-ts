@@ -35,12 +35,12 @@ any
 
 
 {%- macro comment(schema) %}
-    {%- if schema.description -%}
+{%- if schema.description -%}
 /*
 {{ schema.description | blockComment | safe }}
 {%- if schema.default != null %}
  * @default {{ schema.default | toJson | safe }}
 {%- endif %}
  */
-    {%- endif %}
+{%- endif %}
 {%- endmacro %}
