@@ -1,0 +1,68 @@
+/**
+ * EditCases
+ *
+ * Edit feature values for the specified cases.
+ * cases are specified by either case_indices or by the condition. if neither is provided, edits all cases.
+ * updates the accumulated data mass for the model proportional to the number of cases and features modified.
+ * returns null if invalid features specified or an assoc with "count"
+ *
+ * NOTE: This file is auto generated, do not modify manually.
+ */
+import { CaseIndices } from "./CaseIndices";
+import { Condition } from "./Condition";
+
+export type EditCasesRequest = {
+  /*
+   * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the case as
+   *   it was trained. if specified, ignores condition and condition_session
+   * @default []
+   */
+  case_indices?: CaseIndices;
+
+  /*
+   * Assoc of feature->value(s)
+   *     no value = must have feature
+   *      - for continuous or numeric ordinal features:
+   *       one value = must equal exactly the value or be close to it for fuzzy match
+   *       two values = inclusive between
+   *      - for nominal or string ordinal features:
+   *       n values = must match any of these values exactly
+   * @default {}
+   */
+  condition?: Condition;
+
+  /*
+   * If specified ignores condition and operates on cases for the specified session id
+   */
+  condition_session?: string;
+
+  /*
+   * List of names of feature to edit
+   * @default []
+   */
+  features?: string[];
+
+  /*
+   * List of values corresponding to features
+   * @default []
+   */
+  feature_values?: any[];
+
+  /*
+   * Limit on the number of cases to edit; if set to zero there will be no limit.
+   *   if null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
+   */
+  num_cases?: number;
+
+  /*
+   * Enum used only with 'condition' parameter, will find exact matches if 'exact' and similar cases if 'similar'.
+   * @default "exact"
+   */
+  precision?: "exact" | "similar";
+
+  /*
+   * The session id when this call is being made
+   * @default "none"
+   */
+  session?: string;
+};
