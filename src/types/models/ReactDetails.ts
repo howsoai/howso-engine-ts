@@ -258,7 +258,43 @@ export interface ReactDetails {
    * @memberof ReactDetails
    */
   generate_attempts?: boolean;
+  /**
+   * Types of stats to output. When unspecified, returns all except the confusion_matrix. If all, then returns all including the confusion_matrix.
+   * @type {Array<string>}
+   * @memberof ReactAggregateDetails
+   */
+  selected_prediction_stats?: Array<ReactDetailsSelectedPredictionStat>;
 }
+
+/**
+ * @export
+ * @enum {string}
+ */
+export type ReactDetailsSelectedPredictionStat =
+  // Returns all the the available prediction stats, including the confusion matrix.
+  | "all"
+  // The number of correct predictions divided by the total number of predictions.
+  | "accuracy"
+  // A sparse map of actual feature value to a map of predicted feature value to counts.
+  | "confusion_matrix"
+  // Mean absolute error. For continuous features, this is calculated as the mean of absolute values of the difference between the actual and predicted values. For nominal features, this is 1 - the average categorical action probability of each case’s correct classes. Categorical action probabilities are the probabilities for each class for the action feature.
+  | "mae"
+  // Mean decrease in accuracy when each feature is dropped from the model, applies to all features.
+  | "mda"
+  // Mean decrease in accuracy that used scrambling of feature values instead of dropping each feature, applies to all features.
+  | "feature_mda_permutation_full"
+  // Precision (positive predictive) value for nominal features only.
+  | "precision"
+  // The r-squared coefficient of determination, for continuous features only.
+  | "r2"
+  // Recall (sensitivity) value for nominal features only.
+  | "recall"
+  // Root mean squared error, for continuous features only.
+  | "rmse"
+  // Spearman’s rank correlation coefficient, for continuous features only.
+  | "spearman_coeff"
+  // Matthews correlation coefficient, for nominal features only.
+  | "mcc";
 
 /**
  * Check if a given object implements the ReactDetails interface.
@@ -355,6 +391,9 @@ export function ReactDetailsFromJSONTyped(json: any, ignoreDiscriminator: boolea
     similarity_conviction: !exists(json, "similarity_conviction") ? undefined : json["similarity_conviction"],
     observational_errors: !exists(json, "observational_errors") ? undefined : json["observational_errors"],
     generate_attempts: !exists(json, "generate_attempts") ? undefined : json["generate_attempts"],
+    selected_prediction_stats: !exists(json, "selected_prediction_stats")
+      ? undefined
+      : json["selected_prediction_stats"],
   };
 }
 
@@ -407,5 +446,6 @@ export function ReactDetailsToJSON(value?: ReactDetails | null): any {
     similarity_conviction: value.similarity_conviction,
     observational_errors: value.observational_errors,
     generate_attempts: value.generate_attempts,
+    selected_prediction_stats: value.selected_prediction_stats,
   };
 }
