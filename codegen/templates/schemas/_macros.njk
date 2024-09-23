@@ -1,25 +1,36 @@
-{%- macro field(schema) %}
+{%- macro field(schema, type=null) %}
+{%- if not type %}
+    {%- if schema | isString or schema | isArray %}
+        {%- set type = schema %}
+    {%- else %}
+        {%- set type = schema.type %}
+    {%- endif %}
+{%- endif %}
+{%- if type | isArray %}
+    {%- for item in type -%}
+{{ field(schema, item) }}{% if not loop.last %} | {% endif %}
+    {%- endfor %}
+{%- else %}
     {%- if schema | isRef -%}
 {{ schema.ref }}
     {%- elif schema | isSchema -%}
-        {%- if schema.type == "assoc" -%}
+        {%- if type == "assoc" -%}
 {% include "schemas/types/_assoc.njk" %}
-        {%- elif schema.type == "list" -%}
+        {%- elif type == "list" -%}
 {% include "schemas/types/_list.njk" %}
-        {%- elif schema.type == "string" -%}
+        {%- elif type == "string" -%}
 {% include "schemas/types/_string.njk" %}
-        {%- elif schema.type == "number" -%}
+        {%- elif type == "number" -%}
 {% include "schemas/types/_number.njk" %}
-        {%- elif schema.type == "boolean" -%}
+        {%- elif type == "boolean" -%}
 boolean
-        {%- elif schema.type | isArray -%}
-any[] /* TODO */
         {%- else -%}
 any
         {%- endif -%}
     {%- else -%}
-{{ schema | convertType }}
+{{ type | convertType }}
     {%- endif -%}
+{%- endif -%}
 {%- endmacro %}
 
 

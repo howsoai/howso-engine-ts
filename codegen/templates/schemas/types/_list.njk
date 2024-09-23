@@ -1,1 +1,12 @@
-unknown[]
+{%- from "schemas/_macros.njk" import field %}
+{%- if schema.values -%}
+    {%- if schema.values | isArray -%}(
+        {%- for item in schema.values -%}
+{{ field(item) }}{% if not loop.last %} | {% endif %}
+        {%- endfor -%})[]
+    {%- else -%}
+{{ field(schema.values) }}[]
+    {%- endif -%}
+{%- else -%}
+any[]
+{%- endif %}
