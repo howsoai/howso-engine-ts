@@ -11,6 +11,10 @@ export class Generator {
   basePath: string;
   schemaDir: string;
 
+  /**
+   * Construct a new Generator.
+   * @param doc The Howso Engine API document.
+   */
   public constructor(doc: EngineApi) {
     this.basePath = path.resolve(__dirname, "../../src");
     this.schemaDir = path.resolve(this.basePath, "types/schemas");
@@ -22,11 +26,24 @@ export class Generator {
     registerFilters(this.env);
   }
 
+  /**
+   * Render all API code to file.
+   */
   public render() {
     this.renderSchemas();
     this.renderClient();
   }
 
+  /**
+   * Render all client logic from the API to file.
+   */
+  private renderClient() {
+    return true;
+  }
+
+  /**
+   * Render all schemas from the API to file.
+   */
   private renderSchemas() {
     const allNames = [];
 
@@ -64,19 +81,27 @@ export class Generator {
     this.renderFile(this.schemaDir, "index.ts", "schemas/index.njk", { items: allNames });
   }
 
-  private renderFile(parent: string, target: string, template: string, context: object) {
+  /**
+   * Render a file template.
+   * @param parent The path to a directory to write the file in.
+   * @param filename The name of the file to write.
+   * @param template The template to render into the file.
+   * @param context Context to pass to template renderer.
+   */
+  private renderFile(parent: string, filename: string, template: string, context: object) {
     const output = this.env.render(template, context);
-    const filepath = path.join(parent, target);
+    const filepath = path.join(parent, filename);
     if (!fs.existsSync(path.dirname(filepath))) {
       fs.mkdirSync(path.dirname(filepath), { recursive: true });
     }
     fs.writeFileSync(filepath, output);
   }
 
-  private renderClient() {
-    return true;
-  }
-
+  /**
+   * Recursively detect referenced schemas by a label definition.
+   * @param label The label definition to check.
+   * @returns The list of referenced schema names.
+   */
   private detectLabelImports(label: LabelDefinition) {
     const imports: string[] = [];
     if (label.parameters != null) {
@@ -90,6 +115,11 @@ export class Generator {
     return [...new Set(imports)];
   }
 
+  /**
+   * Recursively detect referenced schemas in provided schema.
+   * @param schema The schema to check.
+   * @returns The list of referenced schema names.
+   */
   private detectSchemaImports(schema: Ref | Schema): string[] {
     const imports: string[] = [];
     if (isRef(schema)) {
