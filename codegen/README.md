@@ -18,3 +18,8 @@ up to date before generation.
 ```bash
 npm run generate
 ```
+
+### Development Guide
+
+This sub project uses [nunjucks](https://mozilla.github.io/nunjucks/) for
+templating, which is very similar to jinja2.
