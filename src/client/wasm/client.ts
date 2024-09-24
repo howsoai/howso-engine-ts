@@ -1,3 +1,4 @@
+import type { Session, Trainee } from "@/types";
 import {
   AmalgamError,
   type AmalgamCommand,
@@ -6,69 +7,11 @@ import {
   type AmalgamResponseBody,
 } from "@howso/amalgam-lang";
 import { v4 as uuid } from "uuid";
-import {
-  AnalyzeRequest,
-  AnalyzeRequestToJSON,
-  AutoAblationParams,
-  CaseCountResponse,
-  Cases,
-  CasesRequest,
-  CasesRequestToJSON,
-  FeatureAttributes,
-  FeatureAttributesFromJSON,
-  FeatureAttributesToJSON,
-  FeatureConviction,
-  FeatureConvictionRequest,
-  FeatureConvictionRequestToJSON,
-  FeatureMarginalStats,
-  FeatureMarginalStatsFromJSON,
-  FeatureMarginalStatsRequest,
-  FeatureMarginalStatsRequestToJSON,
-  ReactAggregateRequest,
-  ReactAggregateRequestToJSON,
-  ReactAggregateResponse,
-  ReactAggregateResponseContent,
-  ReactAggregateResponseFromJSON,
-  ReactIntoFeaturesRequest,
-  ReactIntoFeaturesRequestToJSON,
-  ReactIntoFeaturesResponse,
-  ReactIntoFeaturesResponseFromJSON,
-  ReactRequest,
-  ReactRequestToJSON,
-  ReactResponse,
-  ReactResponseContent,
-  ReactResponseFromJSON,
-  ReactSeriesRequest,
-  ReactSeriesRequestToJSON,
-  ReactSeriesResponse,
-  ReactSeriesResponseContent,
-  ReactSeriesResponseFromJSON,
-  Session,
-  SessionIdentity,
-  SessionToJSON,
-  SetAutoAnalyzeParamsRequest,
-  SetAutoAnalyzeParamsRequestToJSON,
-  Trainee,
-  TraineeFromJSON,
-  TraineeIdentity,
-  TraineeToJSON,
-  TraineeWorkflowAttributesFromJSON,
-  TraineeWorkflowAttributesRequest,
-  TraineeWorkflowAttributesRequestToJSON,
-  TrainRequest,
-  TrainRequestToJSON,
-  TrainResponse,
-} from "../../types";
-import { mapValues, RequiredError } from "../../types/runtime";
-import type { Capabilities, ISessionClient, ITraineeClient } from "../capabilities/index";
-import { BaseClient, TraineeBaseCache } from "../capabilities/index";
-import { ProblemError } from "../errors";
-import { batcher, BatchOptions, CacheMap, isNode } from "../utilities/index";
-import { AmalgamCoreResponse, prepareCoreRequest, prepareCoreResponse } from "./core";
+import { ClientCache, EngineResponse } from "../base";
+import { TraineeClient, type ISessionClient } from "../capabilities";
+import { HowsoError, RequiredError } from "../errors";
+import { batcher, BatchOptions, CacheMap, isNode } from "../utilities";
 import { FileSystemClient } from "./files";
-
-/* eslint-disable-next-line @typescript-eslint/no-empty-object-type */
-export interface TraineeCache extends TraineeBaseCache {}
 
 export interface ClientOptions {
   trace?: boolean;
@@ -80,17 +23,10 @@ export interface ClientOptions {
   libPath?: string;
 }
 
-export class WasmClient extends BaseClient implements ITraineeClient, ISessionClient {
-  public static readonly capabilities: Readonly<Capabilities> = {
-    supportsTrainees: true,
-    supportsSessions: true,
-    supportsTrace: true,
-    supportsFileSystem: true,
-  };
+export class HowsoWasmClient extends TraineeClient implements ISessionClient {
   public readonly fs: FileSystemClient;
-
-  protected readonly traineeCache: CacheMap<TraineeCache>;
   protected activeSession?: Session;
+  protected cache: CacheMap<ClientCache>;
 
   constructor(
     protected readonly worker: Worker,
@@ -103,38 +39,39 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     if (options == null) {
       throw new RequiredError("options", "Client options are required.");
     }
-    this.traineeCache = new CacheMap<TraineeCache>();
+    this.cache = new CacheMap();
     this.fs = new FileSystemClient(this.worker, options?.libPath);
   }
 
   /**
-   * Execute a core entity request.
-   * @param label The core label.
-   * @param data The request data.
-   * @param throwErrors If core errors should be thrown or returned.
+   * Execute an Engine entity request.
+   * @param handle The identifier of the entity.
+   * @param label The name of the method to execute.
+   * @param data The data to pass to the method.
+   * @param throwErrors If errors should be thrown automatically.
    * @returns The core response object.
    */
-  protected async execute<R, D = unknown>(
-    traineeId: string,
+  public async execute<R, D = unknown>(
+    handle: string,
     label: string,
     data: D,
     throwErrors = true,
-  ): Promise<AmalgamCoreResponse<R>> {
+  ): Promise<EngineResponse<R>> {
     const response = await this.dispatch({
       type: "request",
       command: "executeEntityJson",
-      parameters: [traineeId, label, prepareCoreRequest(data)],
+      parameters: [handle, label, this.prepareRequest(data)],
     });
     try {
-      const result = prepareCoreResponse<R>(response);
-      if (throwErrors) {
+      const result = this.processResponse<R>(response);
+      if (throwErrors && Array.isArray(result.errors)) {
         for (const err of result.errors) {
-          throw new ProblemError(err?.message || "An unknown error occurred.", err?.code);
+          throw new HowsoError(err?.message, err?.code);
         }
       }
       return result;
     } catch (reason) {
-      if (reason instanceof AmalgamError || reason instanceof ProblemError) {
+      if (reason instanceof AmalgamError || reason instanceof HowsoError) {
         throw reason;
       }
 
@@ -185,12 +122,12 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     if (traineeId == null) {
       throw new TypeError("A trainee identifier is required.");
     }
-    if (!this.traineeCache.has(traineeId)) {
+    if (!this.cache.has(traineeId)) {
       await this.acquireTraineeResources(traineeId);
     }
-    const cached = this.traineeCache.get(traineeId);
+    const cached = this.cache.get(traineeId);
     if (cached == null) {
-      throw new ProblemError(`Trainee "${traineeId}" not found.`);
+      throw new HowsoError(`Trainee "${traineeId}" not found.`);
     }
     return cached.trainee;
   }
@@ -200,7 +137,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
    * @param traineeId The trainee identifier.
    */
   protected async autoPersistTrainee(traineeId: string): Promise<void> {
-    const cached = this.traineeCache.get(traineeId);
+    const cached = this.cache.get(traineeId);
     if (cached?.trainee?.persistence === "always") {
       await this.persistTrainee(traineeId);
     }
@@ -218,6 +155,7 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       parameters: [traineeId, fileUri],
     });
   }
+
   /**
    * Retrieve the trainees that are currently loaded in core.
    * @returns List of trainee identifiers.
@@ -287,12 +225,12 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
     if (isNode) {
       // NodeJS
       if (this.options.libPath == null) {
-        throw new ProblemError("Setup Failed - The client requires a file path to the library files.");
+        throw new HowsoError("Setup Failed - The client requires a file path to the library files.");
       }
     } else {
       // Browsers
       if (!this.options.howsoUrl) {
-        throw new ProblemError("Setup Failed - The client requires a URL for the howso.caml.");
+        throw new HowsoError("Setup Failed - The client requires a URL for the howso.caml.");
       }
 
       await this.fs.mkdir(this.fs.libDir);
@@ -339,20 +277,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   public async beginSession(name = "default", metadata: Record<string, unknown> = {}): Promise<Session> {
     this.activeSession = { id: uuid(), name, metadata, created_date: new Date(), modified_date: new Date() };
     return this.activeSession;
-  }
-
-  /**
-   * Get all sessions in use by trainee.
-   * @param traineeId The trainee identifier.
-   * @returns The list of session identities.
-   */
-  public async getTraineeSessions(traineeId: string): Promise<Required<SessionIdentity>[]> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<Required<SessionIdentity>[]>(traineeId, "get_sessions", {
-      attributes: ["id", "name"],
-    });
-    return content ?? [];
   }
 
   /**
@@ -535,20 +459,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Retrieve the trainee's metadata, without attempting automatic resolution.
-   *
-   * @param traineeId The trainee identifier.
-   * @returns The feature metadata object.
-   */
-  protected async _getMetadata(traineeId: string): Promise<NonNullable<Trainee["metadata"]>> {
-    const { content } = await this.execute<Record<string, Record<string, unknown>>>(traineeId, "get_metadata", {});
-    if (content == null) {
-      throw new ProblemError(`Trainee ${traineeId} not found.`);
-    }
-    return content;
-  }
-
-  /**
    * Retrieve the trainee's feature attributes after attempting automatic resolution.
    *
    * @param traineeId The trainee identifier.
@@ -638,97 +548,6 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
   }
 
   /**
-   * Set the parameters use by auto analyze.
-   */
-  public async getInternalParams(traineeId: string, request: TraineeWorkflowAttributesRequest = {}) {
-    await this.autoResolveTrainee(traineeId);
-
-    const response = this.execute(
-      traineeId,
-      "get_internal_parameters",
-      TraineeWorkflowAttributesRequestToJSON(request),
-    );
-    return TraineeWorkflowAttributesFromJSON(response);
-  }
-
-  /**
-   * Set the parameters use by auto analyze.
-   * @param traineeId The trainee identifier.
-   * @param params The analysis parameters.
-   */
-  public async setAutoAblationParams(traineeId: string, params: AutoAblationParams): Promise<void> {
-    await this.autoResolveTrainee(traineeId);
-
-    await this.execute(
-      traineeId,
-      "set_auto_ablation_params",
-      JSON.stringify({
-        trainee_id: traineeId,
-        ...params,
-      }),
-    );
-    await this.autoPersistTrainee(traineeId);
-  }
-
-  /**
-   * Set the parameters use by auto analyze.
-   * @param traineeId The trainee identifier.
-   * @param request The analysis parameters.
-   */
-  public async setAutoAnalyzeParams(traineeId: string, request: SetAutoAnalyzeParamsRequest = {}): Promise<void> {
-    const { experimental_options, ...rest } = request;
-    await this.autoResolveTrainee(traineeId);
-
-    await this.execute(traineeId, "set_auto_analyze_params", {
-      ...SetAutoAnalyzeParamsRequestToJSON(rest),
-      ...experimental_options,
-    });
-    await this.autoPersistTrainee(traineeId);
-  }
-
-  /**
-   * Analyze the trainee.
-   * @param traineeId The trainee identifier.
-   * @param request The analysis parameters.
-   */
-  public async analyze(traineeId: string, request: AnalyzeRequest = {}): Promise<void> {
-    const { experimental_options, ...rest } = request;
-    await this.autoResolveTrainee(traineeId);
-
-    await this.execute(traineeId, "analyze", {
-      ...AnalyzeRequestToJSON(rest),
-      ...experimental_options,
-    });
-  }
-
-  /**
-   * Retrieve cases from a trainee.
-   * @param traineeId The trainee identifier.
-   * @param request The get parameters.
-   * @returns The cases response.
-   */
-  public async getCases(traineeId: string, request?: CasesRequest): Promise<Cases> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<Cases>(traineeId, "get_cases", {
-      ...CasesRequestToJSON(request),
-    });
-    return content;
-  }
-
-  /**
-   * Retrieve the number of trained cases in a trainee.
-   * @param traineeId The trainee identifier.
-   * @returns The number of trained cases.
-   */
-  public async getNumTrainingCases(traineeId: string): Promise<number> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<CaseCountResponse>(traineeId, "get_num_training_cases", {});
-    return content?.count || 0;
-  }
-
-  /**
    * React to a trainee.
    * @param traineeId The trainee identifier.
    * @param request The react parameters.
@@ -781,70 +600,5 @@ export class WasmClient extends BaseClient implements ITraineeClient, ISessionCl
       ...rest,
     });
     return ReactSeriesResponseFromJSON({ warnings, content });
-  }
-
-  /**
-   * Calculate metrics and store them into the model to the specified features.
-   * @param traineeId The trainee identifier.
-   * @param request The react into features request.
-   * @returns The react into features response.
-   */
-  public async reactIntoFeatures(
-    traineeId: string,
-    request: ReactIntoFeaturesRequest,
-  ): Promise<ReactIntoFeaturesResponse> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { warnings = [] } = await this.execute<never>(traineeId, "react_into_features", {
-      ...ReactIntoFeaturesRequestToJSON(request),
-    });
-    return ReactIntoFeaturesResponseFromJSON({ warnings });
-  }
-
-  /**
-   * Get marginal stats of a trainee.
-   * @param traineeId The trainee identifier.
-   * @param request The marginal stats request.
-   * @returns The marginal stats.
-   */
-  public async getMarginalStats(
-    traineeId: string,
-    request: FeatureMarginalStatsRequest,
-  ): Promise<FeatureMarginalStats> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content, warnings = [] } = await this.execute<never>(traineeId, "get_marginal_stats", {
-      ...FeatureMarginalStatsRequestToJSON(request),
-    });
-    return FeatureMarginalStatsFromJSON({ content, warnings });
-  }
-
-  /**
-   * Get familiarity conviction for features.
-   * @param traineeId The trainee identifier.
-   * @param request The feature conviction request.
-   * @returns A map of metric name to value.
-   */
-  public async getFeatureConviction(traineeId: string, request: FeatureConvictionRequest): Promise<FeatureConviction> {
-    await this.autoResolveTrainee(traineeId);
-
-    const { content } = await this.execute<Record<string, number>>(traineeId, "compute_conviction_of_features", {
-      ...FeatureConvictionRequestToJSON(request),
-    });
-    return content;
-  }
-
-  /**
-   * Preprocess a request for react or react series.
-   * @param trainee The trainee identifier.
-   * @param request The react request.
-   */
-  private preprocessReactRequest(trainee: Trainee, request: ReactRequest | ReactSeriesRequest): void {
-    if (!trainee) {
-      throw new Error("trainee is undefined");
-    }
-    if (!request) {
-      throw new Error("request is undefined");
-    }
   }
 }

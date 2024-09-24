@@ -11,6 +11,7 @@ export interface ValidationErrorCollection {
 }
 
 export class HowsoError extends Error {
+  override name = "HowsoError";
   readonly code: string | null;
   readonly detail: string[];
 
@@ -25,19 +26,20 @@ export class HowsoError extends Error {
     this.code = code || null;
     // Set the prototype explicitly
     Object.setPrototypeOf(this, new.target.prototype);
-    this.name = "HowsoError";
   }
 }
 
 export class HowsoValidationError extends HowsoError {
-  errors: ValidationErrorCollection | undefined;
+  override name = "HowsoValidationError";
 
-  constructor(message?: string | string[], code?: string | null, errors?: ValidationErrorCollection) {
+  constructor(
+    message?: string | string[],
+    code?: string | null,
+    public readonly errors?: ValidationErrorCollection,
+  ) {
     super(message, code);
-    this.errors = errors;
     // Set the prototype explicitly
     Object.setPrototypeOf(this, new.target.prototype);
-    this.name = "HowsoValidationError";
   }
 
   /**
@@ -70,5 +72,18 @@ export class HowsoValidationError extends HowsoError {
         yield item;
       }
     }
+  }
+}
+
+export class RequiredError extends Error {
+  override name = "RequiredError";
+
+  constructor(
+    public field: string,
+    msg?: string,
+  ) {
+    super(msg);
+    // Set the prototype explicitly
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

@@ -1,0 +1,37 @@
+/**
+ * NOTE: This file is auto generated, do not modify manually.
+ */
+import type { Trainee } from "@/types";
+import type * as schemas from "@/types/schemas";
+import { AbstractHowsoClient } from "../base";
+
+export interface LabelResponse<R = unknown> {
+  payload: R;
+  warnings: string[];
+}
+
+export abstract class TraineeClient extends AbstractHowsoClient {
+  public abstract createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee>;
+  public abstract updateTrainee(trainee: Trainee): Promise<Trainee>;
+  public abstract copyTrainee(traineeId: string, name?: string): Promise<Trainee>;
+  public abstract getTrainee(traineeId: string): Promise<Trainee>;
+  public abstract queryTrainees(search?: string): Promise<Trainee[]>;
+  public abstract deleteTrainee(traineeId: string): Promise<void>;
+  public abstract acquireTraineeResources(traineeId: string): Promise<void>;
+  public abstract releaseTraineeResources(traineeId: string): Promise<void>;
+  public abstract persistTrainee(traineeId: string): Promise<void>;
+  protected abstract autoResolveTrainee(traineeId: string): Promise<Trainee>;
+  protected abstract autoPersistTrainee(traineeId: string): Promise<void>;
+{% for label, def in labels | dictsort %}
+  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: schemas.{{ label | pascalCase }}Request{% endif %}): Promise<LabelResponse<any>> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const response = await this.execute<any>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});
+    {%- if not def.read_only %}
+    this.autoPersistTrainee(trainee.id);
+    {%- endif %}
+    return { payload: response.payload, warnings: response.warnings };
+  }
+{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+}

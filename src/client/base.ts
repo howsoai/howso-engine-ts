@@ -6,7 +6,7 @@ export interface ClientCache {
   trainee: Trainee;
 }
 
-export interface EngineResponse<R = unknown> {
+export interface ExecuteResponse<R = unknown> {
   payload: R;
   errors: HowsoError[];
   warnings: string[];
@@ -32,7 +32,7 @@ export abstract class AbstractHowsoClient {
     label: string,
     data: D,
     throwErrors?: boolean,
-  ): Promise<EngineResponse<R>>;
+  ): Promise<ExecuteResponse<R>>;
 
   /**
    * Prepare payload for an Engine request.
@@ -60,7 +60,7 @@ export abstract class AbstractHowsoClient {
    * @param data The Engine response.
    * @returns The updated Engine response.
    */
-  protected processResponse<R = unknown>(data: any): EngineResponse<R> {
+  protected processResponse<R = unknown>(data: any): ExecuteResponse<R> {
     if (!data) {
       throw new HowsoError("Null or empty response received from Engine.");
     }
