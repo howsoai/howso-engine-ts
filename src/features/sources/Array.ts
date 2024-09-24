@@ -2,14 +2,13 @@ import type { FeatureAttributes } from "../../types";
 import {
   AbstractDataType,
   ArrayData,
-  FeatureSerializerBase,
   FeatureSourceFormat,
-  InferFeatureAttributesBase,
   InferFeatureBoundsOptions,
   InferFeatureTimeSeriesOptions,
   isArrayData,
 } from "../base";
 import * as utils from "../utils";
+import { FeatureSerializerBase, InferFeatureAttributesBase } from "./Base";
 
 export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase {
   public static sourceFormat: FeatureSourceFormat = "array";

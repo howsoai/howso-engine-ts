@@ -3,12 +3,15 @@ import type { FeatureAttributesIndex } from "../types";
 import {
   AbstractDataType,
   FeatureSourceFormat,
-  InferFeatureAttributesBase,
   type ArrayData,
   type InferFeatureAttributesOptions,
   type ParsedArrayData,
 } from "./base";
-import { InferFeatureAttributesFromArray, InferFeatureAttributesFromParsedArray } from "./sources";
+import {
+  InferFeatureAttributesBase,
+  InferFeatureAttributesFromArray,
+  InferFeatureAttributesFromParsedArray,
+} from "./sources";
 
 export * from "./utils";
 

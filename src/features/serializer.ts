@@ -3,14 +3,12 @@ import type { FeatureAttributes } from "../types";
 import {
   AbstractDataType,
   ArrayData,
-  FeatureSerializerBase,
   FeatureSourceFormat,
   isArrayData,
   isParsedArrayData,
   ParsedArrayData,
 } from "./base";
-import { FeatureSerializerArrayData } from "./sources/Array";
-import { FeatureSerializerParsedArrayData } from "./sources/ParsedArray";
+import { FeatureSerializerArrayData, FeatureSerializerBase, FeatureSerializerParsedArrayData } from "./sources";
 
 export type FeatureSerializerDataType<T extends FeatureSourceFormat> = T extends "array"
   ? ArrayData
