@@ -104,7 +104,7 @@ export class Generator {
     }
 
     // Render package index
-    this.renderFile(this.schemaDir, "index.ts", "schemas/index.njk", { items: allNames });
+    this.renderFile(this.schemaDir, "index.ts", "schemas/index.njk", { items: allNames.sort() });
   }
 
   /**
@@ -138,7 +138,7 @@ export class Generator {
     if (isSchemaOrRef(label.returns)) {
       imports.push(...this.detectSchemaImports(label.returns));
     }
-    return [...new Set(imports)];
+    return [...new Set(imports)].sort();
   }
 
   /**
@@ -164,6 +164,6 @@ export class Generator {
         }
       }
     }
-    return [...new Set(imports)];
+    return [...new Set(imports)].sort();
   }
 }

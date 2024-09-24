@@ -1,7 +1,7 @@
 /**
  * NOTE: This file is auto generated, do not modify manually.
  */
-import type { Trainee } from "@/types";
+import type { Trainee, Session } from "@/types";
 import type * as schemas from "@/types/schemas";
 import { AbstractHowsoClient } from "../base";
 
@@ -23,8 +23,8 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /** Get an existing Trainee by Id. */
   public abstract getTrainee(traineeId: string): Promise<Trainee>;
 
-  /** Query existing Trainees. */
-  public abstract queryTrainees(search?: string): Promise<Trainee[]>;
+  /** Search existing Trainees. */
+  public abstract queryTrainees(keywords: string | string[]): Promise<Trainee[]>;
 
   /** Delete a Trainee. */
   public abstract deleteTrainee(traineeId: string): Promise<void>;
@@ -43,6 +43,12 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /** Automatically persist Trainee object when appropriate based on persistence level. */
   protected abstract autoPersistTrainee(traineeId: string): Promise<void>;
+
+  /** Get active Session. */
+  public abstract getActiveSession(): Promise<Readonly<Session>>;
+
+  /** Begin a new Session. */
+  public abstract beginSession(name?: string, metadata?: Record<string, any>): Promise<Session>;
 {% for label, def in labels | dictsort %}
   /**
    * {{ def.description | capitalize | blockComment | safe | indent(2) }}
