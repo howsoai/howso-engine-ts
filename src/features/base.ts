@@ -1,4 +1,4 @@
-import type { FeatureAttributes, FeatureAttributesIndex, FeatureOriginalType } from "../types";
+import type { FeatureAttributesIndex } from "../types";
 
 export type FeatureSourceFormat = "unknown" | "array" | "parsed_array";
 

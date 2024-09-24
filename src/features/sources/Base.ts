@@ -10,7 +10,10 @@ import {
 export abstract class InferFeatureAttributesBase {
   public static sourceFormat: FeatureSourceFormat;
 
-  public static isAcceptedSourceFormat(data: AbstractDataType): boolean {
+  public static isAcceptedSourceFormat(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    data: AbstractDataType,
+  ): boolean {
     throw new Error("InferFeatureAttributesBase must be implemented in non-abstract classes");
   }
 
@@ -133,12 +136,7 @@ export abstract class InferFeatureAttributesBase {
       case "boolean":
         return { data_type: "boolean" };
       case "string":
-        const dateParsed = value.match(/^[\d]{4}-[\d]{2}-[\d]{2}/) ? Date.parse(value) : 0;
-        if (dateParsed > 0) {
-          return { data_type: "datetime" };
-        }
-
-        return { data_type: "string" };
+        return this.getOriginalFeatureTypeString(featureName, value);
       case "object":
         if (value instanceof Date) {
           return { data_type: "datetime" };
@@ -147,6 +145,23 @@ export abstract class InferFeatureAttributesBase {
       default:
         return undefined;
     }
+  }
+
+  protected async getOriginalFeatureTypeString(
+    featureName: string,
+    value?: string,
+  ): Promise<FeatureOriginalType | undefined> {
+    value ||= this.getSample(featureName);
+    if (!value) {
+      return undefined;
+    }
+
+    const dateParsed = value.match(/^[\d]{4}-[\d]{2}-[\d]{2}/) ? Date.parse(value) : 0;
+    if (dateParsed > 0) {
+      return { data_type: "datetime" };
+    }
+
+    return { data_type: "string" };
   }
 
   protected async inferBoolean(
@@ -169,10 +184,7 @@ export abstract class InferFeatureAttributesBase {
     };
   }
 
-  protected async inferDateTime(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
+  protected async inferDateTime(featureName: string): Promise<FeatureAttributes> {
     return {
       type: this.inferType(featureName),
       data_type: "formatted_date_time",
@@ -180,10 +192,7 @@ export abstract class InferFeatureAttributesBase {
     };
   }
 
-  protected async inferDate(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
+  protected async inferDate(featureName: string): Promise<FeatureAttributes> {
     return {
       type: this.inferType(featureName),
       data_type: "formatted_date_time",
@@ -191,20 +200,14 @@ export abstract class InferFeatureAttributesBase {
     };
   }
 
-  protected async inferTime(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
+  protected async inferTime(featureName: string): Promise<FeatureAttributes> {
     return {
       type: this.inferType(featureName),
       data_type: "string",
     };
   }
 
-  protected async inferString(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
+  protected async inferString(featureName: string): Promise<FeatureAttributes> {
     return {
       type: this.inferType(featureName),
       data_type: "string",
