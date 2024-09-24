@@ -1,6 +1,6 @@
 import type { FeatureAttributes } from "../../types";
 import { ArrayData, FeatureSerializerBase, ParsedArrayData } from "../base";
-import { InferFeatureAttributesFromArray } from "./arrays";
+import { InferFeatureAttributesFromArray } from "./Array";
 
 /**
  * Reformat array of objects to 2d array of values.

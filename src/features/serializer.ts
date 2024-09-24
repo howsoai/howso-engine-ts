@@ -3,8 +3,8 @@ import type * as base from "./base";
 import { ProblemError } from "../client/errors";
 import type { FeatureAttributes } from "../types";
 import { isArrayData, isParsedArrayData } from "./base";
-import { FeatureSerializerArrayData } from "./sources/arrays";
-import { FeatureSerializerParsedArrayData } from "./sources/parsed";
+import { FeatureSerializerArrayData } from "./sources/Array";
+import { FeatureSerializerParsedArrayData } from "./sources/ParsedArray";
 
 export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
 
