@@ -1,38 +1,42 @@
-import type * as base from "./base";
-
 import { ProblemError } from "../client/errors";
 import type { FeatureAttributes } from "../types";
-import { isArrayData, isParsedArrayData } from "./base";
+import {
+  AbstractDataType,
+  ArrayData,
+  FeatureSerializerBase,
+  FeatureSourceFormat,
+  isArrayData,
+  isParsedArrayData,
+  ParsedArrayData,
+} from "./base";
 import { FeatureSerializerArrayData } from "./sources/Array";
 import { FeatureSerializerParsedArrayData } from "./sources/ParsedArray";
 
-export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
-
-export type FeatureSerializerDataType<T extends FeatureSerializerFormat> = T extends "array"
-  ? base.ArrayData
+export type FeatureSerializerDataType<T extends FeatureSourceFormat> = T extends "array"
+  ? ArrayData
   : T extends "parsed"
-    ? base.ParsedArrayData
+    ? ParsedArrayData
     : T extends "excel"
       ? number
       : never;
 
-function detectFormat(data: base.AbstractDataType): FeatureSerializerFormat {
+export function detectSourceFormat(data: AbstractDataType): FeatureSourceFormat {
   if (isArrayData(data)) {
     return "array";
   }
   if (isParsedArrayData(data)) {
-    return "parsed";
+    return "parsed_array";
   }
   return "unknown";
 }
 
-export function getFeatureSerializer(format: FeatureSerializerFormat): base.FeatureSerializerBase {
-  let svc: base.FeatureSerializerBase;
+export function getFeatureSerializer(format: FeatureSourceFormat): FeatureSerializerBase {
+  let svc: FeatureSerializerBase;
   switch (format) {
     case "array":
       svc = new FeatureSerializerArrayData();
       break;
-    case "parsed":
+    case "parsed_array":
       svc = new FeatureSerializerParsedArrayData();
       break;
     default:
@@ -48,10 +52,10 @@ export function getFeatureSerializer(format: FeatureSerializerFormat): base.Feat
  * @returns The serialized cases.
  */
 export async function serializeCases(
-  data: base.AbstractDataType,
+  data: AbstractDataType,
   features: Record<string, FeatureAttributes>,
 ): Promise<any[][]> {
-  const svc = getFeatureSerializer(detectFormat(data));
+  const svc = getFeatureSerializer(detectSourceFormat(data));
   return await svc.serialize(data, features);
 }
 
@@ -61,7 +65,7 @@ export async function serializeCases(
  * @param features The feature attributes of the data.
  * @returns The deserialized data.
  */
-export async function deserializeCases<T extends FeatureSerializerFormat>(
+export async function deserializeCases<T extends FeatureSourceFormat>(
   format: T,
   data: any[][],
   columns: string[],

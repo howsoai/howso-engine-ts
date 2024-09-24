@@ -1,5 +1,12 @@
 import type { FeatureAttributes } from "../../types";
-import { ArrayData, FeatureSerializerBase, ParsedArrayData } from "../base";
+import {
+  AbstractDataType,
+  ArrayData,
+  FeatureSerializerBase,
+  FeatureSourceFormat,
+  isParsedArrayData,
+  ParsedArrayData,
+} from "../base";
 import { InferFeatureAttributesFromArray } from "./Array";
 
 /**
@@ -20,6 +27,12 @@ function parsedDataToArrayData(dataset: ParsedArrayData): ArrayData {
 }
 
 export class InferFeatureAttributesFromParsedArray extends InferFeatureAttributesFromArray {
+  public static sourceFormat: FeatureSourceFormat = "parsed_array";
+
+  public static isAcceptedSourceFormat(data: AbstractDataType): boolean {
+    return isParsedArrayData(data);
+  }
+
   constructor(dataset: ParsedArrayData) {
     super(parsedDataToArrayData(dataset));
   }
