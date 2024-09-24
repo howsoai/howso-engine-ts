@@ -1,4 +1,6 @@
-import type { FeatureAttributes, FeatureOriginalType } from "../types";
+import type { FeatureAttributes, FeatureAttributesIndex, FeatureOriginalType } from "../types";
+
+export type FeatureSourceFormat = "unknown" | "array" | "parsed_array";
 
 export interface InferFeatureBoundsOptions {
   tightBounds?: boolean | string[];
@@ -11,11 +13,12 @@ export interface InferFeatureTimeSeriesOptions {
 }
 
 export interface InferFeatureAttributesOptions {
-  defaults?: Record<string, FeatureAttributes>;
+  defaults?: FeatureAttributesIndex;
   inferBounds?: boolean | InferFeatureBoundsOptions;
   timeSeries?: InferFeatureTimeSeriesOptions;
   ordinalFeatureValues?: Record<string, string[]>;
   dependentFeatures?: Record<string, string[]>;
+  includeSample?: boolean;
 }
 
 export interface ArrayData<T = any, C extends string = string> {
@@ -38,8 +41,19 @@ export function isParsedArrayData(data: any): data is ParsedArrayData {
 }
 
 export abstract class InferFeatureAttributesBase {
+  public static sourceFormat: FeatureSourceFormat;
+
+  public static isAcceptedSourceFormat(data: AbstractDataType): boolean {
+    throw new Error("InferFeatureAttributesBase must be implemented in non-abstract classes");
+  }
+
+  public static isNominal(uniqueValues: number, totalValues: number): boolean {
+    return uniqueValues <= 2 && totalValues > 10;
+  }
+  protected abstract inferType(featureName: string): FeatureAttributes["type"];
+
   /* Entrypoint */
-  public async infer(options: InferFeatureAttributesOptions = {}): Promise<Record<string, FeatureAttributes>> {
+  public async infer(options: InferFeatureAttributesOptions = {}): Promise<FeatureAttributesIndex> {
     const attributes: Record<string, FeatureAttributes> = options.defaults || {};
     const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
     const columns = await this.getFeatureNames();
@@ -52,7 +66,7 @@ export abstract class InferFeatureAttributesBase {
         continue;
       }
 
-      const featureType = await this.getFeatureType(feature);
+      const originalFeatureType = await this.getOriginalFeatureType(feature);
 
       // Explicitly declared ordinals
       if (feature in ordinalFeatureValues) {
@@ -60,8 +74,8 @@ export abstract class InferFeatureAttributesBase {
           type: "ordinal",
           bounds: { allowed: ordinalFeatureValues[feature] },
         };
-      } else if (featureType != null) {
-        switch (featureType.data_type) {
+      } else if (originalFeatureType != null) {
+        switch (originalFeatureType.data_type) {
           case "numeric":
             attributes[feature] = await this.inferFloat(feature);
             break;
@@ -75,7 +89,7 @@ export abstract class InferFeatureAttributesBase {
             attributes[feature] = await this.inferBoolean(feature);
             break;
           case "datetime":
-            attributes[feature] = await this.inferDatetime(feature);
+            attributes[feature] = await this.inferDateTime(feature);
             break;
           case "date":
             attributes[feature] = await this.inferDate(feature);
@@ -84,7 +98,7 @@ export abstract class InferFeatureAttributesBase {
             attributes[feature] = await this.inferTime(feature);
             break;
           case "timedelta":
-            attributes[feature] = await this.inferTimedelta(feature);
+            attributes[feature] = await this.inferTimeDelta(feature);
             break;
           default:
             attributes[feature] = await this.inferString(feature);
@@ -95,8 +109,8 @@ export abstract class InferFeatureAttributesBase {
       }
 
       // Add original type
-      if (featureType != null) {
-        attributes[feature].original_type = featureType;
+      if (originalFeatureType != null) {
+        attributes[feature].original_type = originalFeatureType;
       }
     }
 
@@ -131,26 +145,112 @@ export abstract class InferFeatureAttributesBase {
       if (options.timeSeries && attributes[feature].time_series == null) {
         // TODO - infer time series
       }
+
+      if (options.includeSample) {
+        attributes[feature].sample = this.getSample(feature);
+      }
     }
 
     return attributes;
   }
 
   /* Feature types */
-  protected abstract getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined>;
-  protected abstract inferBoolean(featureName: string): Promise<FeatureAttributes>;
-  protected abstract inferTimedelta(featureName: string): Promise<FeatureAttributes>;
-  protected abstract inferDatetime(featureName: string): Promise<FeatureAttributes>;
-  protected abstract inferDate(featureName: string): Promise<FeatureAttributes>;
-  protected abstract inferTime(featureName: string): Promise<FeatureAttributes>;
-  protected abstract inferString(featureName: string): Promise<FeatureAttributes>;
+  protected async getOriginalFeatureType(featureName: string): Promise<FeatureOriginalType | undefined> {
+    const value = this.getSample(featureName);
+    const dataType = typeof value;
+    switch (dataType) {
+      case "bigint":
+        throw TypeError("BigInt is not supported.");
+      case "number":
+        return { data_type: "numeric", size: 8 };
+      case "boolean":
+        return { data_type: "boolean" };
+      case "string":
+        const dateParsed = value.match(/^[\d]{4}-[\d]{2}-[\d]{2}/) ? Date.parse(value) : 0;
+        if (dateParsed > 0) {
+          return { data_type: "datetime" };
+        }
+
+        return { data_type: "string" };
+      case "object":
+        if (value instanceof Date) {
+          return { data_type: "datetime" };
+        }
+        return { data_type: "object" };
+      default:
+        return undefined;
+    }
+  }
+
+  protected async inferBoolean(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
+    return {
+      type: "nominal",
+      data_type: "boolean",
+    };
+  }
+
+  protected async inferTimeDelta(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
+    return {
+      data_type: "number",
+      type: "continuous",
+    };
+  }
+
+  protected async inferDateTime(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
+    return {
+      type: this.inferType(featureName),
+      data_type: "formatted_date_time",
+      date_time_format: "%Y-%m-%dT%H:%M:%SZ",
+    };
+  }
+
+  protected async inferDate(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
+    return {
+      type: this.inferType(featureName),
+      data_type: "formatted_date_time",
+      date_time_format: "%Y-%m-%d",
+    };
+  }
+
+  protected async inferTime(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
+    return {
+      type: this.inferType(featureName),
+      data_type: "string",
+    };
+  }
+
+  protected async inferString(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
+    return {
+      type: this.inferType(featureName),
+      data_type: "string",
+    };
+  }
+
   protected abstract inferInteger(featureName: string): Promise<FeatureAttributes>;
   protected abstract inferFloat(featureName: string): Promise<FeatureAttributes>;
   protected async inferUnknown(
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
     featureName: string,
   ): Promise<FeatureAttributes> {
-    return { type: "nominal" };
+    return { type: "nominal", data_type: "string" };
   }
 
   /* Feature properties */
@@ -159,12 +259,14 @@ export abstract class InferFeatureAttributesBase {
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
     options: InferFeatureBoundsOptions,
-  ): Promise<FeatureAttributes["bounds"] | undefined>;
+  ): Promise<FeatureAttributes["bounds"]>;
   public abstract inferTimeSeries(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
     options: InferFeatureTimeSeriesOptions,
   ): Promise<Partial<FeatureAttributes>>;
+
+  protected abstract getSample(featureName: string): any | undefined;
 
   /* Descriptive operations */
   public abstract getFeatureNames(): Promise<string[]>;
