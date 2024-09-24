@@ -29,6 +29,7 @@ export class Generator {
       "debug_label",
       "initialize",
       "initialize_for_deployment",
+      "set_contained_trainee_maps",
       "major_version",
       "minor_version",
       "point_version",
@@ -60,7 +61,7 @@ export class Generator {
         targetLabels[label] = value;
       }
     }
-    this.renderFile(this.clientDir, "base.ts", "client/base.njk", {
+    this.renderFile(this.clientDir, "capabilities/trainees.ts", "client/capabilities/trainees.njk", {
       labels: targetLabels,
     });
   }

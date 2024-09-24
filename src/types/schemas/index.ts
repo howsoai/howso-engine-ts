@@ -57,7 +57,6 @@ export * from "./SetTraineeId";
 export * from "./GetDistances";
 export * from "./RemoveCases";
 export * from "./SingleReactSeries";
-export * from "./SetContainedTraineeMaps";
 export * from "./Train";
 export * from "./SetRandomSeed";
 export * from "./Impute";

@@ -1,4 +1,4 @@
-export interface Session {
+export interface SessionIdentity {
   /**
    * The Session's unique identifier.
    */
@@ -8,7 +8,9 @@ export interface Session {
    * The name given to the Session.
    */
   name?: string;
+}
 
+export interface Session extends SessionIdentity {
   /**
    * Any key-value pair to be stored with the Session.
    */
