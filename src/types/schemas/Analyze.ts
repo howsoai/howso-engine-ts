@@ -2,7 +2,7 @@
  * Analyze
  *
  * Analyzes the data to compute the appropriate statistics, uncertainties, and select parameters as appropriate.
- * {long_running (true) idempotent (false)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

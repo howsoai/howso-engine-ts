@@ -5,20 +5,20 @@
  *
  * output:
  *  default output of this method is a react object in the format of
- *  { 'action_values' : [ all_action_values ], 'action_features' : [ all_action_features ] }, where all_action_values is a list of all action
+ *  , where all_action_values is a list of all action
  *  values, reacted/generated and derived, in the same order as all_action_features, e.g., [2, "a", .75384] to match ['width','name','height']
  *  if details is specified, the react object will contain appropriate additional details properties and values,
  *    details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
  *     'influential_cases' : etc... }
  *   see api docs for documentation of all output properties
- * {long_running (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { GenerateNewCases } from "./GenerateNewCases";
-import { ReactDetails } from "./ReactDetails";
 import { FeatureBoundsMap } from "./FeatureBoundsMap";
+import { GenerateNewCases } from "./GenerateNewCases";
 import { NewCaseThreshold } from "./NewCaseThreshold";
+import { ReactDetails } from "./ReactDetails";
 
 export type SingleReactRequest = {
   /*

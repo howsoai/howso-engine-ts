@@ -2,7 +2,7 @@
  * GetFeatureConviction
  *
  * Computes the conviction for each feature and returns an assoc of feature -> conviction value
- * {read_only (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

@@ -2,7 +2,7 @@
  * Impute
  *
  * Imputes the model, filling in all the (null) feature values
- * {long_running (true) idempotent (false)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

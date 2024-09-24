@@ -2,7 +2,6 @@
  * AppendToSeriesStore
  *
  * Append cases to a series
- * {idempotent (false)}
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

@@ -3,8 +3,8 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { Precision } from "./Precision";
 import { Condition } from "./Condition";
+import { Precision } from "./Precision";
 
 export type ReactAggregateDetails = {
   action_condition?: Condition;

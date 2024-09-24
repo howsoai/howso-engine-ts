@@ -1,6 +1,6 @@
 import { FeatureAttributes } from "./schemas";
 
-export interface Trainee {
+export interface TraineeIdentity {
   /**
    * The unique identifier of the Trainee.
    */
@@ -10,7 +10,9 @@ export interface Trainee {
    * The name of the Trainee.
    */
   name?: string | null;
+}
 
+export interface Trainee extends TraineeIdentity {
   /**
    * Feature attributes of the Trainee.
    */

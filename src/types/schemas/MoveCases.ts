@@ -5,9 +5,9 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
+import { CaseIndices } from "./CaseIndices";
 import { Condition } from "./Condition";
 import { Precision } from "./Precision";
-import { CaseIndices } from "./CaseIndices";
 
 export type MoveCasesRequest = {
   /*

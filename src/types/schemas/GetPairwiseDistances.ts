@@ -3,7 +3,7 @@
  *
  * Returns a list of computed distances between respective cases specified in either from_values or from_case_indices to to_values or to_case_indices.
  *  if one case is specified in any of the lists, all respective distances are computed to/from that one case.
- * {read_only (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

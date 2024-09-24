@@ -8,7 +8,7 @@
  *   'row_case_indices' : [ session-indices ],
  *   'distances': [ [ pairwise distances ] ]
  *  }
- * {read_only (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

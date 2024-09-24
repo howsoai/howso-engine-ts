@@ -3,7 +3,7 @@
  *
  * Evaluate custom amalgam code for feature values of every case in the model and returns
  * a list of the custom code's return values for each feature specified.
- * {read_only (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

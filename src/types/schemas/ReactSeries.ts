@@ -4,14 +4,14 @@
  * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
  * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
- * {long_running (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
 import { CaseIndices } from "./CaseIndices";
 import { GenerateNewCases } from "./GenerateNewCases";
-import { ReactDetails } from "./ReactDetails";
 import { NewCaseThreshold } from "./NewCaseThreshold";
+import { ReactDetails } from "./ReactDetails";
 
 export type ReactSeriesRequest = {
   /*
@@ -177,6 +177,7 @@ export type ReactSeriesRequest = {
    *
    *    all of the following parameters, if specified, must be either length of 1 or equal to the length of
    *   context_values/case_indices for discriminative reacts, and num_series_to_generate for generative reacts.
+   *
    */
   num_series_to_generate?: number;
 

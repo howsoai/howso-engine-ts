@@ -3,7 +3,7 @@
  *
  * Reduce the trained data by removing cases which have an influence weight entropy that falls above
  *  a threshold.
- * {long_running (true) idempotent (false) }
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */

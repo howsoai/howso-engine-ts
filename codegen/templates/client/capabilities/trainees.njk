@@ -11,18 +11,45 @@ export interface LabelResponse<R = unknown> {
 }
 
 export abstract class TraineeClient extends AbstractHowsoClient {
+  /** Create a new Trainee. */
   public abstract createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee>;
+
+  /** Update an existing Trainee. */
   public abstract updateTrainee(trainee: Trainee): Promise<Trainee>;
+
+  /** Copy an existing Trainee. */
   public abstract copyTrainee(traineeId: string, name?: string): Promise<Trainee>;
+
+  /** Get an existing Trainee by Id. */
   public abstract getTrainee(traineeId: string): Promise<Trainee>;
+
+  /** Query existing Trainees. */
   public abstract queryTrainees(search?: string): Promise<Trainee[]>;
+
+  /** Delete a Trainee. */
   public abstract deleteTrainee(traineeId: string): Promise<void>;
+
+  /** Acquire the resources for a Trainee. */
   public abstract acquireTraineeResources(traineeId: string): Promise<void>;
+
+  /** Release the resources for a Trainee. */
   public abstract releaseTraineeResources(traineeId: string): Promise<void>;
+
+  /** Persist a Trainee to storage. **/
   public abstract persistTrainee(traineeId: string): Promise<void>;
+
+  /** Automatically resolve a Trainee and ensure it is loaded. */
   protected abstract autoResolveTrainee(traineeId: string): Promise<Trainee>;
+
+  /** Automatically persist Trainee object when appropriate based on persistence level. */
   protected abstract autoPersistTrainee(traineeId: string): Promise<void>;
 {% for label, def in labels | dictsort %}
+  /**
+   * {{ def.description | capitalize | blockComment | safe | indent(2) }}
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
   public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: schemas.{{ label | pascalCase }}Request{% endif %}): Promise<LabelResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});

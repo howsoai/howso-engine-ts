@@ -21,8 +21,8 @@ export interface Schema extends BaseSchema {
   enum?: (number | string)[];
   min?: number;
   max?: number;
-  min_length?: number;
-  max_length?: number;
+  min_size?: number;
+  max_size?: number;
   values?: SchemaType | Schema | Ref;
   indices?: Record<string, SchemaType | Schema | Ref>;
   additional_indices?: SchemaType | Schema | Ref;

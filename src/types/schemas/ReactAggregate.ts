@@ -3,7 +3,7 @@
  *
  * Computes, caches, and returns specified details and feature prediction statistics such as mean decrease in accuracy (mda), residuals (accuracy, mean absolute error),
  *  precision, recall, etc. returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
- * {long_running (true)}
+ *
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
