@@ -2,9 +2,9 @@ import type * as base from "./base";
 
 import { ProblemError } from "../client/errors";
 import type { FeatureAttributes } from "../types";
-import { FeatureSerializerArrayData } from "./abstract/arrays";
-import { FeatureSerializerParsedArrayData } from "./abstract/parsed";
 import { isArrayData, isParsedArrayData } from "./base";
+import { FeatureSerializerArrayData } from "./sources/arrays";
+import { FeatureSerializerParsedArrayData } from "./sources/parsed";
 
 export type FeatureSerializerFormat = "unknown" | "array" | "parsed";
 

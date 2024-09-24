@@ -2,9 +2,9 @@ import type * as base from "./base";
 
 import { ProblemError } from "../client/errors";
 import type { FeatureAttributes } from "../types";
-import { InferFeatureAttributesFromArray } from "./abstract/arrays";
-import { InferFeatureAttributesFromParsedArray } from "./abstract/parsed";
 import { isArrayData, isParsedArrayData } from "./base";
+import { InferFeatureAttributesFromArray } from "./sources/arrays";
+import { InferFeatureAttributesFromParsedArray } from "./sources/parsed";
 
 export * from "./utils";
 
