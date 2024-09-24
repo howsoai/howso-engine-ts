@@ -1,0 +1,555 @@
+import type { Session, Trainee } from "@/types";
+import type * as schemas from "@/types/schemas";
+import {
+  AmalgamError,
+  type AmalgamCommand,
+  type AmalgamOptions,
+  type AmalgamRequest,
+  type AmalgamResponseBody,
+} from "@howso/amalgam-lang";
+import { v4 as uuid } from "uuid";
+import { ClientCache, ExecuteResponse } from "../base";
+import { LabelResponse, TraineeClient } from "../capabilities";
+import { HowsoError, RequiredError } from "../errors";
+import { batcher, BatchOptions, CacheMap, isNode } from "../utilities";
+import { FileSystemClient } from "./files";
+
+export interface ClientOptions {
+  trace?: boolean;
+  // Browser only
+  migrationsUrl?: string | URL;
+  /** Generic howso.caml file. This will not be loaded unless a function requires it such as `createTrainee` */
+  howsoUrl?: string | URL;
+  // Node only
+  libPath?: string;
+}
+
+export class HowsoWorkerClient extends TraineeClient {
+  public readonly fs: FileSystemClient;
+  protected activeSession?: Session;
+  protected cache: CacheMap<ClientCache>;
+
+  constructor(
+    protected readonly worker: Worker,
+    protected readonly options: ClientOptions,
+  ) {
+    super();
+    if (worker == null) {
+      throw new RequiredError("worker", "A worker is required to instantiate a client.");
+    }
+    if (options == null) {
+      throw new RequiredError("options", "Client options are required.");
+    }
+    this.cache = new CacheMap();
+    this.fs = new FileSystemClient(this.worker, options?.libPath);
+  }
+
+  /**
+   * Execute an Engine entity request.
+   * @param handle The identifier of the entity.
+   * @param label The name of the method to execute.
+   * @param data The data to pass to the method.
+   * @param throwErrors If errors should be thrown automatically.
+   * @returns The Engine response object.
+   */
+  public async execute<R, D = unknown>(
+    handle: string,
+    label: string,
+    data: D,
+    throwErrors = true,
+  ): Promise<ExecuteResponse<R>> {
+    const response = await this.dispatch({
+      type: "request",
+      command: "executeEntityJson",
+      parameters: [handle, label, this.prepareRequest(data)],
+    });
+    try {
+      const result = this.processResponse<R>(response);
+      if (throwErrors && Array.isArray(result.errors)) {
+        for (const err of result.errors) {
+          throw new HowsoError(err?.message, err?.code);
+        }
+      }
+      return result;
+    } catch (reason) {
+      if (reason instanceof AmalgamError || reason instanceof HowsoError) {
+        throw reason;
+      }
+
+      const message = reason instanceof Error ? reason.message : `${reason}`;
+      throw new Error(`${message} Label: ${label} Data: ${JSON.stringify(data)}`);
+    }
+  }
+
+  /**
+   * Dispatch an Amalgam operation.
+   * @param request The operation request.
+   * @returns The operation response.
+   */
+  protected dispatch<T extends AmalgamCommand = AmalgamCommand>(
+    request: AmalgamRequest<T>,
+  ): Promise<AmalgamResponseBody<T>> {
+    return new Promise((resolve, reject) => {
+      const channel = new MessageChannel();
+      channel.port1.onmessage = (ev: MessageEvent) => {
+        if (ev.data?.success) {
+          resolve(ev.data.body);
+        } else if (ev.data) {
+          const error = ev.data.error;
+          if (error instanceof Error && ev.data.body?.name) {
+            error.name = ev.data.body.name;
+          }
+          reject(error);
+        } else {
+          reject();
+        }
+      };
+      if (isNode) {
+        this.worker.postMessage({ data: request, ports: [channel.port2] }, [channel.port2]);
+      } else {
+        this.worker.postMessage(request, [channel.port2]);
+      }
+    });
+  }
+
+  /**
+   * Retrieve the entities that are currently loaded in Engine.
+   * @returns List of entity identifiers.
+   */
+  protected async getEntities(): Promise<string[]> {
+    const entities = await this.dispatch({
+      type: "request",
+      command: "getEntities",
+      parameters: [],
+    });
+    return entities;
+  }
+
+  /**
+   * Automatically resolve a Trainee and ensure it is loaded given an identifier.
+   *
+   * @param traineeId The Trainee identifier.
+   * @returns The Trainee object.
+   */
+  protected async autoResolveTrainee(traineeId: string): Promise<Trainee> {
+    if (traineeId == null) {
+      throw new TypeError("A Trainee identifier is required.");
+    }
+    if (!this.cache.has(traineeId)) {
+      await this.acquireTraineeResources(traineeId);
+    }
+    const cached = this.cache.get(traineeId);
+    if (cached == null) {
+      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
+    }
+    return cached.trainee;
+  }
+
+  /**
+   * Automatically persist Trainee object when appropriate based on persistence level.
+   * @param traineeId The Trainee identifier.
+   */
+  protected async autoPersistTrainee(traineeId: string): Promise<void> {
+    const cached = this.cache.get(traineeId);
+    if (cached?.trainee?.persistence === "always") {
+      await this.persistTrainee(traineeId);
+    }
+  }
+
+  /**
+   * Constructs Trainee object from it's Engine metadata.
+   *
+   * @param traineeId The Trainee identifier.
+   * @returns The Trainee object.
+   */
+  protected async getTraineeFromEngine(traineeId: string): Promise<Trainee> {
+    const [metadata, features] = await Promise.all([
+      this.execute<Record<string, any>>(traineeId, "get_metadata", {}),
+      this.execute<Record<string, schemas.FeatureAttributes>>(traineeId, "get_feature_attributes", {}),
+    ]);
+    if (!metadata?.payload) {
+      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
+    }
+    return {
+      id: traineeId,
+      name: metadata?.payload?.name,
+      features: features?.payload,
+      persistence: metadata?.payload?.persistence ?? "allow",
+      metadata: metadata?.payload?.metadata,
+    };
+  }
+
+  /**
+   * Setup client.
+   * Prepares the file system and initializes the worker.
+   * No Trainee is loaded automatically during this process.
+   */
+  public async setup(): Promise<void> {
+    // Initialize the Amalgam runtime
+    const options: AmalgamOptions = { trace: this.options.trace };
+    const ready = await this.dispatch({
+      type: "request",
+      command: "initialize",
+      parameters: [options],
+    });
+
+    if (ready) {
+      // Initialize the session
+      await this.beginSession();
+      return;
+    }
+
+    // Prepare the Engine files
+    if (isNode) {
+      // NodeJS
+      if (this.options.libPath == null) {
+        throw new HowsoError("The Howso client requires a file path to the library files.", "setup_failed");
+      }
+    } else {
+      // Browsers
+      if (!this.options.howsoUrl) {
+        throw new HowsoError("The Howso client requires a URL for the howso.caml.", "setup_failed");
+      }
+
+      await this.fs.mkdir(this.fs.libDir);
+      await this.fs.mkdir(this.fs.traineeDir);
+
+      if (this.options.migrationsUrl != null) {
+        await this.fs.mkdir(this.fs.migrationsDir);
+        await this.fs.createLazyFile(
+          this.fs.migrationsDir,
+          `migrations.${this.fs.entityExt}`,
+          String(this.options.migrationsUrl),
+          true,
+          false,
+        );
+      }
+      await this.fs.createLazyFile(
+        this.fs.libDir,
+        `howso.${this.fs.entityExt}`,
+        String(this.options.howsoUrl),
+        true,
+        false,
+      );
+    }
+  }
+
+  /**
+   * Retrieves the active session.
+   * @returns The session object.
+   */
+  public async getActiveSession(): Promise<Readonly<Session>> {
+    if (this.activeSession == null) {
+      return await this.beginSession();
+    } else {
+      return this.activeSession;
+    }
+  }
+
+  /**
+   * Begins a new session.
+   * @param name A name for the new session.
+   * @param metadata Arbitrary metadata to include in the new session.
+   * @returns The session object.
+   */
+  public async beginSession(name = "default", metadata: Record<string, unknown> = {}): Promise<Session> {
+    this.activeSession = { id: uuid(), name, metadata, created_date: new Date(), modified_date: new Date() };
+    return this.activeSession;
+  }
+
+  /**
+   * Persist Trainee object
+   * @param traineeId The Trainee identifier.
+   */
+  public async persistTrainee(traineeId: string): Promise<void> {
+    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.sanitizeFilename(traineeId));
+    await this.dispatch({
+      type: "request",
+      command: "storeEntity",
+      parameters: [traineeId, fileUri],
+    });
+  }
+
+  /**
+   * Acquire resources for a Trainee.
+   * @param traineeId The Trainee identifier.
+   * @param url A URL to the Trainee file.
+   */
+  public async acquireTraineeResources(traineeId: string, url?: string): Promise<void> {
+    if (this.cache.has(traineeId)) {
+      // Already acquired
+      return;
+    }
+
+    const filename = `${this.fs.sanitizeFilename(traineeId)}.${this.fs.entityExt}`;
+    if (url) {
+      // Prepare the file on the virtual file system
+      await this.fs.createLazyFile(this.fs.traineeDir, filename, url, true, false);
+    }
+
+    // Load Trainee only if entity not already loaded
+    const loaded = await this.getEntities();
+    if (loaded.indexOf(traineeId) == -1) {
+      // Only call load if not already loaded
+      await this.dispatch({
+        type: "request",
+        command: "loadEntity",
+        parameters: [traineeId, this.fs.join(this.fs.traineeDir, filename)],
+      });
+    }
+
+    // Get Trainee details. Use the internal method to prevent auto resolution loops.
+    const trainee = await this.getTraineeFromEngine(traineeId);
+    // Cache the Trainee
+    this.cache.set(traineeId, { trainee });
+  }
+
+  /**
+   * Releases resources for a Trainee.
+   * @param traineeId The Trainee identifier.
+   */
+  public async releaseTraineeResources(traineeId: string): Promise<void> {
+    if (traineeId == null) {
+      throw new HowsoError("A Trainee id is required.");
+    }
+
+    // Check if Trainee already loaded
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const cached = this.cache.get(trainee.id);
+    if (cached) {
+      if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
+        // Auto persist the trainee
+        await this.persistTrainee(traineeId);
+      } else if (cached.trainee.persistence == "never") {
+        throw new HowsoError(
+          "Trainees set to never persist may not have their resources released. Delete the Trainee instead.",
+        );
+      }
+      this.cache.discard(traineeId);
+    }
+
+    await this.dispatch({
+      type: "request",
+      command: "destroyEntity",
+      parameters: [traineeId],
+    });
+  }
+
+  /**
+   * Create a new Trainee.
+   * @param trainee The Trainee identifier.
+   * @returns The new Trainee object.
+   */
+  public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
+    const traineeId = trainee.name || uuid();
+    // Load the Engine entity
+    const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
+    const loaded = await this.dispatch({
+      type: "request",
+      command: "loadEntity",
+      parameters: [traineeId, howsoPath],
+    });
+    if (!loaded) {
+      throw new HowsoError(`Failed to initialize the Trainee "${traineeId}".`);
+    }
+
+    // Create the Trainee entity
+    await this.execute<boolean>(traineeId, "initialize", {
+      trainee_id: traineeId,
+      filepath: howsoPath,
+    });
+
+    // Set Trainee metadata
+    const metadata = {
+      name: trainee.name,
+      metadata: structuredClone(trainee.metadata || {}),
+      persistence: trainee.persistence || "allow",
+    };
+    await this.execute(traineeId, "set_metadata", { metadata });
+
+    // Set the feature attributes
+    const { payload: feature_attributes } = await this.execute<schemas.SetFeatureAttributesResponse>(
+      traineeId,
+      "set_feature_attributes",
+      {
+        feature_attributes: trainee.features || {},
+      },
+    );
+
+    // Build, cache and return new trainee object
+    const newTrainee: Trainee = { id: traineeId, features: feature_attributes, ...metadata };
+    this.cache.set(traineeId, { trainee: newTrainee });
+    return newTrainee;
+  }
+
+  /**
+   * Update a Trainee's properties.
+   * @param trainee The Trainee identifier.
+   */
+  public async updateTrainee(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+    trainee: Trainee,
+  ): Promise<Trainee> {
+    throw new Error("Method not implemented.");
+  }
+
+  /**
+   * Retrieve a Trainee.
+   * @param traineeId The Trainee identifier.
+   * @returns The Trainee object.
+   */
+  public async getTrainee(traineeId: string): Promise<Trainee> {
+    await this.autoResolveTrainee(traineeId);
+    return await this.getTraineeFromEngine(traineeId); // Get latest Trainee from Engine
+  }
+
+  /**
+   * Copy a Trainee.
+   * @param traineeId The Trainee identifier.
+   * @param name The new Trainee name.
+   */
+  public async copyTrainee(traineeId: string, name?: string): Promise<Trainee> {
+    const trainee = structuredClone(await this.autoResolveTrainee(traineeId));
+    const newTraineeId = name || uuid();
+    const cloned = await this.dispatch({
+      type: "request",
+      command: "cloneEntity",
+      parameters: [trainee.id, newTraineeId],
+    });
+    if (!cloned) {
+      throw new HowsoError(
+        `Failed to copy the Trainee "${traineeId}". This may be due to incorrect filepaths to the Howso binaries, or a Trainee "${newTraineeId}" already exists.`,
+      );
+    }
+    const newTrainee = { ...trainee, name, id: newTraineeId };
+    this.cache.set(newTraineeId, { trainee: newTrainee });
+    return newTrainee;
+  }
+
+  /**
+   * Deletes a Trainee.
+   * @param traineeId The Trainee identifier.
+   */
+  public async deleteTrainee(traineeId: string): Promise<void> {
+    await this.dispatch({
+      type: "request",
+      command: "destroyEntity",
+      parameters: [traineeId],
+    });
+    this.cache.discard(traineeId);
+    const filename = this.fs.sanitizeFilename(traineeId);
+    this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}.${this.fs.entityExt}`));
+  }
+
+  /**
+   * Search existing Trainees.
+   * @param keywords Keywords to filter the list of Trainees by.
+   */
+  public async queryTrainees(keywords?: string | string[]): Promise<Trainee[]> {
+    const cache = this.cache.values();
+    // Normalize keywords to array
+    let search: string[];
+    if (!keywords) {
+      search = [];
+    } else if (typeof keywords === "string") {
+      search = keywords.split(/\s/g);
+    } else {
+      search = keywords;
+    }
+
+    function isMatch(value: string | null | undefined) {
+      if (value == null) return false;
+      if (search!.length) {
+        return search.some((keyword) => value.toLowerCase().includes(keyword.toLowerCase()));
+      }
+      return true;
+    }
+
+    return cache.reduce<Trainee[]>((accumulator, value) => {
+      if (isMatch(value.trainee.name) || isMatch(value.trainee.id)) {
+        accumulator.push(value.trainee);
+      }
+      return accumulator;
+    }, []);
+  }
+
+  /**
+   * Set the Trainee's feature attributes.
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   */
+  public async setFeatureAttributes(traineeId: string, request: schemas.SetFeatureAttributesRequest) {
+    const response = await super.setFeatureAttributes(traineeId, request);
+    // Also update cached Trainee
+    const trainee = this.cache.get(traineeId)?.trainee;
+    if (trainee) {
+      trainee.features = response.payload;
+    }
+    return response;
+  }
+
+  /**
+   * Train cases into a Trainee.
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async train(traineeId: string, request: schemas.TrainRequest): Promise<LabelResponse<any>> {
+    const session = await this.getActiveSession();
+    if (request?.session) {
+      console.warn("Using an explicit session during train is not supported. The active session will be used instead.");
+    }
+    // Include active session metadata in Trainee
+    await this.execute(traineeId, "set_session_metadata", {
+      session: session.id,
+      metadata: session,
+    });
+    return super.train(traineeId, { ...request, session: session.id });
+  }
+
+  /**
+   * Batch train data into the Trainee.
+   * @param traineeId The Trainee identifier.
+   * @param request The train parameters.
+   */
+  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<void> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const session = await this.getActiveSession();
+    const { cases = [], session: explicitSession, ...rest } = request;
+
+    // Include active session metadata in Trainee
+    if (explicitSession) {
+      console.warn("Using an explicit session during train is not supported. The active session will be used instead.");
+    }
+    await this.execute(traineeId, "set_session_metadata", {
+      session: session.id,
+      metadata: session,
+    });
+
+    const batchOptions: BatchOptions = { startSize: 100 };
+    if (!isNode) {
+      // WASM builds are currently sensitive to large request sizes and may throw memory errors
+      batchOptions.startSize = 50;
+      batchOptions.limits = [1, 50];
+    }
+
+    // Batch scale the requests
+    await batcher(
+      async function* (this: HowsoWorkerClient, size: number) {
+        let offset = 0;
+        while (offset < cases.length) {
+          await this.execute<any | null>(trainee.id, "train", {
+            ...rest,
+            cases: cases.slice(offset, offset + size),
+            session: session.id, // Always use active session
+          });
+          offset += size;
+          size = yield;
+        }
+      }.bind(this),
+      batchOptions,
+    );
+
+    await this.autoPersistTrainee(trainee.id);
+  }
+}

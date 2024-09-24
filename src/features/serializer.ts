@@ -1,7 +1,7 @@
 import type * as base from "./base";
 
-import { ProblemError } from "../client/errors";
-import type { FeatureAttributes } from "../types";
+import { HowsoError } from "@/client/errors";
+import type { FeatureAttributes } from "@/types";
 import { FeatureSerializerArrayData } from "./abstract/arrays";
 import { FeatureSerializerParsedArrayData } from "./abstract/parsed";
 import { isArrayData, isParsedArrayData } from "./base";
@@ -36,7 +36,7 @@ export function getFeatureSerializer(format: FeatureSerializerFormat): base.Feat
       svc = new FeatureSerializerParsedArrayData();
       break;
     default:
-      throw new ProblemError("Unexpected data format.");
+      throw new HowsoError("Unexpected data format.");
   }
   return svc;
 }

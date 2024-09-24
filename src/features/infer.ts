@@ -1,7 +1,7 @@
 import type * as base from "./base";
 
-import { ProblemError } from "../client/errors";
-import type { FeatureAttributes } from "../types";
+import { HowsoError } from "@/client/errors";
+import type { FeatureAttributes } from "@/types";
 import { InferFeatureAttributesFromArray } from "./abstract/arrays";
 import { InferFeatureAttributesFromParsedArray } from "./abstract/parsed";
 import { isArrayData, isParsedArrayData } from "./base";
@@ -15,7 +15,7 @@ export function getFeatureAttributesInferrer(data: base.AbstractDataType): base.
   } else if (isParsedArrayData(data)) {
     svc = new InferFeatureAttributesFromParsedArray(data);
   } else {
-    throw new ProblemError("Unexpected data format.");
+    throw new HowsoError("Unexpected data format.");
   }
   return svc;
 }

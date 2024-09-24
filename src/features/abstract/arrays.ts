@@ -1,4 +1,4 @@
-import type { FeatureAttributes, FeatureOriginalType } from "../../types";
+import type { FeatureAttributes, FeatureOriginalType } from "@/types";
 import {
   ArrayData,
   FeatureSerializerBase,
