@@ -1,6 +1,6 @@
 import { FeatureAttributes, FeatureAttributesIndex } from "../types";
 
-it.skip("TODO implement generic infer tests", () => {});
+it.todo("TODO implement generic infer tests");
 
 export const expectFeatureAttributesIndex = (index: FeatureAttributesIndex | undefined) => {
   if (!index) {

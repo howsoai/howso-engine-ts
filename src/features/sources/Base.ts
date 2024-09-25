@@ -6,6 +6,17 @@ import {
   InferFeatureBoundsOptions,
   InferFeatureTimeSeriesOptions,
 } from "../base";
+import { coerceDate } from "../utils";
+
+export type InferFeatureAttributeFeatureStatistics = {
+  uniqueValues: number;
+  totalValues: number;
+  minimum: string | number | Date;
+  maximum: string | number | Date;
+  hasNulls: boolean;
+  unique: boolean;
+  samples: (string | number | Date)[];
+};
 
 export abstract class InferFeatureAttributesBase {
   public static sourceFormat: FeatureSourceFormat;
@@ -17,16 +28,30 @@ export abstract class InferFeatureAttributesBase {
     throw new Error("InferFeatureAttributesBase must be implemented in non-abstract classes");
   }
 
-  public static isNominal(uniqueValues: number, totalValues: number): boolean {
-    return uniqueValues <= 2 && totalValues > 10;
-  }
-  protected abstract inferType(featureName: string): FeatureAttributes["type"];
+  protected statistics: Record<string, InferFeatureAttributeFeatureStatistics> = {};
+  /** Returns cached basic statistics for the feature */
+  protected abstract getStatistics(featureName: string): Promise<InferFeatureAttributeFeatureStatistics>;
 
   /* Entrypoint */
   public async infer(options: InferFeatureAttributesOptions = {}): Promise<FeatureAttributesIndex> {
     const attributes: Record<string, FeatureAttributes> = options.defaults || {};
     const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
     const columns = await this.getFeatureNames();
+
+    // Generate initial statistics
+    const statisticsItems = await Promise.all(
+      columns.map(async (featureName) => ({
+        featureName,
+        statistics: await this.getStatistics(featureName),
+      })),
+    );
+    this.statistics = statisticsItems.reduce(
+      (allStatistics, { featureName, statistics }) => {
+        allStatistics[featureName] = statistics;
+        return allStatistics;
+      },
+      {} as Record<string, InferFeatureAttributeFeatureStatistics>,
+    );
 
     // Determine base feature attributes
     for (let i = 0; i < columns.length; i++) {
@@ -117,7 +142,7 @@ export abstract class InferFeatureAttributesBase {
       }
 
       if (options.includeSample) {
-        attributes[feature].sample = this.getSample(feature);
+        attributes[feature].sample = await this.getSample(feature);
       }
     }
 
@@ -126,7 +151,7 @@ export abstract class InferFeatureAttributesBase {
 
   /* Feature types */
   protected async getOriginalFeatureType(featureName: string): Promise<FeatureOriginalType | undefined> {
-    const value = this.getSample(featureName);
+    const value = await this.getSample(featureName);
     const dataType = typeof value;
     switch (dataType) {
       case "bigint":
@@ -151,13 +176,13 @@ export abstract class InferFeatureAttributesBase {
     featureName: string,
     value?: string,
   ): Promise<FeatureOriginalType | undefined> {
-    value ||= this.getSample(featureName);
+    value ||= await this.getSample(featureName);
     if (!value) {
       return undefined;
     }
 
-    const dateParsed = value.match(/^[\d]{4}-[\d]{2}-[\d]{2}/) ? Date.parse(value) : 0;
-    if (dateParsed > 0) {
+    const date = coerceDate(value);
+    if (date) {
       return { data_type: "datetime" };
     }
 
@@ -184,32 +209,44 @@ export abstract class InferFeatureAttributesBase {
     };
   }
 
-  protected async inferDateTime(featureName: string): Promise<FeatureAttributes> {
+  protected async inferDateTime(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
-      type: this.inferType(featureName),
+      type: "continuous",
       data_type: "formatted_date_time",
       date_time_format: "%Y-%m-%dT%H:%M:%SZ",
     };
   }
 
-  protected async inferDate(featureName: string): Promise<FeatureAttributes> {
+  protected async inferDate(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
-      type: this.inferType(featureName),
+      type: "continuous",
       data_type: "formatted_date_time",
       date_time_format: "%Y-%m-%d",
     };
   }
 
-  protected async inferTime(featureName: string): Promise<FeatureAttributes> {
+  protected async inferTime(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
-      type: this.inferType(featureName),
+      type: "continuous",
       data_type: "string",
     };
   }
 
-  protected async inferString(featureName: string): Promise<FeatureAttributes> {
+  protected async inferString(
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
+    featureName: string,
+  ): Promise<FeatureAttributes> {
     return {
-      type: this.inferType(featureName),
+      type: "nominal",
       data_type: "string",
     };
   }
@@ -224,7 +261,11 @@ export abstract class InferFeatureAttributesBase {
   }
 
   /* Feature properties */
-  protected abstract inferUnique(featureName: string): Promise<boolean>;
+
+  protected async inferUnique(featureName: string): Promise<boolean> {
+    const { unique } = await this.getStatistics(featureName);
+    return unique;
+  }
   public abstract inferBounds(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
@@ -236,7 +277,9 @@ export abstract class InferFeatureAttributesBase {
     options: InferFeatureTimeSeriesOptions,
   ): Promise<Partial<FeatureAttributes>>;
 
-  protected abstract getSample(featureName: string): any | undefined;
+  protected async getSample(featureName: string): Promise<any | undefined> {
+    return this.statistics[featureName]?.samples.at(0);
+  }
 
   /* Descriptive operations */
   public abstract getFeatureNames(): Promise<string[]>;

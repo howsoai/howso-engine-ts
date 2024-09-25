@@ -6,13 +6,16 @@ import { InferFeatureAttributesFromArray } from "./Array";
 
 describe("features/sources/Array", () => {
   const now = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
   const columns = ["id", "number", "date", "boolean"];
   const data: ArrayData = {
     columns,
     data: [
-      ["0", 1.2, now.toISOString(), false],
+      ["0", 1.2, yesterday.toISOString(), false],
       ["1", 2.4, now.toISOString(), true],
       ["3", 2.4, null, true],
+      ["4", 5, now.toISOString(), true],
     ],
   };
 
@@ -37,7 +40,7 @@ describe("features/sources/Array", () => {
         expectFeatureAttributesIndex(features);
 
         // Id
-        expect(features["id"].type).toBe("continuous");
+        expect(features["id"].type).toBe("nominal");
         expect(features["id"].data_type).toBe("string");
         // Number
         expect(features["number"].type).toBe("continuous");
