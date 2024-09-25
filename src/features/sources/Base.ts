@@ -251,7 +251,7 @@ export abstract class InferFeatureAttributesBase {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
     featureName: string,
   ): Promise<FeatureAttributes> {
-    return { type: "nominal", data_type: "string" };
+    return { type: "nominal" };
   }
 
   /* Feature properties */
