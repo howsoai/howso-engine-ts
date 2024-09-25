@@ -85,25 +85,23 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
 
   protected async inferFloat(featureName: string): Promise<FeatureAttributes> {
     const { samples, totalValues, uniqueValues } = await this.getStatistics(featureName);
-    let decimal_places = 0;
     let asNominal = false;
 
     const index = this.dataset.columns.indexOf(featureName);
-    const column = this.dataset.data.map((x) => {
-      decimal_places = Math.max(decimal_places, utils.precision(x[index]));
-      return x[index];
-    });
+    let decimals = this.dataset.data.reduce((decimals, row) => {
+      return Math.max(decimals, utils.precision(row[index]));
+    }, 0);
 
-    const intLike = decimal_places === 0;
-    if (decimal_places >= 15) {
+    const intLike = decimals === 0;
+    if (decimals >= 15) {
       // Don't specify decimal places if using max precision of float64
-      decimal_places = 0;
+      decimals = 0;
     }
 
     // Detect if column should be treated as nominal
     if (samples.at(0) !== undefined) {
       if (intLike) {
-        asNominal = uniqueValues < Math.pow(column.length, 0.5);
+        asNominal = uniqueValues < Math.pow(totalValues, 0.5);
       } else {
         asNominal = uniqueValues <= 2 && totalValues > 10;
       }
@@ -113,13 +111,13 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
       return {
         type: "nominal",
         data_type: "number",
-        decimal_places,
+        decimal_places: decimals,
       };
     }
     return {
       type: "continuous",
       data_type: "number",
-      decimal_places,
+      decimal_places: decimals,
     };
   }
 
