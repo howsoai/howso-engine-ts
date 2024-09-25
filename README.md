@@ -10,7 +10,41 @@ An interface surrounding `@howso/amalgam-lang` WASM to create a simplified clien
 npm install @howso/engine
 ```
 
-### Create a client using a Worker
+### Inferring feature attributes
+
+During trainee creation, you'll need to iterate on your data to describe its
+[feature attributes](https://docs.howso.com/user_guide/basic_capabilities/feature_attributes.html).
+
+This package supplied methods to assist with inference from data generically, or directly through dedicated classes.
+The primary entry point is through `inferFeatureAttributes`:
+
+```ts
+import { inferFeatureAttributes, type ArrayData } from "@howso/engine";
+
+const columns = ["id", "number", "date", "boolean"];
+const data: ArrayData = {
+  columns,
+  data: [
+    ["0", 1.2, yesterday.toISOString(), false],
+    ["1", 2.4, now.toISOString(), true],
+    ["3", 2.4, null, true],
+    ["4", 5, now.toISOString(), true],
+  ],
+};
+const featureAttributes = await inferFeatureAttributes(data, "array");
+```
+
+If your data's source is always the same, you may bypass the method, creating and calling a source handler directly.
+For example, the data above could be used directly with the `InferFeatureAttributesFromArray` class:
+
+```ts
+const service = new InferFeatureAttributesFromArray(data);
+const features = await service.infer();
+```
+
+### Using a client
+
+#### Through a web Worker
 
 ```ts
 import { AmalgamWasmService, initRuntime } from "@howso/amalgam-lang";
