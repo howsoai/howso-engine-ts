@@ -42,6 +42,8 @@ const service = new InferFeatureAttributesFromArray(data);
 const features = await service.infer();
 ```
 
+This process can be CPU intensive, you are encouraged to use a web `Worker` if run in a user's browser.
+
 ### Using a client
 
 #### Through a web Worker
