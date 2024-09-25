@@ -231,14 +231,8 @@ export abstract class InferFeatureAttributesBase {
     };
   }
 
-  protected async inferTime(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
-    return {
-      type: "continuous",
-      data_type: "string",
-    };
+  protected async inferTime(featureName: string): Promise<FeatureAttributes> {
+    return this.inferString(featureName);
   }
 
   protected async inferString(
