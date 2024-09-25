@@ -41,8 +41,8 @@ import wasmUri from "@howso/amalgam-lang/lib/amalgam-st.wasm?url";
 You can then create the worker client using a url import:
 
 ```ts
-import howsoUrl from "@/data/engine/howso.caml?url";
-import migrationsUrl from "@/data/engine/migrations.caml?url";
+import howsoUrl from "@howso/engine/lib/howso.caml?url";
+import migrationsUrl from "@howso/engine/lib/migrations.caml?url";
 import { type ClientOptions, HowsoWorkerClient } from "@howso/engine";
 
 const getClient = async (options?: ClientOptions): Promise<HowsoWorkerClient> => {
