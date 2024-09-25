@@ -38,113 +38,95 @@ export abstract class InferFeatureAttributesBase {
     const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
     const columns = await this.getFeatureNames();
 
-    // Generate initial statistics
-    const statisticsItems = await Promise.all(
-      columns.map(async (featureName) => ({
-        featureName,
-        statistics: await this.getStatistics(featureName),
-      })),
+    const getFeatureAttributes = async (featureName: string): Promise<FeatureAttributes | undefined> => {
+      if (featureName in attributes && attributes[featureName]?.type) {
+        return undefined;
+      }
+
+      const originalFeatureType = await this.getOriginalFeatureType(featureName);
+      const featureAttributes: Omit<FeatureAttributes, "type"> = {
+        original_type: originalFeatureType,
+      };
+      switch (true) {
+        case featureName in ordinalFeatureValues:
+          return { ...featureAttributes, type: "ordinal", bounds: { allowed: ordinalFeatureValues[featureName] } };
+        case originalFeatureType?.data_type === "numeric":
+          return { ...featureAttributes, ...(await this.inferFloat(featureName)) };
+        case originalFeatureType?.data_type === "integer":
+          return { ...featureAttributes, ...(await this.inferInteger(featureName)) };
+        case originalFeatureType?.data_type === "string":
+          return { ...featureAttributes, ...(await this.inferString(featureName)) };
+        case originalFeatureType?.data_type === "boolean":
+          return { ...featureAttributes, ...(await this.inferBoolean(featureName)) };
+        case originalFeatureType?.data_type === "datetime":
+          return { ...featureAttributes, ...(await this.inferDateTime(featureName)) };
+        case originalFeatureType?.data_type === "date":
+          return { ...featureAttributes, ...(await this.inferDate(featureName)) };
+        case originalFeatureType?.data_type === "time":
+          return { ...featureAttributes, ...(await this.inferTime(featureName)) };
+        case originalFeatureType?.data_type === "timedelta":
+          return { ...featureAttributes, ...(await this.inferTimeDelta(featureName)) };
+        default:
+          return { ...featureAttributes, ...(await this.inferUnknown(featureName)) };
+      }
+    };
+
+    const items = await Promise.all(
+      columns.map(async (featureName) => {
+        // This will automatically cache the required values into `this.statistics`.
+        await this.getStatistics(featureName);
+        const featureAttributes = await getFeatureAttributes(featureName);
+
+        return { featureName, featureAttributes };
+      }),
     );
-    this.statistics = statisticsItems.reduce(
-      (allStatistics, { featureName, statistics }) => {
-        allStatistics[featureName] = statistics;
-        return allStatistics;
-      },
-      {} as Record<string, InferFeatureAttributeFeatureStatistics>,
-    );
+    items.forEach(({ featureName, featureAttributes }) => {
+      attributes[featureName] = { ...featureAttributes, ...attributes[featureName] };
+    });
 
-    // Determine base feature attributes
-    for (let i = 0; i < columns.length; i++) {
-      const feature = columns[i];
-      if (feature in attributes && attributes[feature]?.type) {
-        // Attributes exist for feature, skip
-        continue;
-      }
+    // Determine additional attributes. The infer methods require basic attributes and statistics to be completed.
+    const additions = await Promise.all(
+      columns.map(async (featureName) => {
+        const additions: Partial<FeatureAttributes> = {};
 
-      const originalFeatureType = await this.getOriginalFeatureType(feature);
-
-      // Explicitly declared ordinals
-      if (feature in ordinalFeatureValues) {
-        attributes[feature] = {
-          type: "ordinal",
-          bounds: { allowed: ordinalFeatureValues[feature] },
-        };
-      } else if (originalFeatureType != null) {
-        switch (originalFeatureType.data_type) {
-          case "numeric":
-            attributes[feature] = await this.inferFloat(feature);
-            break;
-          case "integer":
-            attributes[feature] = await this.inferInteger(feature);
-            break;
-          case "string":
-            attributes[feature] = await this.inferString(feature);
-            break;
-          case "boolean":
-            attributes[feature] = await this.inferBoolean(feature);
-            break;
-          case "datetime":
-            attributes[feature] = await this.inferDateTime(feature);
-            break;
-          case "date":
-            attributes[feature] = await this.inferDate(feature);
-            break;
-          case "time":
-            attributes[feature] = await this.inferTime(feature);
-            break;
-          case "timedelta":
-            attributes[feature] = await this.inferTimeDelta(feature);
-            break;
-          default:
-            attributes[feature] = await this.inferString(feature);
-            break;
+        // Set unique flag
+        if (typeof attributes[featureName].unique === "boolean" && (await this.inferUnique(featureName))) {
+          additions.unique = true;
         }
-      } else {
-        attributes[feature] = await this.inferUnknown(feature);
-      }
 
-      // Add original type
-      if (originalFeatureType != null) {
-        attributes[feature].original_type = originalFeatureType;
-      }
-    }
-
-    // Determine feature properties
-    for (let i = 0; i < columns.length; i++) {
-      const feature = columns[i];
-
-      // Set unique flag
-      if (attributes[feature].unique == null && (await this.inferUnique(feature))) {
-        attributes[feature].unique = true;
-      }
-
-      // Add dependent features
-      if (attributes[feature].dependent_features == null && feature in dependentFeatures) {
-        attributes[feature].dependent_features = dependentFeatures[feature];
-      }
-
-      // Infer bounds
-      const { inferBounds = true } = options;
-      if (inferBounds && attributes[feature].bounds == null) {
-        const bounds = await this.inferBounds(
-          attributes[feature],
-          feature,
-          typeof inferBounds === "boolean" ? {} : inferBounds,
-        );
-        if (bounds != null) {
-          attributes[feature].bounds = bounds;
+        // Add dependent features
+        if (!Array.isArray(attributes[featureName].dependent_features) && featureName in dependentFeatures) {
+          additions.dependent_features = dependentFeatures[featureName];
         }
-      }
 
-      // Infer time series attributes
-      if (options.timeSeries && attributes[feature].time_series == null) {
+        // Infer bounds
+        const { inferBounds = true } = options;
+        if (inferBounds && !attributes[featureName].bounds) {
+          const bounds = await this.inferBounds(
+            attributes[featureName],
+            featureName,
+            typeof inferBounds === "boolean" ? {} : inferBounds,
+          );
+          if (bounds) {
+            additions.bounds = bounds;
+          }
+        }
+
+        // Infer time series attributes
+        // if (options.timeSeries && !attributes[featureName].time_series) {
         // TODO - infer time series
-      }
+        // }
 
-      if (options.includeSample) {
-        attributes[feature].sample = await this.getSample(feature);
-      }
-    }
+        if (options.includeSample) {
+          additions.sample = await this.getSample(featureName);
+        }
+
+        return { featureName, additions };
+      }),
+    );
+    additions.forEach(({ featureName, additions }) => {
+      attributes[featureName] = { ...additions, ...attributes[featureName] };
+    });
 
     return attributes;
   }
@@ -272,6 +254,9 @@ export abstract class InferFeatureAttributesBase {
   ): Promise<Partial<FeatureAttributes>>;
 
   protected async getSample(featureName: string): Promise<any | undefined> {
+    if (!this.statistics[featureName]) {
+      throw new Error(`this.statistics[${featureName}] is undefined`);
+    }
     return this.statistics[featureName]?.samples.at(0);
   }
 
