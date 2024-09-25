@@ -45,9 +45,15 @@ describe("features/sources/Array", () => {
         // Number
         expect(features["number"].type).toBe("continuous");
         expect(features["number"].data_type).toBe("number");
+        expect(features["number"].bounds?.min).toBeDefined();
+        expect(features["number"].bounds?.max).toBeDefined();
+        expect(features["number"].bounds?.allow_null).toBeDefined();
         // Date
         expect(features["date"].type).toBe("continuous");
         expect(features["date"].data_type).toBe("formatted_date_time");
+        expect(features["date"].bounds?.min).toBeDefined();
+        expect(features["date"].bounds?.max).toBeDefined();
+        expect(features["date"].bounds?.allow_null).toBeDefined();
         // Boolean
         expect(features["boolean"].type).toBe("nominal");
         expect(features["boolean"].data_type).toBe("boolean");
