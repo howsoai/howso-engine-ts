@@ -9,6 +9,10 @@ export function precision(x: number): number {
   let p = 0;
   while (Math.round(x * e) / e !== x) {
     e *= 10;
+    // Happened on several columns in the asteroid data set. moid for sure.
+    if (!isFinite(e)) {
+      return p;
+    }
     p++;
   }
   return p;
