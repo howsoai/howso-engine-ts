@@ -137,7 +137,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     const index = this.dataset.columns.indexOf(featureName);
     const column = this.dataset.data.reduce((result, el) => {
       const value = el[index];
-      if (!!coercedDate) {
+      if (coercedDate) {
         const date = utils.coerceDate(value);
         result.push(date?.getTime() ?? value);
       } else {
@@ -207,7 +207,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
             return new Date(value);
           }
 
-          if (!!coercedDate) {
+          if (coercedDate) {
             // TODO There's a small concern here that we may need to go back into the format we found
             // For now we can't currently find anything that isn't ISO in the JS implementation
             return new Date(value).toISOString();
