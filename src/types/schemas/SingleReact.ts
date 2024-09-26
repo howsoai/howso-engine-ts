@@ -12,7 +12,6 @@
  *     'influential_cases' : etc... }
  *   see api docs for documentation of all output properties
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 import { FeatureBoundsMap } from "./FeatureBoundsMap";
@@ -109,7 +108,7 @@ export type SingleReactRequest = {
    *  only used when desired_conviction is specified
    * @default {}
    */
-  feature_bounds_map?: FeatureBoundsMap;
+  feature_bounds_map?: Record<string, FeatureBoundsMap>;
 
   /*
    * Enum, acceptable values are:

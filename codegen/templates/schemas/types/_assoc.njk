@@ -7,7 +7,7 @@
     {%- endfor %}
 }
     {%- if schema.additional_indices %}
-  | Record<string, {{ field(schema.additional_indices) }}>
+  & Record<string, {{ field(schema.additional_indices) }}>
     {%- endif %}
 {%- elif schema.additional_indices -%}
 Record<string, {{ field(schema.additional_indices) }}>

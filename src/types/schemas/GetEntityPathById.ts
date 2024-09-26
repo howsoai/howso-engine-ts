@@ -5,7 +5,6 @@
  * iterates down the hierarchy searching for a trainee that matches the specified id, returns null if not found or
  * a string error if found but trainee is stored externally as an independent trainee.
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

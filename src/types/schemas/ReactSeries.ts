@@ -5,10 +5,10 @@
  * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 import { CaseIndices } from "./CaseIndices";
+import { FeatureBoundsMap } from "./FeatureBoundsMap";
 import { GenerateNewCases } from "./GenerateNewCases";
 import { NewCaseThreshold } from "./NewCaseThreshold";
 import { ReactDetails } from "./ReactDetails";
@@ -110,7 +110,7 @@ export type ReactSeriesRequest = {
    *     allow_null - default is true, if true nulls may be generated per their distribution in the data
    * @default {}
    */
-  feature_bounds_map?: Record<string, any>;
+  feature_bounds_map?: Record<string, FeatureBoundsMap>;
 
   /*
    * Time step values at which to end synthesis for each series, applicable only for time series.
@@ -177,7 +177,6 @@ export type ReactSeriesRequest = {
    *
    *    all of the following parameters, if specified, must be either length of 1 or equal to the length of
    *   context_values/case_indices for discriminative reacts, and num_series_to_generate for generative reacts.
-   *
    */
   num_series_to_generate?: number;
 

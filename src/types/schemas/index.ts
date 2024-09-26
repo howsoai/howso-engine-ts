@@ -23,7 +23,6 @@ export * from "./GetCases";
 export * from "./GetDistances";
 export * from "./GetEntityPathById";
 export * from "./GetExtremeCases";
-export * from "./GetFeatureAttributes";
 export * from "./GetFeatureConviction";
 export * from "./GetMarginalStats";
 export * from "./GetPairwiseDistances";

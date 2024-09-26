@@ -4,7 +4,6 @@
  * Return the full internal parameters map if no parameters are specified.
  * if any of the parameters are specified, then gethyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

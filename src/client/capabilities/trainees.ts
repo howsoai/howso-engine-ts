@@ -68,7 +68,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Analyzes the data to compute the appropriate statistics, uncertainties, and select parameters as appropriate.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -98,7 +97,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Automatically analyze the model using stored parameters from previous analyze calls
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -157,7 +155,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Removes replay specified by session and any references within cases
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -171,7 +168,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Destroys the instance of the trainee specified by the parameter "trainee".
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -205,7 +201,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Evaluate custom amalgam code for feature values of every case in the model and returns
    * a list of the custom code's return values for each feature specified.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -218,7 +213,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Execute any method in the api directly on any child trainee of this trainee, used for hierarchy operations.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -236,7 +230,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Export trainee's metadata, case and session data into json files.
    * this method should be run by a script from the ./migrations folder
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -250,7 +243,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Get auto-ablation parameters set by #set_auto_ablation_params
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -265,17 +257,13 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * Returns assoc with features and cases - a list of lists of all feature values. retrieves all feature values for cases for
    * all (unordered) sessions in the order they were trained within each session. if a session is specified, only that session's
    * cases wil be output.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getCases(
-    traineeId: string,
-    request: schemas.GetCasesRequest,
-  ): Promise<LabelResponse<schemas.GetCasesResponse>> {
+  public async getCases(traineeId: string, request: schemas.GetCasesRequest): Promise<LabelResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<schemas.GetCasesResponse>(trainee.id, "get_cases", request);
+    const response = await this.execute<any>(trainee.id, "get_cases", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -287,7 +275,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    *   'row_case_indices' : [ session-indices ],
    *   'distances': [ [ pairwise distances ] ]
    *  }
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -302,7 +289,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * Returns the full entity path to a child trainee provided its unique trainee id if it is contained in the hierarchy.
    * iterates down the hierarchy searching for a trainee that matches the specified id, returns null if not found or
    * a string error if found but trainee is stored externally as an independent trainee.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -318,7 +304,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Method to return the list of all model attributes that can be exported/imported
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -331,7 +316,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Retrieve the top or bottom number of cases for a specified feature, sorted top to bottom for top, and bottom to top for bottom
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -347,21 +331,19 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Output all feature attributes
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getFeatureAttributes(traineeId: string): Promise<LabelResponse<schemas.GetFeatureAttributesResponse>> {
+  public async getFeatureAttributes(traineeId: string): Promise<LabelResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<schemas.GetFeatureAttributesResponse>(trainee.id, "get_feature_attributes", {});
+    const response = await this.execute<any>(trainee.id, "get_feature_attributes", {});
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
    * Computes the conviction for each feature and returns an assoc of feature -> conviction value
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -378,7 +360,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Pull the hierarchy for a trainee, returns an assoc of:
    * the currently contained hierarchy as a nested assoc with (false) for trainees that are stored independently.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -392,7 +373,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Outputs all marginal stats (min, max, median, mean, mode, count, uniques, mean_absdev, variance, stddev, skew, kurtosis, entropy)
    * for all features in the format of feature -> assoc stat -> value. the marginal stats can be computed for a subset of the data using condition, precision, and num_cases
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -409,7 +389,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Get metadata for model
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -422,7 +401,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Returns the total number of training cases for trainee
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -436,7 +414,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Returns a list of computed distances between respective cases specified in either from_values or from_case_indices to to_values or to_case_indices.
    *  if one case is specified in any of the lists, all respective distances are computed to/from that one case.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -453,7 +430,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Return the full internal parameters map if no parameters are specified.
    * if any of the parameters are specified, then gethyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -466,7 +442,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Returns the trainee's !revision
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -479,7 +454,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Returns a list of all of the training sessions, assoc of id->session, and whatever other attributes specified.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -493,7 +467,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Return list of all session indices for a specified session.
    * session indices are 0-based index of number of the case for the session used for replays; may change if cases are removed
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -509,7 +482,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Returns all the metadata for a specified session
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -526,7 +498,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Return list of all session training indices for a specified session.
    * session training indices are 0-based index of the case, ordered by training during the session; is not changed
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -542,7 +513,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Returns the substitution map
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -555,7 +525,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Returns the trainee's unique id
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -568,7 +537,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * The version stored in trainee
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -581,7 +549,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Imputes the model, filling in all the (null) feature values
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -625,7 +592,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Run reacts in a batch, output a an assoc of list of outputs from each individual react.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -640,7 +606,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Computes, caches, and returns specified details and feature prediction statistics such as mean decrease in accuracy (mda), residuals (accuracy, mean absolute error),
    *  precision, recall, etc. returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -661,7 +626,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    *   "combined_model_average_distance_contribution" (list 4.05 3.9)
    *   "distance_contributions" (list 4.5 3.2)
    *  )
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -675,7 +639,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Computes various data, such as familiarity convictions and distance contribution for each case in the model and stores them into specified features.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -694,7 +657,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
    * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
    * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -709,7 +671,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Reduce the trained data by removing cases which have an influence weight entropy that falls above
    *  a threshold.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -751,7 +712,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Clears stored series
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -784,7 +744,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Resets all hyperparameters and thresholds back to original values, while leaving feature definitions alone
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -811,7 +770,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Sets the model to auto-ablate by tracking its size and training certain cases as weights
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -828,7 +786,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Sets the model to auto-analyze by tracking its size and notifying the clients in train responses when it should be analyzed
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -845,7 +802,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Set all features and their attributes for the trainee, and returns the updated feature attributes
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -853,13 +809,9 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setFeatureAttributes(
     traineeId: string,
     request: schemas.SetFeatureAttributesRequest,
-  ): Promise<LabelResponse<schemas.SetFeatureAttributesResponse>> {
+  ): Promise<LabelResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<schemas.SetFeatureAttributesResponse>(
-      trainee.id,
-      "set_feature_attributes",
-      request,
-    );
+    const response = await this.execute<any>(trainee.id, "set_feature_attributes", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -867,7 +819,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   /**
    * Set the influence weight threshold for outputting only the k neighbors whose influence weight is <= to this threshold
    * default value is 0.99
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -884,7 +835,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Set metadata for model
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -898,7 +848,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Sets internal hyperparameters
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -912,7 +861,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Set trainee's unique parent id
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -939,7 +887,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Set session metadata for a specified session.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -956,7 +903,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Sets substitution feature values used in case generation
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -973,7 +919,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 
   /**
    * Set trainee's unique id
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -996,7 +941,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    *    details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
    *     'influential_cases' : etc... }
    *   see api docs for documentation of all output properties
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -1012,7 +956,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
    * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
    * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -1039,7 +982,6 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    *     (null) - default output, no status output
    *     "analyzed" - if auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed
    *     "analyze" - if auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed
-   *
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.

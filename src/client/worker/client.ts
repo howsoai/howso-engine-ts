@@ -20,8 +20,6 @@ export interface ClientOptions {
   migrationsUrl?: string | URL;
   /** Generic howso.caml file. This will not be loaded unless a function requires it such as `createTrainee` */
   howsoUrl?: string | URL;
-  // Node only
-  libPath?: string;
 }
 
 export class HowsoWorkerClient extends TraineeClient {
@@ -41,7 +39,7 @@ export class HowsoWorkerClient extends TraineeClient {
       throw new RequiredError("options", "Client options are required.");
     }
     this.cache = new CacheMap();
-    this.fs = new FileSystemClient(this.worker, options?.libPath);
+    this.fs = new FileSystemClient(this.worker);
   }
 
   /**
@@ -104,11 +102,7 @@ export class HowsoWorkerClient extends TraineeClient {
           reject();
         }
       };
-      if (isNode) {
-        this.worker.postMessage({ data: request, ports: [channel.port2] }, [channel.port2]);
-      } else {
-        this.worker.postMessage(request, [channel.port2]);
-      }
+      this.worker.postMessage(request, [channel.port2]);
     });
   }
 
@@ -200,38 +194,30 @@ export class HowsoWorkerClient extends TraineeClient {
     }
 
     // Prepare the Engine files
-    if (isNode) {
-      // NodeJS
-      if (this.options.libPath == null) {
-        throw new HowsoError("The Howso client requires a file path to the library files.", "setup_failed");
-      }
-    } else {
-      // Browsers
-      if (!this.options.howsoUrl) {
-        throw new HowsoError("The Howso client requires a URL for the howso.caml.", "setup_failed");
-      }
+    if (!this.options.howsoUrl) {
+      throw new HowsoError("The Howso client requires a URL for the howso.caml.", "setup_failed");
+    }
 
-      await this.fs.mkdir(this.fs.libDir);
-      await this.fs.mkdir(this.fs.traineeDir);
+    await this.fs.mkdir(this.fs.libDir);
+    await this.fs.mkdir(this.fs.traineeDir);
 
-      if (this.options.migrationsUrl != null) {
-        await this.fs.mkdir(this.fs.migrationsDir);
-        await this.fs.createLazyFile(
-          this.fs.migrationsDir,
-          `migrations.${this.fs.entityExt}`,
-          String(this.options.migrationsUrl),
-          true,
-          false,
-        );
-      }
+    if (this.options.migrationsUrl != null) {
+      await this.fs.mkdir(this.fs.migrationsDir);
       await this.fs.createLazyFile(
-        this.fs.libDir,
-        `howso.${this.fs.entityExt}`,
-        String(this.options.howsoUrl),
+        this.fs.migrationsDir,
+        `migrations.${this.fs.entityExt}`,
+        String(this.options.migrationsUrl),
         true,
         false,
       );
     }
+    await this.fs.createLazyFile(
+      this.fs.libDir,
+      `howso.${this.fs.entityExt}`,
+      String(this.options.howsoUrl),
+      true,
+      false,
+    );
   }
 
   /**
@@ -291,11 +277,14 @@ export class HowsoWorkerClient extends TraineeClient {
     const loaded = await this.getEntities();
     if (loaded.indexOf(traineeId) == -1) {
       // Only call load if not already loaded
-      await this.dispatch({
+      const status = await this.dispatch({
         type: "request",
         command: "loadEntity",
         parameters: [traineeId, this.fs.join(this.fs.traineeDir, filename)],
       });
+      if (!status.loaded) {
+        throw new HowsoError(`Failed to acquire the Trainee "${traineeId}": ${status.message}`);
+      }
     }
 
     // Get Trainee details. Use the internal method to prevent auto resolution loops.
@@ -344,13 +333,13 @@ export class HowsoWorkerClient extends TraineeClient {
     const traineeId = trainee.name || uuid();
     // Load the Engine entity
     const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
-    const loaded = await this.dispatch({
+    const status = await this.dispatch({
       type: "request",
       command: "loadEntity",
       parameters: [traineeId, howsoPath],
     });
-    if (!loaded) {
-      throw new HowsoError(`Failed to initialize the Trainee "${traineeId}".`);
+    if (!status.loaded) {
+      throw new HowsoError(`Failed to initialize the Trainee "${traineeId}": ${status.message}`);
     }
 
     // Create the Trainee entity

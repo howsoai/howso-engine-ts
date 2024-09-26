@@ -5,4 +5,4 @@
  */
 import { HyperparameterMap } from "./HyperparameterMap";
 
-export type FullHyperparameterMap = Record<string, any>;
+export type FullHyperparameterMap = Record<string, Record<string, Record<string, Record<string, HyperparameterMap>>>>;

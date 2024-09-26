@@ -10,7 +10,6 @@
  *   "distance_contributions" (list 4.5 3.2)
  *  )
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

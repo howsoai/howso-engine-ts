@@ -5,7 +5,7 @@
 {{ field(item) }}{% if not loop.last %} | {% endif %}
         {%- endfor -%})[]
     {%- else -%}
-{{ field(schema.values) }}[]
+({{ field(schema.values) }})[]
     {%- endif -%}
 {%- else -%}
 any[]

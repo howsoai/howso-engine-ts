@@ -13,7 +13,6 @@
  *     "analyzed" - if auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed
  *     "analyze" - if auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

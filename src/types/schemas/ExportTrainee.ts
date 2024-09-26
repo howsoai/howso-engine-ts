@@ -4,7 +4,6 @@
  * Export trainee's metadata, case and session data into json files.
  * this method should be run by a script from the ./migrations folder
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

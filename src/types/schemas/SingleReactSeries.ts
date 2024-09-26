@@ -5,9 +5,9 @@
  * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
+import { FeatureBoundsMap } from "./FeatureBoundsMap";
 import { GenerateNewCases } from "./GenerateNewCases";
 
 export type SingleReactSeriesRequest = {
@@ -92,7 +92,7 @@ export type SingleReactSeriesRequest = {
    *     allow_null - default is true, if true nulls may be generated per their distribution in the data
    * @default {}
    */
-  feature_bounds_map?: Record<string, any>;
+  feature_bounds_map?: Record<string, FeatureBoundsMap>;
 
   /*
    * Enum, acceptable values are:

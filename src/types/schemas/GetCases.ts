@@ -5,7 +5,6 @@
  * all (unordered) sessions in the order they were trained within each session. if a session is specified, only that session's
  * cases wil be output.
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 import { CaseIndices } from "./CaseIndices";
@@ -64,9 +63,4 @@ export type GetCasesRequest = {
    * @default 0
    */
   skip_decoding?: number;
-};
-
-export type GetCasesResponse = {
-  cases?: any[][];
-  features?: string[];
 };

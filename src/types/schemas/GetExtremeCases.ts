@@ -3,7 +3,6 @@
  *
  * Retrieve the top or bottom number of cases for a specified feature, sorted top to bottom for top, and bottom to top for bottom
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

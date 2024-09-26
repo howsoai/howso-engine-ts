@@ -3,7 +3,6 @@
  *
  * Sets substitution feature values used in case generation
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 

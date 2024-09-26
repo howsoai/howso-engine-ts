@@ -3,7 +3,6 @@
  *
  * Set all features and their attributes for the trainee, and returns the updated feature attributes
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 import { FeatureAttributes } from "./FeatureAttributes";
@@ -165,5 +164,3 @@ export type SetFeatureAttributesRequest = {
    */
   feature_attributes?: Record<string, FeatureAttributes>;
 };
-
-export type SetFeatureAttributesResponse = Record<string, FeatureAttributes>;

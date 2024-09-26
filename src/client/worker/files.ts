@@ -5,7 +5,6 @@ import type {
   FileSystemResponseBody,
   IFileSystem,
 } from "@howso/amalgam-lang";
-import { isNode } from "../utilities/detectors";
 
 export class FileSystemClient implements IFileSystem {
   protected readonly baseDir: string;
@@ -59,11 +58,7 @@ export class FileSystemClient implements IFileSystem {
           reject(ev.data?.error);
         }
       };
-      if (isNode) {
-        this.worker.postMessage({ data: request, ports: [channel.port2] }, [channel.port2]);
-      } else {
-        this.worker.postMessage(request, [channel.port2]);
-      }
+      this.worker.postMessage(request, [channel.port2]);
     });
   }
 

@@ -10,6 +10,14 @@ export function blockComment(content: any) {
 
   return str
     .split("\n")
+    .reduceRight<string[]>((accumulator, value) => {
+      // Removing tailing empty lines
+      if (accumulator.length === 0 && value.trim() === "") {
+        return accumulator;
+      }
+      accumulator.unshift(value);
+      return accumulator;
+    }, [])
     .map((line, index) => {
       let value: string;
       if (line.replace(/^\s+$/gm, "")) {

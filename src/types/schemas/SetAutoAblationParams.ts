@@ -3,7 +3,6 @@
  *
  * Sets the model to auto-ablate by tracking its size and training certain cases as weights
  *
- *
  * NOTE: This file is auto generated, do not modify manually.
  */
 
@@ -66,7 +65,7 @@ export type SetAutoAblationParamsRequest = {
    * Assoc of feature -> percent. for each of the features specified, will
    *   ablate a case if abs(prediction - case value) / prediction <= percent
    */
-  relative_prediction_threshold_map?: Record<string, any>;
+  relative_prediction_threshold_map?: Record<string, number>;
 
   /*
    * List of features. for each of the features specified, will ablate a case if
@@ -78,5 +77,5 @@ export type SetAutoAblationParamsRequest = {
    * Assoc of feature -> [min, max]. for each of the features specified, will
    *   ablate a case if the prediction >= (case value - min) and the prediction <= (case value + max)
    */
-  tolerance_prediction_threshold_map?: Record<string, any>;
+  tolerance_prediction_threshold_map?: Record<string, any[]>;
 };
