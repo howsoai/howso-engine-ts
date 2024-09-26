@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 
-export type SchemaTypeOption = "any" | "assoc" | "boolean" | "list" | "number" | "string";
+export type SchemaTypeOption = "any" | "assoc" | "boolean" | "list" | "number" | "string" | "null";
 export type SchemaType = SchemaTypeOption | SchemaTypeOption[];
 
 export interface BaseSchema {

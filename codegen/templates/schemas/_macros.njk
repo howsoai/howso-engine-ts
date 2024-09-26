@@ -24,6 +24,8 @@
 {% include "schemas/types/_number.njk" %}
         {%- elif type == "boolean" -%}
 boolean
+        {%- elif type == "null" -%}
+null
         {%- else -%}
 any
         {%- endif -%}

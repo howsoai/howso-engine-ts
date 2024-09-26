@@ -20,6 +20,8 @@ export function convertType(value: SchemaType) {
       return "boolean";
     case "number":
       return "number";
+    case "null":
+      return "null";
     case "any":
       return "any";
     default:

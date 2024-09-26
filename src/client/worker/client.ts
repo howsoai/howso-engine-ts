@@ -357,7 +357,7 @@ export class HowsoWorkerClient extends TraineeClient {
     await this.execute(traineeId, "set_metadata", { metadata });
 
     // Set the feature attributes
-    const { payload: feature_attributes } = await this.execute<schemas.SetFeatureAttributesResponse>(
+    const { payload: feature_attributes } = await this.execute<Record<string, schemas.FeatureAttributes>>(
       traineeId,
       "set_feature_attributes",
       {
