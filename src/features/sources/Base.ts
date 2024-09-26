@@ -39,15 +39,14 @@ export abstract class InferFeatureAttributesBase {
     const columns = await this.getFeatureNames();
 
     const getFeatureAttributes = async (featureName: string): Promise<FeatureAttributes | undefined> => {
-      if (featureName in attributes && attributes[featureName]?.type) {
-        return undefined;
-      }
-
       const originalFeatureType = await this.getOriginalFeatureType(featureName);
       const featureAttributes: Omit<FeatureAttributes, "type"> = {
         original_type: originalFeatureType,
       };
+
       switch (true) {
+        case !!attributes[featureName]?.type:
+          return { ...featureAttributes, type: attributes[featureName]?.type };
         case featureName in ordinalFeatureValues:
           return { ...featureAttributes, type: "ordinal", bounds: { allowed: ordinalFeatureValues[featureName] } };
         case originalFeatureType?.data_type === "numeric":
