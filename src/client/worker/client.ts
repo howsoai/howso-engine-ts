@@ -1,4 +1,4 @@
-import type { Session, Trainee } from "@/types";
+import type { FeatureAttributesIndex, Session, Trainee } from "@/types";
 import type * as schemas from "@/types/schemas";
 import {
   AmalgamError,
@@ -158,8 +158,8 @@ export class HowsoWorkerClient extends TraineeClient {
    */
   protected async getTraineeFromEngine(traineeId: string): Promise<Trainee> {
     const [metadata, features] = await Promise.all([
-      this.execute<Record<string, any>>(traineeId, "get_metadata", {}),
-      this.execute<Record<string, schemas.FeatureAttributes>>(traineeId, "get_feature_attributes", {}),
+      this.execute<any>(traineeId, "get_metadata", {}),
+      this.execute<FeatureAttributesIndex>(traineeId, "get_feature_attributes", {}),
     ]);
     if (!metadata?.payload) {
       throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
@@ -345,7 +345,7 @@ export class HowsoWorkerClient extends TraineeClient {
     await this.execute(traineeId, "set_metadata", { metadata });
 
     // Set the feature attributes
-    const { payload: feature_attributes } = await this.execute<Record<string, schemas.FeatureAttributes>>(
+    const { payload: feature_attributes } = await this.execute<FeatureAttributesIndex>(
       traineeId,
       "set_feature_attributes",
       {
@@ -456,11 +456,6 @@ export class HowsoWorkerClient extends TraineeClient {
     }, []);
   }
 
-  /**
-   * Set the Trainee's feature attributes.
-   * @param traineeId The Trainee identifier.
-   * @param request The operation parameters.
-   */
   public async setFeatureAttributes(traineeId: string, request: schemas.SetFeatureAttributesRequest) {
     const response = await super.setFeatureAttributes(traineeId, request);
     // Also update cached Trainee
@@ -471,8 +466,30 @@ export class HowsoWorkerClient extends TraineeClient {
     return response;
   }
 
+  public async addFeature(traineeId: string, request: schemas.AddFeatureRequest) {
+    const response = await super.addFeature(traineeId, request);
+    // Also update cached Trainee
+    const trainee = this.cache.get(traineeId)?.trainee;
+    if (trainee) {
+      const { payload: features } = await this.getFeatureAttributes(traineeId);
+      trainee.features = features;
+    }
+    return response;
+  }
+
+  public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest) {
+    const response = await super.removeFeature(traineeId, request);
+    // Also update cached Trainee
+    const trainee = this.cache.get(traineeId)?.trainee;
+    if (trainee) {
+      const { payload: features } = await this.getFeatureAttributes(traineeId);
+      trainee.features = features;
+    }
+    return response;
+  }
+
   /**
-   * Batch train data into the Trainee.
+   * Train data into the Trainee using batched requests to the Engine.
    * @param traineeId The Trainee identifier.
    * @param request The train parameters.
    */
@@ -492,7 +509,7 @@ export class HowsoWorkerClient extends TraineeClient {
       async function* (this: HowsoWorkerClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          await this.execute<any | null>(trainee.id, "train", {
+          await this.train(trainee.id, {
             ...rest,
             cases: cases.slice(offset, offset + size),
           });

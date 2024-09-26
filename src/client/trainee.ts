@@ -1,7 +1,7 @@
 /**
  * NOTE: This file is auto generated, do not modify manually.
  */
-import type { Trainee, Session } from "@/types";
+import type { Session, Trainee } from "@/types";
 import type * as schemas from "@/types/schemas";
 import { AbstractHowsoClient } from "./base";
 
