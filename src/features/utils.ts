@@ -9,6 +9,10 @@ export function precision(x: number): number {
   let p = 0;
   while (Math.round(x * e) / e !== x) {
     e *= 10;
+    // Happened on several columns in the asteroid data set. moid for sure.
+    if (!isFinite(e)) {
+      return p;
+    }
     p++;
   }
   return p;
@@ -88,3 +92,23 @@ export function allModes<T = any>(values: T[]): [T[], number] {
 
   return [modeValues, mode];
 }
+
+/** Attempts to get a Date object from a string or Date */
+export const coerceDate = (value: string | Date | null | undefined): Date | undefined => {
+  if (!value || isNull(value)) {
+    return undefined;
+  }
+
+  if (value instanceof Date) {
+    return value;
+  }
+
+  const dateParsed =
+    // "1", "2" etc as strings count as dates to Date.parse, we'll need a minimum standard to avoid that.
+    value.match(/^[\d]{4}-[\d]{2}-[\d]{2}/) ? Date.parse(value) : 0;
+  if (dateParsed === 0) {
+    return undefined;
+  }
+
+  return new Date(dateParsed);
+};
