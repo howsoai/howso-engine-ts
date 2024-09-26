@@ -10,6 +10,8 @@ import { FeatureOriginalTypeFromJSON, FeatureOriginalTypeToJSON } from "./Featur
 import type { FeatureTimeSeries } from "./FeatureTimeSeries";
 import { FeatureTimeSeriesFromJSON, FeatureTimeSeriesToJSON } from "./FeatureTimeSeries";
 
+export type FeatureAttributesIndex = { [key: string]: FeatureAttributes };
+
 /**
  * The mapping of attributes for a single feature.
  * @export

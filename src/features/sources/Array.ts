@@ -1,14 +1,22 @@
-import type { FeatureAttributes, FeatureOriginalType } from "../../types";
+import type { FeatureAttributes } from "../../types";
 import {
+  AbstractDataType,
   ArrayData,
-  FeatureSerializerBase,
-  InferFeatureAttributesBase,
+  FeatureSourceFormat,
   InferFeatureBoundsOptions,
   InferFeatureTimeSeriesOptions,
+  isArrayData,
 } from "../base";
 import * as utils from "../utils";
+import { FeatureSerializerBase, InferFeatureAttributeFeatureStatistics, InferFeatureAttributesBase } from "./Base";
 
 export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase {
+  public static sourceFormat: FeatureSourceFormat = "array";
+
+  public static isAcceptedSourceFormat(data: AbstractDataType): boolean {
+    return isArrayData(data);
+  }
+
   constructor(protected readonly dataset: ArrayData) {
     super();
     if (dataset.data?.length) {
@@ -22,52 +30,53 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     }
   }
 
-  protected async inferBoolean(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
-    return {
-      type: "nominal",
-      data_type: "boolean",
-    };
-  }
+  protected async getStatistics(featureName: string): Promise<InferFeatureAttributeFeatureStatistics> {
+    if (this.statistics[featureName]) {
+      return this.statistics[featureName];
+    }
 
-  protected async inferTimedelta(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
-    return {
-      type: "continuous",
-    };
-  }
+    const index = this.dataset.columns.indexOf(featureName);
+    const { values, ...statistics } = this.dataset.data.reduce(
+      (statistics, data) => {
+        const value = data[index];
+        const isNull = utils.isNull(value);
 
-  protected async inferTime(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
-    return {
-      type: "continuous",
-    };
-  }
+        // Unique value counts
+        const uniqueValue = value || Infinity;
+        statistics.values[uniqueValue] ||= 0;
+        statistics.values[uniqueValue]++;
 
-  protected async inferDate(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
-    return {
-      type: "continuous",
-      date_time_format: "%Y-%m-%d",
-    };
-  }
+        // Bounds
+        statistics.hasNulls = statistics.hasNulls || isNull;
+        statistics.minimum =
+          statistics.minimum === undefined ? value : statistics.minimum > value ? value : statistics.minimum;
+        statistics.maximum =
+          statistics.maximum === undefined ? value : statistics.maximum < value ? value : statistics.maximum;
 
-  protected async inferDatetime(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
-    return {
-      type: "continuous",
-      date_time_format: "%Y-%m-%dT%H:%M:%SZ",
+        // Sample
+        statistics.samples ||= [];
+        if (statistics.samples.length <= 5 && !isNull) {
+          statistics.samples.push(value);
+        }
+
+        return statistics;
+      },
+      {
+        values: {},
+      } as Omit<InferFeatureAttributeFeatureStatistics, "uniqueValues" | "totalValues"> & {
+        values: Record<string | number, number>;
+      },
+    );
+    const totalValues = Object.values(values).reduce((sum, count) => sum + count, 0);
+    const uniqueValues = Object.keys(values).length;
+
+    this.statistics[featureName] = {
+      ...statistics,
+      totalValues,
+      unique: uniqueValues === totalValues,
+      uniqueValues,
     };
+    return this.statistics[featureName];
   }
 
   protected async inferInteger(featureName: string): Promise<FeatureAttributes> {
@@ -75,28 +84,26 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
   }
 
   protected async inferFloat(featureName: string): Promise<FeatureAttributes> {
-    let decimal_places = 0;
+    const { samples, totalValues, uniqueValues } = await this.getStatistics(featureName);
     let asNominal = false;
 
     const index = this.dataset.columns.indexOf(featureName);
-    const column = this.dataset.data.map((x) => {
-      decimal_places = Math.max(decimal_places, utils.precision(x[index]));
-      return x[index];
-    });
-    const numUnique = new Set(column).size;
+    let decimals = this.dataset.data.reduce((decimals, row) => {
+      return Math.max(decimals, utils.precision(row[index]));
+    }, 0);
 
-    const intLike = decimal_places === 0;
-    if (decimal_places >= 15) {
+    const intLike = decimals === 0;
+    if (decimals >= 15) {
       // Don't specify decimal places if using max precision of float64
-      decimal_places = 0;
+      decimals = 0;
     }
 
     // Detect if column should be treated as nominal
-    if (this.findFirstValue(featureName) !== undefined) {
+    if (samples.at(0) !== undefined) {
       if (intLike) {
-        asNominal = numUnique < Math.pow(column.length, 0.5);
+        asNominal = uniqueValues < Math.pow(totalValues, 0.5);
       } else {
-        asNominal = numUnique <= 2 && column.length > 10;
+        asNominal = uniqueValues <= 2 && totalValues > 10;
       }
     }
 
@@ -104,22 +111,13 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
       return {
         type: "nominal",
         data_type: "number",
-        decimal_places,
-      };
-    } else {
-      return {
-        type: "continuous",
-        decimal_places,
+        decimal_places: decimals,
       };
     }
-  }
-
-  protected async inferString(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<FeatureAttributes> {
     return {
-      type: "nominal",
+      type: "continuous",
+      data_type: "number",
+      decimal_places: decimals,
     };
   }
 
@@ -127,28 +125,43 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
     options: InferFeatureBoundsOptions,
-  ): Promise<FeatureAttributes["bounds"] | undefined> {
-    let hasNull = false;
-    let isDate = false;
+  ): Promise<FeatureAttributes["bounds"]> {
+    const { minimum, maximum, hasNulls, samples, uniqueValues, totalValues } = await this.getStatistics(featureName);
+
+    const sample = samples.at(0);
+    const isDate = sample instanceof Date;
+    const coercedDate = typeof sample !== "number" ? utils.coerceDate(sample) : undefined;
     const output: FeatureAttributes["bounds"] = {};
     const index = this.dataset.columns.indexOf(featureName);
     const column = this.dataset.data.reduce((result, el) => {
-      if (utils.isNull(el[index])) {
-        // Exclude nulls
-        hasNull = true;
-      } else if (el[index] instanceof Date) {
-        result.push(el[index].getTime());
-        isDate = true;
+      const value = el[index];
+      if (coercedDate) {
+        const date = utils.coerceDate(value);
+        result.push(date?.getTime() ?? value);
       } else {
-        result.push(el[index]);
+        result.push(value);
       }
       return result;
     }, []);
 
     if (attributes.type === "continuous") {
-      column.sort((a, b) => a - b || Number(isNaN(a)) - Number(isNaN(b)));
-      let minValue = column[0];
-      let maxValue = column[column.length - 1];
+      const getNumericValue = (value: string | number | Date | undefined | null): number | undefined => {
+        if (typeof value === "number") {
+          return value;
+        }
+        if (!value) {
+          return undefined;
+        }
+        if (typeof value === "string" || value instanceof Date) {
+          const date = utils.coerceDate(value);
+          return date?.getTime();
+        }
+        return undefined;
+      };
+
+      let minValue = getNumericValue(minimum);
+      let maxValue = getNumericValue(maximum);
+
       // Save original value
       const actualMin = minValue;
       const actualMax = maxValue;
@@ -164,8 +177,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
           const { modeBounds = true } = options;
           if (modeBounds || (Array.isArray(modeBounds) && modeBounds.indexOf(featureName) >= 0)) {
             // Check for mode bounds
-            const numUnique = new Set(column).size;
-            if (numUnique !== column.length) {
+            if (uniqueValues !== totalValues) {
               const [modes, modeCount] = utils.allModes(column);
 
               // If the mode for the feature is same as an original bound, set that appropriate bound to the mode value
@@ -183,20 +195,32 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
             }
           }
         }
-        // Convert back to date object
-        if (isDate) {
-          minValue = new Date(minValue);
-          maxValue = new Date(maxValue);
-        }
+
+        const getBoundValue = (value: number | undefined): number | string | Date | undefined => {
+          if (value === undefined) {
+            return undefined;
+          }
+
+          if (isDate) {
+            return new Date(value);
+          }
+
+          if (coercedDate) {
+            // TODO There's a small concern here that we may need to go back into the format we found
+            // For now we can't currently find anything that isn't ISO in the JS implementation
+            return new Date(value).toISOString();
+          }
+
+          return value;
+        };
+
         // Set bounds
-        output["min"] = minValue;
-        output["max"] = maxValue;
+        output["min"] = getBoundValue(minValue);
+        output["max"] = getBoundValue(maxValue);
       }
     }
 
-    if (!hasNull) {
-      output["allow_null"] = false;
-    }
+    output["allow_null"] = hasNulls;
 
     if (Object.keys(output).length > 0) {
       return output;
@@ -214,47 +238,6 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
   ): Promise<Partial<FeatureAttributes>> {
     // TODO - infer time series
     throw new Error("Method not implemented.");
-  }
-
-  protected async inferUnique(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    featureName: string,
-  ): Promise<boolean> {
-    // Arrays don't support unique constraints
-    return false;
-  }
-
-  protected async getFeatureType(featureName: string): Promise<FeatureOriginalType | undefined> {
-    const value = this.findFirstValue(featureName);
-    const dataType = typeof value;
-    switch (dataType) {
-      case "bigint":
-        throw TypeError("BigInt is not supported.");
-      case "number":
-        return { data_type: "numeric", size: 8 };
-      case "boolean":
-        return { data_type: "boolean" };
-      case "string":
-        return { data_type: "string" };
-      case "object":
-        if (value instanceof Date) {
-          return { data_type: "datetime" };
-        }
-        return { data_type: "object" };
-      default:
-        return undefined;
-    }
-  }
-
-  private findFirstValue(featureName: string): any | undefined {
-    const index = this.dataset.columns.indexOf(featureName);
-    for (const row of this.dataset.data) {
-      if (utils.isNull(row[index])) {
-        continue;
-      }
-      return row[index];
-    }
-    return undefined;
   }
 
   public async getFeatureNames(): Promise<string[]> {
