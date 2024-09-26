@@ -61,7 +61,7 @@ export class Generator {
         targetLabels[label] = value;
       }
     }
-    this.renderFile(this.clientDir, "capabilities/trainees.ts", "client/capabilities/trainees.njk", {
+    this.renderFile(this.clientDir, "trainee.ts", "client/trainee.njk", {
       labels: targetLabels,
     });
   }

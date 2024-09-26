@@ -3,7 +3,7 @@
  */
 import type { Trainee, Session } from "@/types";
 import type * as schemas from "@/types/schemas";
-import { AbstractHowsoClient } from "../base";
+import { AbstractHowsoClient } from "./base";
 
 export interface LabelResponse<R = unknown> {
   payload: R;

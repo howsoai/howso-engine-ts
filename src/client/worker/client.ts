@@ -9,8 +9,8 @@ import {
 } from "@howso/amalgam-lang";
 import { v4 as uuid } from "uuid";
 import { ClientCache, ExecuteResponse } from "../base";
-import { LabelResponse, TraineeClient } from "../capabilities";
 import { HowsoError, RequiredError } from "../errors";
+import { LabelResponse, TraineeClient } from "../trainee";
 import { batcher, BatchOptions, CacheMap, isNode } from "../utilities";
 import { FileSystemClient } from "./files";
 
