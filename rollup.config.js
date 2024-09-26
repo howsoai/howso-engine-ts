@@ -25,6 +25,7 @@ export default {
     terser(), // minifies generated bundles
   ],
   external: [
+    "node:fs/promises",
     ...Object.keys(pkg.dependencies || {}),
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.optionalDependencies || {}),

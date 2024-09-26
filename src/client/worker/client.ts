@@ -10,16 +10,16 @@ import {
 import { v4 as uuid } from "uuid";
 import { ClientCache, ExecuteResponse } from "../base";
 import { HowsoError, RequiredError } from "../errors";
-import { LabelResponse, TraineeClient } from "../trainee";
-import { batcher, BatchOptions, CacheMap, isNode } from "../utilities";
+import { TraineeClient } from "../trainee";
+import { batcher, BatchOptions, CacheMap } from "../utilities";
 import { FileSystemClient } from "./files";
 
 export interface ClientOptions {
   trace?: boolean;
-  // Browser only
-  migrationsUrl?: string | URL;
-  /** Generic howso.caml file. This will not be loaded unless a function requires it such as `createTrainee` */
+  /** The Howso Engine caml file. This will not be loaded unless a function requires it, such as `createTrainee` */
   howsoUrl?: string | URL;
+  /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
+  migrationsUrl?: string | URL;
 }
 
 export class HowsoWorkerClient extends TraineeClient {
@@ -181,17 +181,14 @@ export class HowsoWorkerClient extends TraineeClient {
   public async setup(): Promise<void> {
     // Initialize the Amalgam runtime
     const options: AmalgamOptions = { trace: this.options.trace };
-    const ready = await this.dispatch({
+    await this.dispatch({
       type: "request",
       command: "initialize",
       parameters: [options],
     });
 
-    if (ready) {
-      // Initialize the session
-      await this.beginSession();
-      return;
-    }
+    // Create a default initial session
+    await this.beginSession();
 
     // Prepare the Engine files
     if (!this.options.howsoUrl) {
@@ -203,21 +200,13 @@ export class HowsoWorkerClient extends TraineeClient {
 
     if (this.options.migrationsUrl != null) {
       await this.fs.mkdir(this.fs.migrationsDir);
-      await this.fs.createLazyFile(
+      await this.fs.prepareFile(
         this.fs.migrationsDir,
         `migrations.${this.fs.entityExt}`,
         String(this.options.migrationsUrl),
-        true,
-        false,
       );
     }
-    await this.fs.createLazyFile(
-      this.fs.libDir,
-      `howso.${this.fs.entityExt}`,
-      String(this.options.howsoUrl),
-      true,
-      false,
-    );
+    await this.fs.prepareFile(this.fs.libDir, `howso.${this.fs.entityExt}`, String(this.options.howsoUrl));
   }
 
   /**
@@ -248,7 +237,7 @@ export class HowsoWorkerClient extends TraineeClient {
    * @param traineeId The Trainee identifier.
    */
   public async persistTrainee(traineeId: string): Promise<void> {
-    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.sanitizeFilename(traineeId));
+    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.traineeFilename(traineeId));
     await this.dispatch({
       type: "request",
       command: "storeEntity",
@@ -267,10 +256,10 @@ export class HowsoWorkerClient extends TraineeClient {
       return;
     }
 
-    const filename = `${this.fs.sanitizeFilename(traineeId)}.${this.fs.entityExt}`;
+    const filename = this.fs.traineeFilename(traineeId);
     if (url) {
       // Prepare the file on the virtual file system
-      await this.fs.createLazyFile(this.fs.traineeDir, filename, url, true, false);
+      await this.fs.prepareFile(this.fs.traineeDir, filename, url);
     }
 
     // Load Trainee only if entity not already loaded
@@ -303,8 +292,7 @@ export class HowsoWorkerClient extends TraineeClient {
     }
 
     // Check if Trainee already loaded
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const cached = this.cache.get(trainee.id);
+    const cached = this.cache.get(traineeId);
     if (cached) {
       if (["allow", "always"].indexOf(String(cached.trainee.persistence)) != -1) {
         // Auto persist the trainee
@@ -410,7 +398,13 @@ export class HowsoWorkerClient extends TraineeClient {
         `Failed to copy the Trainee "${traineeId}". This may be due to incorrect filepaths to the Howso binaries, or a Trainee "${newTraineeId}" already exists.`,
       );
     }
-    const newTrainee = { ...trainee, name, id: newTraineeId };
+    // Update the trainee metadata
+    const { payload: metadata } = await this.execute<any>(newTraineeId, "get_metadata", {});
+    metadata.name = name;
+    await this.execute(newTraineeId, "set_metadata", { metadata });
+
+    // Get fresh copy of the trainee object
+    const newTrainee = await this.getTraineeFromEngine(newTraineeId);
     this.cache.set(newTraineeId, { trainee: newTrainee });
     return newTrainee;
   }
@@ -426,8 +420,8 @@ export class HowsoWorkerClient extends TraineeClient {
       parameters: [traineeId],
     });
     this.cache.discard(traineeId);
-    const filename = this.fs.sanitizeFilename(traineeId);
-    this.fs.unlink(this.fs.join(this.fs.traineeDir, `${filename}.${this.fs.entityExt}`));
+    const filename = this.fs.traineeFilename(traineeId);
+    this.fs.unlink(this.fs.join(this.fs.traineeDir, filename));
   }
 
   /**
@@ -478,49 +472,20 @@ export class HowsoWorkerClient extends TraineeClient {
   }
 
   /**
-   * Train cases into a Trainee.
-   * @param traineeId The Trainee identifier.
-   * @param request The operation parameters.
-   * @returns The response of the operation, including any warnings.
-   */
-  public async train(traineeId: string, request: schemas.TrainRequest): Promise<LabelResponse<any>> {
-    const session = await this.getActiveSession();
-    if (request?.session) {
-      console.warn("Using an explicit session during train is not supported. The active session will be used instead.");
-    }
-    // Include active session metadata in Trainee
-    await this.execute(traineeId, "set_session_metadata", {
-      session: session.id,
-      metadata: session,
-    });
-    return super.train(traineeId, { ...request, session: session.id });
-  }
-
-  /**
    * Batch train data into the Trainee.
    * @param traineeId The Trainee identifier.
    * @param request The train parameters.
    */
   public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const session = await this.getActiveSession();
-    const { cases = [], session: explicitSession, ...rest } = request;
-
-    // Include active session metadata in Trainee
-    if (explicitSession) {
-      console.warn("Using an explicit session during train is not supported. The active session will be used instead.");
+    const { cases = [], ...rest } = request;
+    if (!rest.session) {
+      rest.session = (await this.getActiveSession()).id;
     }
-    await this.execute(traineeId, "set_session_metadata", {
-      session: session.id,
-      metadata: session,
-    });
 
-    const batchOptions: BatchOptions = { startSize: 100 };
-    if (!isNode) {
-      // WASM builds are currently sensitive to large request sizes and may throw memory errors
-      batchOptions.startSize = 50;
-      batchOptions.limits = [1, 50];
-    }
+    // WASM builds are currently sensitive to large request sizes and may throw memory errors,
+    // so we cap it to a smaller size for now
+    const batchOptions: BatchOptions = { startSize: 50, limits: [1, 50] };
 
     // Batch scale the requests
     await batcher(
@@ -530,7 +495,6 @@ export class HowsoWorkerClient extends TraineeClient {
           await this.execute<any | null>(trainee.id, "train", {
             ...rest,
             cases: cases.slice(offset, offset + size),
-            session: session.id, // Always use active session
           });
           offset += size;
           size = yield;

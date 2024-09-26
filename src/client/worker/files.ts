@@ -5,6 +5,8 @@ import type {
   FileSystemResponseBody,
   IFileSystem,
 } from "@howso/amalgam-lang";
+import { readFile } from "node:fs/promises";
+import { isNode } from "../utilities";
 
 export class FileSystemClient implements IFileSystem {
   protected readonly baseDir: string;
@@ -14,7 +16,7 @@ export class FileSystemClient implements IFileSystem {
     private readonly worker: Worker,
     baseDir?: string,
   ) {
-    this.baseDir = baseDir || "/app/";
+    this.baseDir = baseDir ?? "/app/";
   }
 
   public get libDir(): string {
@@ -62,6 +64,15 @@ export class FileSystemClient implements IFileSystem {
     });
   }
 
+  public async prepareFile(parent: string, name: string, url: string): Promise<void> {
+    if (isNode) {
+      const data = await readFile(url);
+      this.writeFile(this.join(parent, name), data);
+    } else {
+      this.createLazyFile(parent, name, url);
+    }
+  }
+
   public async createLazyFile(
     parent: string,
     name: string,
@@ -76,11 +87,15 @@ export class FileSystemClient implements IFileSystem {
     });
   }
 
-  public async writeFile(path: string, data: string | DataView): Promise<void> {
+  public async writeFile(
+    path: string,
+    data: string | DataView | ArrayBufferView,
+    opts?: { flags?: string | undefined },
+  ): Promise<void> {
     await this.dispatch({
       type: "request",
       command: "writeFile",
-      parameters: [path, data],
+      parameters: [path, data, opts],
     });
   }
 
@@ -156,5 +171,10 @@ export class FileSystemClient implements IFileSystem {
       }
     }
     return escaped;
+  }
+
+  public traineeFilename(traineeId: string): string {
+    const sanitized = this.sanitizeFilename(traineeId);
+    return `${sanitized}.${this.entityExt}`;
   }
 }
