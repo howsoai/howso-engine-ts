@@ -196,13 +196,13 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
           }
         }
 
-        const getBoundValue = (value: number | undefined): number | string | Date | undefined => {
+        const getBoundValue = (value: number | undefined): number | string | undefined => {
           if (value === undefined) {
             return undefined;
           }
 
           if (isDate) {
-            return new Date(value);
+            return new Date(value).toISOString();
           }
 
           if (coercedDate) {
