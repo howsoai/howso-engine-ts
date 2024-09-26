@@ -70,21 +70,18 @@ export abstract class InferFeatureAttributesBase {
       }
     };
 
-    const items = await Promise.all(
+    await Promise.all(
       columns.map(async (featureName) => {
         // This will automatically cache the required values into `this.statistics`.
         await this.getStatistics(featureName);
         const featureAttributes = await getFeatureAttributes(featureName);
 
-        return { featureName, featureAttributes };
+        attributes[featureName] = { ...featureAttributes, ...attributes[featureName] };
       }),
     );
-    items.forEach(({ featureName, featureAttributes }) => {
-      attributes[featureName] = { ...featureAttributes, ...attributes[featureName] };
-    });
 
     // Determine additional attributes. The infer methods require basic attributes and statistics to be completed.
-    const additions = await Promise.all(
+    await Promise.all(
       columns.map(async (featureName) => {
         const additions: Partial<FeatureAttributes> = {};
 
@@ -120,12 +117,9 @@ export abstract class InferFeatureAttributesBase {
           additions.sample = await this.getSample(featureName);
         }
 
-        return { featureName, additions };
+        attributes[featureName] = { ...additions, ...attributes[featureName] };
       }),
     );
-    additions.forEach(({ featureName, additions }) => {
-      attributes[featureName] = { ...additions, ...attributes[featureName] };
-    });
 
     return attributes;
   }
