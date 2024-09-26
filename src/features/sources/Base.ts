@@ -213,6 +213,12 @@ export abstract class InferFeatureAttributesBase {
     };
   }
 
+  /**
+   * Support for time only attributes is a near term goal. Parts of the work are under way:
+   * Product Backlog Item 21293: Full support for time(-only) types
+   *
+   * Before full implementation, they must be treated as unrelated strings.
+   */
   protected async inferTime(featureName: string): Promise<FeatureAttributes> {
     return this.inferString(featureName);
   }
