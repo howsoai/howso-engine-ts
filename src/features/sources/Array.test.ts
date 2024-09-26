@@ -61,7 +61,6 @@ describe("features/sources/Array", () => {
         expect(features["boolean"].type).toBe("nominal");
         expect(features["boolean"].data_type).toBe("boolean");
         expect(features["boolean"].original_type?.data_type).toBe("boolean");
-        console.info(features);
       });
 
       it("should infer feature attributes from data using options", async () => {
