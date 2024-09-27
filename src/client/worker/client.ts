@@ -1,4 +1,4 @@
-import type { FeatureAttributesIndex, Session, Trainee } from "@/types";
+import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "@/types";
 import type * as schemas from "@/types/schemas";
 import {
   AmalgamError,
@@ -540,8 +540,9 @@ export class HowsoWorkerClient extends TraineeClient {
    * Train data into the Trainee using batched requests to the Engine.
    * @param traineeId The Trainee identifier.
    * @param request The train parameters.
+   * @returns The train result.
    */
-  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<void> {
+  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<TrainResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { cases = [], ...rest } = request;
 
@@ -549,16 +550,23 @@ export class HowsoWorkerClient extends TraineeClient {
     // so we cap it to a smaller size for now
     const batchOptions: BatchOptions = { startSize: 50, limits: [1, 50] };
 
+    let num_trained = 0;
+    let status = null;
+    const ablated_indices: number[] = [];
+
     // Batch scale the requests
     await batcher(
       async function* (this: HowsoWorkerClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          await this.train(trainee.id, {
+          const { payload: response } = await this.train(trainee.id, {
             ...rest,
             cases: cases.slice(offset, offset + size),
           });
           offset += size;
+          if (response.status) status = response.status;
+          if (response.num_trained) num_trained += response.num_trained;
+          if (response.ablated_indices) ablated_indices.push(...response.ablated_indices);
           size = yield;
         }
       }.bind(this),
@@ -566,5 +574,6 @@ export class HowsoWorkerClient extends TraineeClient {
     );
 
     await this.autoPersistTrainee(trainee.id);
+    return { num_trained, status, ablated_indices };
   }
 }

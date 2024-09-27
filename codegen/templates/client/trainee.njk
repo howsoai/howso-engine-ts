@@ -3,6 +3,7 @@
  */
 import type { Session, Trainee } from "@/types";
 import type * as schemas from "@/types/schemas";
+import type * as shims from "@/types/shims";
 import { AbstractHowsoClient } from "./base";
 
 export interface LabelResponse<R = unknown> {
@@ -52,15 +53,16 @@ export abstract class TraineeClient extends AbstractHowsoClient {
 {% for label, def in labels | dictsort %}
 {% set requestName = "schemas." + label | pascalCase + "Request" %}
 {% set responseName = "schemas." + label | pascalCase + "Response" %}
+{% set shimName = "shims." + label | pascalCase + "Response" %}
   /**
    * {{ def.description | capitalize | blockComment | safe | indent(2) }}
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: {{ requestName }}{% endif %}): Promise<LabelResponse<{% if def.returns %}{{ responseName }}{% else %}any{% endif %}>> {
+  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: {{ requestName }}{% endif %}): Promise<LabelResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shimName }}{% else %}any{% endif %}>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<{% if def.returns %}{{ responseName }}{% else %}any{% endif %}>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});
+    const response = await this.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shimName }}{% else %}any{% endif %}>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});
     {%- if not def.read_only %}
     this.autoPersistTrainee(trainee.id);
     {%- endif %}

@@ -12,6 +12,7 @@ export class Generator {
   schemaDir: string;
   clientDir: string;
   ignoredLabels: string[];
+  responseShims: string[];
 
   /**
    * Construct a new Generator.
@@ -37,6 +38,9 @@ export class Generator {
       "get_api",
     ];
 
+    // Temporary shims until return values are defined
+    this.responseShims = ["get_cases", "react", "train"];
+
     // Setup template engine
     const loader = new nunjucks.FileSystemLoader(path.join(__dirname, "templates"));
     this.env = new nunjucks.Environment(loader, { throwOnUndefined: true });
@@ -56,13 +60,14 @@ export class Generator {
    */
   private renderClient() {
     const targetLabels: Record<string, LabelDefinition> = {};
-    for (const [label, value] of Object.entries(this.doc.labels)) {
-      if (!this.ignoredLabels.includes(label)) {
-        targetLabels[label] = value;
+    for (const [label, definition] of Object.entries(this.doc.labels)) {
+      if (!this.ignoredLabels.includes(label) || definition.attribute) {
+        targetLabels[label] = definition;
       }
     }
     this.renderFile(this.clientDir, "trainee.ts", "client/trainee.njk", {
       labels: targetLabels,
+      shims: this.responseShims,
     });
   }
 
@@ -87,7 +92,7 @@ export class Generator {
 
     // Render label schemas
     for (const [label, definition] of Object.entries(this.doc.labels)) {
-      if (this.ignoredLabels.includes(label)) continue;
+      if (this.ignoredLabels.includes(label) || definition.attribute) continue;
       // Add schemas for label parameters and/or return value if it has any
       if (definition.parameters != null || definition.returns != null) {
         const title = toPascalCase(label);

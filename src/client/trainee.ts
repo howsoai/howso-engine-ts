@@ -3,6 +3,7 @@
  */
 import type { Session, Trainee } from "@/types";
 import type * as schemas from "@/types/schemas";
+import type * as shims from "@/types/shims";
 import { AbstractHowsoClient } from "./base";
 
 export interface LabelResponse<R = unknown> {
@@ -261,9 +262,12 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getCases(traineeId: string, request: schemas.GetCasesRequest): Promise<LabelResponse<any>> {
+  public async getCases(
+    traineeId: string,
+    request: schemas.GetCasesRequest,
+  ): Promise<LabelResponse<shims.GetCasesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_cases", request);
+    const response = await this.execute<shims.GetCasesResponse>(trainee.id, "get_cases", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -596,9 +600,9 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async react(traineeId: string, request: schemas.ReactRequest): Promise<LabelResponse<any>> {
+  public async react(traineeId: string, request: schemas.ReactRequest): Promise<LabelResponse<shims.ReactResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "react", request);
+    const response = await this.execute<shims.ReactResponse>(trainee.id, "react", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -986,9 +990,9 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async train(traineeId: string, request: schemas.TrainRequest): Promise<LabelResponse<any>> {
+  public async train(traineeId: string, request: schemas.TrainRequest): Promise<LabelResponse<shims.TrainResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "train", request);
+    const response = await this.execute<shims.TrainResponse>(trainee.id, "train", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
