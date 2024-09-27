@@ -263,8 +263,8 @@ export class HowsoWorkerClient extends TraineeClient {
       await this.fs.prepareFile(this.fs.traineeDir, filename, url);
     }
 
-    const fileStat = await this.fs.analyzePath(filePath);
-    if (!fileStat?.exists) {
+    const existingTrainees = await this.fs.readdir(this.fs.traineeDir);
+    if (!existingTrainees.includes(filename)) {
       throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
     }
 

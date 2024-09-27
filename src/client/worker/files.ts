@@ -151,7 +151,9 @@ export class FileSystemClient implements IFileSystem {
   }
 
   private isSafeChar(code: number) {
-    // UTF-8 chars below zero (U+0030) are unsafe
+    // Space and dash are ok
+    if (code == 32 || code == 45) return true;
+    // Other UTF-8 chars below zero (U+0030) are unsafe
     if (code < 48) return false;
     // Chars between 0 and 9 are ok
     if (code <= 57) return true;
