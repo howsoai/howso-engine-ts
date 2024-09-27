@@ -174,6 +174,20 @@ export class HowsoWorkerClient extends TraineeClient {
   }
 
   /**
+   * Include the active session in a request if not defined.
+   * @param request The Trainee request object.
+   * @returns The Trainee request object with a session.
+   */
+  protected async includeSession<T extends Record<string, any>>(request: T): Promise<T> {
+    if (!request.session) {
+      // Include the active session
+      const session = await this.getActiveSession();
+      return { ...request, session: session.id };
+    }
+    return request;
+  }
+
+  /**
    * Setup client.
    * Prepares the file system and initializes the worker.
    * No Trainee is loaded automatically during this process.
@@ -473,7 +487,28 @@ export class HowsoWorkerClient extends TraineeClient {
     return response;
   }
 
+  public async impute(traineeId: string, request: schemas.ImputeRequest) {
+    request = await this.includeSession(request);
+    return await super.impute(traineeId, request);
+  }
+
+  public async clearImputedData(traineeId: string, request: schemas.ClearImputedDataRequest) {
+    request = await this.includeSession(request);
+    return await super.clearImputedData(traineeId, request);
+  }
+
+  public async moveCases(traineeId: string, request: schemas.MoveCasesRequest) {
+    request = await this.includeSession(request);
+    return await super.moveCases(traineeId, request);
+  }
+
+  public async editCases(traineeId: string, request: schemas.EditCasesRequest) {
+    request = await this.includeSession(request);
+    return await super.editCases(traineeId, request);
+  }
+
   public async addFeature(traineeId: string, request: schemas.AddFeatureRequest) {
+    request = await this.includeSession(request);
     const response = await super.addFeature(traineeId, request);
     // Also update cached Trainee
     const cached = this.cache.get(traineeId);
@@ -485,6 +520,7 @@ export class HowsoWorkerClient extends TraineeClient {
   }
 
   public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest) {
+    request = await this.includeSession(request);
     const response = await super.removeFeature(traineeId, request);
     // Also update cached Trainee
     const cached = this.cache.get(traineeId);
@@ -495,6 +531,11 @@ export class HowsoWorkerClient extends TraineeClient {
     return response;
   }
 
+  public async train(traineeId: string, request: schemas.TrainRequest) {
+    request = await this.includeSession(request);
+    return await super.train(traineeId, request);
+  }
+
   /**
    * Train data into the Trainee using batched requests to the Engine.
    * @param traineeId The Trainee identifier.
@@ -503,9 +544,6 @@ export class HowsoWorkerClient extends TraineeClient {
   public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<void> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { cases = [], ...rest } = request;
-    if (!rest.session) {
-      rest.session = (await this.getActiveSession()).id;
-    }
 
     // WASM builds are currently sensitive to large request sizes and may throw memory errors,
     // so we cap it to a smaller size for now
