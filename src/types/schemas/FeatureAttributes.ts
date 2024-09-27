@@ -101,7 +101,7 @@ export type FeatureAttributes = {
     /*
      * The original type of the data.
      */
-    data_type?: "object" | "string" | "numeric" | "integer" | "boolean" | "datetime" | "time" | "date" | "timedelta";
+    data_type: "object" | "string" | "numeric" | "integer" | "boolean" | "datetime" | "time" | "date" | "timedelta";
   } & Record<string, any>;
   /*
    * Custom amalgam code that is called on resulting values of this feature during react operations.
@@ -166,7 +166,7 @@ export type FeatureAttributes = {
     /*
      * When `rate` is specified, uses the difference of the current value from its previous value divided by the change in time since the previous value. when `delta` is specified, uses the difference of the current value from its previous value regardless of the elapsed time. set to `delta` if feature has `time_feature` set to true.
      */
-    type?: "rate" | "delta";
+    type: "rate" | "delta";
     /*
      * Controls whether future values of independent time series are considered. applicable only to the time feature. when false, the time feature is not universal and allows using future data from other series in decisions; this is applicable when the time is not globally relevant and is independent for each time series. when true, universally excludes using any data with from the future from all series; this is applicable when time is globally relevant and there are events that may affect all time series. if there is any possibility of global relevancy of time, it is generally recommended to set this value to true, which is the default.
      */
@@ -179,7 +179,7 @@ export type FeatureAttributes = {
    * - nominal: a numeric or string value with no ordering. (e.g. the name of a fruit)
    * - ordinal: a nominal numeric value with ordering. (e.g. rating scale, 1-5 stars)
    */
-  type?: "continuous" | "ordinal" | "nominal";
+  type: "continuous" | "ordinal" | "nominal";
   /*
    * Flag feature as only having unique values. only applicable to nominals features.
    */

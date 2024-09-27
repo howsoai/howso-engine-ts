@@ -278,7 +278,7 @@ export type ReactRequest = {
    *  only used when desired_conviction is specified
    * @default {}
    */
-  feature_bounds_map?: FeatureBoundsMap;
+  feature_bounds_map?: Record<string, FeatureBoundsMap>;
 
   /*
    * Enum, acceptable values are:

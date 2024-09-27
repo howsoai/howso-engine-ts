@@ -4,7 +4,7 @@
 export type {{ name }}Request = {
 {%- for key, schema in parameters | dictsort %}
   {{ comment(schema) | indent(2) }}
-  {{ key }}{% if schema.optional != false or schema.default != null %}?{% endif %}: {{ field(schema) }};
+  {{ key }}{% if schema.required != true %}?{% endif %}: {{ field(schema) }};
 {%- if not loop.last %}
 {% endif %}
 {%- endfor %}

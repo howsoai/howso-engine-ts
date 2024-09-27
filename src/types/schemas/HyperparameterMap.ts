@@ -16,7 +16,7 @@ export type HyperparameterMap = {
   /*
    * The distance transform. used as an exponent to convert distance to influence before normalization.
    */
-  dt?: number;
+  dt: number;
   /*
    * Internal map of features to their deviations. includes null deviations and sparse deviation matrices.
    */
@@ -44,7 +44,7 @@ export type HyperparameterMap = {
   /*
    * The number of most similar cases used for interpolation.
    */
-  k?: number;
+  k: number;
   /*
    * Map of features to null uncertainties which describes the distances in the context of missing values.
    */
@@ -52,7 +52,7 @@ export type HyperparameterMap = {
   /*
    * The parameter of the lebesgue space.
    */
-  p?: number;
+  p: number;
   /*
    * The list of strings that make up the path to the set of hyperparameters within the larger hyperparameter map.
    */

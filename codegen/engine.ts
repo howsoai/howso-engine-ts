@@ -8,7 +8,7 @@ export type SchemaType = SchemaTypeOption | SchemaTypeOption[];
 
 export interface BaseSchema {
   description?: string;
-  optional?: boolean;
+  required?: boolean;
   default?: any;
 }
 
