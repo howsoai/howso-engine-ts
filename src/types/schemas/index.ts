@@ -50,6 +50,7 @@ export * from "./RemoveFeature";
 export * from "./RemoveSeriesStore";
 export * from "./RenameSubtrainee";
 export * from "./SaveSubtrainee";
+export * from "./SelectedPredictionStats";
 export * from "./SetAutoAblationParams";
 export * from "./SetAutoAnalyzeParams";
 export * from "./SetFeatureAttributes";

@@ -3,6 +3,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
+import { SelectedPredictionStats } from "./SelectedPredictionStats";
 
 export type ReactDetails = {
   /*
@@ -149,27 +150,15 @@ export type ReactDetails = {
    * When true, outputs observational errors for all features as defined in feature attributes.
    */
   observational_errors?: boolean;
+  /*
+   * When true, outputs the reacted case's context feature values that are outside the min or max of the corresponding feature values of all the cases in the local model area. uses only the context features of the reacted case to determine that area.
+   */
   outlying_feature_values?: boolean;
   /*
    * When true outputs feature prediction stats for all (context and action) features locally around the prediction. the stats returned  are ("r2", "rmse", "spearman_coeff", "precision", "recall", "accuracy", "mcc", "confusion_matrix", "missing_value_accuracy"). uses only the context features of the reacted case to determine that area. uses full calculations, which uses leave-one-out context features for computations. 'selected_prediction_stats' controls the returned prediction stats.
    */
   prediction_stats?: boolean;
-  /*
-   * Types of stats to output. when unspecified, returns all except the confusion_matrix. if all, then returns all including the confusion_matrix.
-   */
-  selected_prediction_stats?: (
-    | "mae"
-    | "confusion_matrix"
-    | "r2"
-    | "rmse"
-    | "spearman_coeff"
-    | "precision"
-    | "recall"
-    | "accuracy"
-    | "mcc"
-    | "all"
-    | "missing_value_accuracy"
-  )[];
+  selected_prediction_stats?: SelectedPredictionStats;
   /*
    * When true, outputs similarity conviction for the reacted case. uses both context and action feature values as the case values for all computations. this is defined as expected (local) distance contribution divided by reacted case distance contribution.
    */
