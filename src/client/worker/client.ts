@@ -25,7 +25,7 @@ export interface ClientOptions {
 export class HowsoWorkerClient extends TraineeClient {
   public readonly fs: FileSystemClient;
   protected activeSession?: Session;
-  protected cache: CacheMap<ClientCache>;
+  protected cache: CacheMap<Required<ClientCache>>;
 
   constructor(
     protected readonly worker: Worker,
@@ -129,9 +129,7 @@ export class HowsoWorkerClient extends TraineeClient {
     if (traineeId == null) {
       throw new TypeError("A Trainee identifier is required.");
     }
-    if (!this.cache.has(traineeId)) {
-      await this.acquireTraineeResources(traineeId);
-    }
+    await this.acquireTraineeResources(traineeId); // does nothing if already cached
     const cached = this.cache.get(traineeId);
     if (cached == null) {
       throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
@@ -154,9 +152,9 @@ export class HowsoWorkerClient extends TraineeClient {
    * Constructs Trainee object from it's Engine metadata.
    *
    * @param traineeId The Trainee identifier.
-   * @returns The Trainee object.
+   * @returns The Trainee object and its feature attributes.
    */
-  protected async getTraineeFromEngine(traineeId: string): Promise<Trainee> {
+  protected async getTraineeFromEngine(traineeId: string): Promise<[Trainee, FeatureAttributesIndex]> {
     const [metadata, features] = await Promise.all([
       this.execute<any>(traineeId, "get_metadata", {}),
       this.execute<FeatureAttributesIndex>(traineeId, "get_feature_attributes", {}),
@@ -164,13 +162,15 @@ export class HowsoWorkerClient extends TraineeClient {
     if (!metadata?.payload) {
       throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
     }
-    return {
-      id: traineeId,
-      name: metadata?.payload?.name,
-      features: features?.payload,
-      persistence: metadata?.payload?.persistence ?? "allow",
-      metadata: metadata?.payload?.metadata,
-    };
+    return [
+      {
+        id: traineeId,
+        name: metadata?.payload?.name,
+        persistence: metadata?.payload?.persistence ?? "allow",
+        metadata: metadata?.payload?.metadata,
+      },
+      features?.payload,
+    ];
   }
 
   /**
@@ -257,9 +257,15 @@ export class HowsoWorkerClient extends TraineeClient {
     }
 
     const filename = this.fs.traineeFilename(traineeId);
+    const filePath = this.fs.join(this.fs.traineeDir, filename);
     if (url) {
       // Prepare the file on the virtual file system
       await this.fs.prepareFile(this.fs.traineeDir, filename, url);
+    }
+
+    const fileStat = await this.fs.analyzePath(filePath);
+    if (!fileStat?.exists) {
+      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
     }
 
     // Load Trainee only if entity not already loaded
@@ -269,7 +275,7 @@ export class HowsoWorkerClient extends TraineeClient {
       const status = await this.dispatch({
         type: "request",
         command: "loadEntity",
-        parameters: [traineeId, this.fs.join(this.fs.traineeDir, filename)],
+        parameters: [traineeId, filePath],
       });
       if (!status.loaded) {
         throw new HowsoError(`Failed to acquire the Trainee "${traineeId}": ${status.message}`);
@@ -277,9 +283,9 @@ export class HowsoWorkerClient extends TraineeClient {
     }
 
     // Get Trainee details. Use the internal method to prevent auto resolution loops.
-    const trainee = await this.getTraineeFromEngine(traineeId);
+    const [trainee, feature_attributes] = await this.getTraineeFromEngine(traineeId);
     // Cache the Trainee
-    this.cache.set(traineeId, { trainee });
+    this.cache.set(traineeId, { trainee, feature_attributes });
   }
 
   /**
@@ -339,23 +345,14 @@ export class HowsoWorkerClient extends TraineeClient {
     // Set Trainee metadata
     const metadata = {
       name: trainee.name,
-      metadata: structuredClone(trainee.metadata || {}),
+      metadata: trainee.metadata || {},
       persistence: trainee.persistence || "allow",
     };
     await this.execute(traineeId, "set_metadata", { metadata });
 
-    // Set the feature attributes
-    const { payload: feature_attributes } = await this.execute<FeatureAttributesIndex>(
-      traineeId,
-      "set_feature_attributes",
-      {
-        feature_attributes: trainee.features || {},
-      },
-    );
-
     // Build, cache and return new trainee object
-    const newTrainee: Trainee = { id: traineeId, features: feature_attributes, ...metadata };
-    this.cache.set(traineeId, { trainee: newTrainee });
+    const newTrainee: Trainee = { id: traineeId, ...metadata };
+    this.cache.set(traineeId, { trainee: structuredClone(newTrainee), feature_attributes: {} });
     return newTrainee;
   }
 
@@ -363,11 +360,20 @@ export class HowsoWorkerClient extends TraineeClient {
    * Update a Trainee's properties.
    * @param trainee The Trainee identifier.
    */
-  public async updateTrainee(
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    trainee: Trainee,
-  ): Promise<Trainee> {
-    throw new Error("Method not implemented.");
+  public async updateTrainee(trainee: Trainee): Promise<Trainee> {
+    await this.autoResolveTrainee(trainee.id);
+
+    // Set Trainee metadata
+    const metadata = {
+      name: trainee.name,
+      metadata: trainee.metadata || {},
+      persistence: trainee.persistence || "allow",
+    };
+    await this.execute(trainee.id, "set_metadata", { metadata });
+
+    const [updatedTrainee, feature_attributes] = await this.getTraineeFromEngine(trainee.id);
+    this.cache.set(trainee.id, { trainee: structuredClone(updatedTrainee), feature_attributes });
+    return updatedTrainee;
   }
 
   /**
@@ -377,7 +383,8 @@ export class HowsoWorkerClient extends TraineeClient {
    */
   public async getTrainee(traineeId: string): Promise<Trainee> {
     await this.autoResolveTrainee(traineeId);
-    return await this.getTraineeFromEngine(traineeId); // Get latest Trainee from Engine
+    const [trainee] = await this.getTraineeFromEngine(traineeId); // Get latest Trainee from Engine
+    return trainee;
   }
 
   /**
@@ -404,8 +411,8 @@ export class HowsoWorkerClient extends TraineeClient {
     await this.execute(newTraineeId, "set_metadata", { metadata });
 
     // Get fresh copy of the trainee object
-    const newTrainee = await this.getTraineeFromEngine(newTraineeId);
-    this.cache.set(newTraineeId, { trainee: newTrainee });
+    const [newTrainee, feature_attributes] = await this.getTraineeFromEngine(newTraineeId);
+    this.cache.set(newTraineeId, { trainee: structuredClone(newTrainee), feature_attributes });
     return newTrainee;
   }
 
@@ -459,9 +466,9 @@ export class HowsoWorkerClient extends TraineeClient {
   public async setFeatureAttributes(traineeId: string, request: schemas.SetFeatureAttributesRequest) {
     const response = await super.setFeatureAttributes(traineeId, request);
     // Also update cached Trainee
-    const trainee = this.cache.get(traineeId)?.trainee;
-    if (trainee) {
-      trainee.features = response.payload;
+    const cached = this.cache.get(traineeId);
+    if (cached) {
+      cached.feature_attributes = structuredClone(response.payload);
     }
     return response;
   }
@@ -469,10 +476,10 @@ export class HowsoWorkerClient extends TraineeClient {
   public async addFeature(traineeId: string, request: schemas.AddFeatureRequest) {
     const response = await super.addFeature(traineeId, request);
     // Also update cached Trainee
-    const trainee = this.cache.get(traineeId)?.trainee;
-    if (trainee) {
+    const cached = this.cache.get(traineeId);
+    if (cached) {
       const { payload: features } = await this.getFeatureAttributes(traineeId);
-      trainee.features = features;
+      cached.feature_attributes = features;
     }
     return response;
   }
@@ -480,10 +487,10 @@ export class HowsoWorkerClient extends TraineeClient {
   public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest) {
     const response = await super.removeFeature(traineeId, request);
     // Also update cached Trainee
-    const trainee = this.cache.get(traineeId)?.trainee;
-    if (trainee) {
+    const cached = this.cache.get(traineeId);
+    if (cached) {
       const { payload: features } = await this.getFeatureAttributes(traineeId);
-      trainee.features = features;
+      cached.feature_attributes = features;
     }
     return response;
   }

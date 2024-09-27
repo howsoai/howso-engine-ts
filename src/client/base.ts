@@ -1,9 +1,10 @@
-import type { Trainee } from "@/types";
+import type { FeatureAttributesIndex, Trainee } from "@/types";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
 import type { CacheMap } from "./utilities/cache";
 
 export interface ClientCache {
   trainee: Trainee;
+  feature_attributes?: FeatureAttributesIndex;
 }
 
 export interface ExecuteResponse<R = unknown> {

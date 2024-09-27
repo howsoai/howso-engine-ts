@@ -1,5 +1,3 @@
-import { FeatureAttributes } from "./schemas";
-
 export interface TraineeIdentity {
   /**
    * The unique identifier of the Trainee.
@@ -13,11 +11,6 @@ export interface TraineeIdentity {
 }
 
 export interface Trainee extends TraineeIdentity {
-  /**
-   * Feature attributes of the Trainee.
-   */
-  features?: { [key: string]: FeatureAttributes };
-
   /**
    * The type of persistence schedule to use.
    * If allow, the trainee may be manually persisted and will be persisted automatically only when unloaded.

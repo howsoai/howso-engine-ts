@@ -73,6 +73,14 @@ export class FileSystemClient implements IFileSystem {
     }
   }
 
+  public async analyzePath(path: string, dontResolveLastLink?: boolean): Promise<FS.Analyze> {
+    return await this.dispatch({
+      type: "request",
+      command: "analyzePath",
+      parameters: [path, dontResolveLastLink],
+    });
+  }
+
   public async createLazyFile(
     parent: string,
     name: string,
@@ -89,7 +97,7 @@ export class FileSystemClient implements IFileSystem {
 
   public async writeFile(
     path: string,
-    data: string | DataView | ArrayBufferView,
+    data: string | ArrayBufferView,
     opts?: { flags?: string | undefined },
   ): Promise<void> {
     await this.dispatch({
