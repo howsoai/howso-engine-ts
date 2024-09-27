@@ -2,7 +2,7 @@
 {%- from "schemas/_macros.njk" import field, comment %}
 {% if parameters %}
 export type {{ name }}Request = {
-{%- for key, schema in parameters | dictsort %}
+{%- for key, schema in parameters | dictsort -%}
   {{ comment(schema) | indent(2) }}
   {{ key }}{% if schema.required != true %}?{% endif %}: {{ field(schema) }};
 {%- if not loop.last %}
