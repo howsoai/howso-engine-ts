@@ -7,7 +7,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { Condition } from "./Condition";
+import type { Condition } from "./Condition";
 
 export type RemoveFeatureRequest = {
   /*

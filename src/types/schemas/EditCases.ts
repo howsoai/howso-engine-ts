@@ -8,8 +8,8 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { CaseIndices } from "./CaseIndices";
-import { Condition } from "./Condition";
+import type { CaseIndices } from "./CaseIndices";
+import type { Condition } from "./Condition";
 
 export type EditCasesRequest = {
   /*

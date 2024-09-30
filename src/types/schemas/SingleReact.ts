@@ -14,10 +14,10 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { FeatureBoundsMap } from "./FeatureBoundsMap";
-import { GenerateNewCases } from "./GenerateNewCases";
-import { NewCaseThreshold } from "./NewCaseThreshold";
-import { ReactDetails } from "./ReactDetails";
+import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { GenerateNewCases } from "./GenerateNewCases";
+import type { NewCaseThreshold } from "./NewCaseThreshold";
+import type { ReactDetails } from "./ReactDetails";
 
 export type SingleReactRequest = {
   /*

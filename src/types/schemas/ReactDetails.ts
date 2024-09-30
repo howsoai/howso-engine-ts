@@ -3,7 +3,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { SelectedPredictionStats } from "./SelectedPredictionStats";
+import type { SelectedPredictionStats } from "./SelectedPredictionStats";
 
 export type ReactDetails = {
   /*

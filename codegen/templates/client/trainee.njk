@@ -1,15 +1,10 @@
 /**
  * NOTE: This file is auto generated, do not modify manually.
  */
-import type { Session, Trainee } from "../types";
+import type { ClientResponse, Session, Trainee } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { AbstractHowsoClient } from "./base";
-
-export interface LabelResponse<R = unknown> {
-  payload: R;
-  warnings: string[];
-}
 
 export abstract class TraineeClient extends AbstractHowsoClient {
   /** Create a new Trainee. */
@@ -59,7 +54,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: {{ requestName }}{% endif %}): Promise<LabelResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
+  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: {{ requestName }}{% endif %}): Promise<ClientResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});
     {%- if not def.read_only %}

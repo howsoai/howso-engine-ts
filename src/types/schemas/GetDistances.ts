@@ -11,7 +11,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { CaseIndices } from "./CaseIndices";
+import type { CaseIndices } from "./CaseIndices";
 
 export type GetDistancesRequest = {
   /*

@@ -5,7 +5,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { FeatureAttributes } from "./FeatureAttributes";
+import type { FeatureAttributes } from "./FeatureAttributes";
 
 export type SetFeatureAttributesRequest = {
   /*

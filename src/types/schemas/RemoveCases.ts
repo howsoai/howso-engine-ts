@@ -5,9 +5,9 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { CaseIndices } from "./CaseIndices";
-import { Condition } from "./Condition";
-import { Precision } from "./Precision";
+import type { CaseIndices } from "./CaseIndices";
+import type { Condition } from "./Condition";
+import type { Precision } from "./Precision";
 
 export type RemoveCasesRequest = {
   /*

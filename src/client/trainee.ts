@@ -1,15 +1,10 @@
 /**
  * NOTE: This file is auto generated, do not modify manually.
  */
-import type { Session, Trainee } from "../types";
+import type { ClientResponse, Session, Trainee } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { AbstractHowsoClient } from "./base";
-
-export interface LabelResponse<R = unknown> {
-  payload: R;
-  warnings: string[];
-}
 
 export abstract class TraineeClient extends AbstractHowsoClient {
   /** Create a new Trainee. */
@@ -60,7 +55,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async addFeature(traineeId: string, request: schemas.AddFeatureRequest): Promise<LabelResponse<any>> {
+  public async addFeature(traineeId: string, request: schemas.AddFeatureRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "add_feature", request);
     this.autoPersistTrainee(trainee.id);
@@ -73,7 +68,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async analyze(traineeId: string, request: schemas.AnalyzeRequest): Promise<LabelResponse<null>> {
+  public async analyze(traineeId: string, request: schemas.AnalyzeRequest): Promise<ClientResponse<null>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<null>(trainee.id, "analyze", request);
     this.autoPersistTrainee(trainee.id);
@@ -89,7 +84,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async appendToSeriesStore(
     traineeId: string,
     request: schemas.AppendToSeriesStoreRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "append_to_series_store", request);
     this.autoPersistTrainee(trainee.id);
@@ -102,7 +97,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async autoAnalyze(traineeId: string): Promise<LabelResponse<any>> {
+  public async autoAnalyze(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "auto_analyze", {});
     this.autoPersistTrainee(trainee.id);
@@ -118,7 +113,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async clearImputedData(
     traineeId: string,
     request: schemas.ClearImputedDataRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "clear_imputed_data", request);
     this.autoPersistTrainee(trainee.id);
@@ -131,7 +126,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async copySubtrainee(traineeId: string, request: schemas.CopySubtraineeRequest): Promise<LabelResponse<any>> {
+  public async copySubtrainee(traineeId: string, request: schemas.CopySubtraineeRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "copy_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -147,7 +142,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async createSubtrainee(
     traineeId: string,
     request: schemas.CreateSubtraineeRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "create_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -160,7 +155,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async deleteSession(traineeId: string, request: schemas.DeleteSessionRequest): Promise<LabelResponse<any>> {
+  public async deleteSession(traineeId: string, request: schemas.DeleteSessionRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "delete_session", request);
     this.autoPersistTrainee(trainee.id);
@@ -176,7 +171,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async deleteSubtrainee(
     traineeId: string,
     request: schemas.DeleteSubtraineeRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "delete_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -192,7 +187,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async editCases(traineeId: string, request: schemas.EditCasesRequest): Promise<LabelResponse<any>> {
+  public async editCases(traineeId: string, request: schemas.EditCasesRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "edit_cases", request);
     this.autoPersistTrainee(trainee.id);
@@ -206,7 +201,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async evaluate(traineeId: string, request: schemas.EvaluateRequest): Promise<LabelResponse<any>> {
+  public async evaluate(traineeId: string, request: schemas.EvaluateRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "evaluate", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -221,7 +216,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async executeOnSubtrainee(
     traineeId: string,
     request: schemas.ExecuteOnSubtraineeRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "execute_on_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -235,7 +230,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async exportTrainee(traineeId: string, request: schemas.ExportTraineeRequest): Promise<LabelResponse<any>> {
+  public async exportTrainee(traineeId: string, request: schemas.ExportTraineeRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "export_trainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -248,7 +243,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getAutoAblationParams(traineeId: string): Promise<LabelResponse<any>> {
+  public async getAutoAblationParams(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_auto_ablation_params", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -265,7 +260,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getCases(
     traineeId: string,
     request: schemas.GetCasesRequest,
-  ): Promise<LabelResponse<shims.GetCasesResponse>> {
+  ): Promise<ClientResponse<shims.GetCasesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.GetCasesResponse>(trainee.id, "get_cases", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -283,7 +278,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getDistances(traineeId: string, request: schemas.GetDistancesRequest): Promise<LabelResponse<any>> {
+  public async getDistances(traineeId: string, request: schemas.GetDistancesRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_distances", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -300,7 +295,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getEntityPathById(
     traineeId: string,
     request: schemas.GetEntityPathByIdRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_entity_path_by_id", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -312,7 +307,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getExportAttributes(traineeId: string): Promise<LabelResponse<any>> {
+  public async getExportAttributes(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_export_attributes", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -327,7 +322,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getExtremeCases(
     traineeId: string,
     request: schemas.GetExtremeCasesRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_extreme_cases", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -339,7 +334,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getFeatureAttributes(traineeId: string): Promise<LabelResponse<shims.FeatureAttributesIndex>> {
+  public async getFeatureAttributes(traineeId: string): Promise<ClientResponse<shims.FeatureAttributesIndex>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.FeatureAttributesIndex>(trainee.id, "get_feature_attributes", {});
     this.autoPersistTrainee(trainee.id);
@@ -355,7 +350,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getFeatureConviction(
     traineeId: string,
     request: schemas.GetFeatureConvictionRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_feature_conviction", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -368,7 +363,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getHierarchy(traineeId: string): Promise<LabelResponse<any>> {
+  public async getHierarchy(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_hierarchy", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -384,7 +379,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getMarginalStats(
     traineeId: string,
     request: schemas.GetMarginalStatsRequest,
-  ): Promise<LabelResponse<shims.GetMarginalStatsResponse>> {
+  ): Promise<ClientResponse<shims.GetMarginalStatsResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.GetMarginalStatsResponse>(trainee.id, "get_marginal_stats", request);
     this.autoPersistTrainee(trainee.id);
@@ -397,7 +392,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getMetadata(traineeId: string): Promise<LabelResponse<any>> {
+  public async getMetadata(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_metadata", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -409,7 +404,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getNumTrainingCases(traineeId: string): Promise<LabelResponse<any>> {
+  public async getNumTrainingCases(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_num_training_cases", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -425,7 +420,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getPairwiseDistances(
     traineeId: string,
     request: schemas.GetPairwiseDistancesRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_pairwise_distances", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -441,7 +436,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getParams(
     traineeId: string,
     request: schemas.GetParamsRequest,
-  ): Promise<LabelResponse<shims.GetParamsResponse>> {
+  ): Promise<ClientResponse<shims.GetParamsResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.GetParamsResponse>(trainee.id, "get_params", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -453,7 +448,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getRevision(traineeId: string): Promise<LabelResponse<any>> {
+  public async getRevision(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_revision", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -465,7 +460,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSessions(traineeId: string, request: schemas.GetSessionsRequest): Promise<LabelResponse<any>> {
+  public async getSessions(traineeId: string, request: schemas.GetSessionsRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_sessions", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -481,7 +476,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getSessionIndices(
     traineeId: string,
     request: schemas.GetSessionIndicesRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_session_indices", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -496,7 +491,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getSessionMetadata(
     traineeId: string,
     request: schemas.GetSessionMetadataRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_session_metadata", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -512,7 +507,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getSessionTrainingIndices(
     traineeId: string,
     request: schemas.GetSessionTrainingIndicesRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_session_training_indices", request);
     return { payload: response.payload, warnings: response.warnings };
@@ -524,7 +519,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSubstituteFeatureValues(traineeId: string): Promise<LabelResponse<any>> {
+  public async getSubstituteFeatureValues(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_substitute_feature_values", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -536,7 +531,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getTraineeId(traineeId: string): Promise<LabelResponse<any>> {
+  public async getTraineeId(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_trainee_id", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -548,7 +543,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getTraineeVersion(traineeId: string): Promise<LabelResponse<any>> {
+  public async getTraineeVersion(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_trainee_version", {});
     return { payload: response.payload, warnings: response.warnings };
@@ -560,7 +555,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async impute(traineeId: string, request: schemas.ImputeRequest): Promise<LabelResponse<any>> {
+  public async impute(traineeId: string, request: schemas.ImputeRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "impute", request);
     this.autoPersistTrainee(trainee.id);
@@ -577,7 +572,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async loadSubtrainee(traineeId: string, request: schemas.LoadSubtraineeRequest): Promise<LabelResponse<any>> {
+  public async loadSubtrainee(traineeId: string, request: schemas.LoadSubtraineeRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "load_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -590,7 +585,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async moveCases(traineeId: string, request: schemas.MoveCasesRequest): Promise<LabelResponse<any>> {
+  public async moveCases(traineeId: string, request: schemas.MoveCasesRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "move_cases", request);
     this.autoPersistTrainee(trainee.id);
@@ -603,7 +598,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async react(traineeId: string, request: schemas.ReactRequest): Promise<LabelResponse<shims.ReactResponse>> {
+  public async react(traineeId: string, request: schemas.ReactRequest): Promise<ClientResponse<shims.ReactResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.ReactResponse>(trainee.id, "react", request);
     this.autoPersistTrainee(trainee.id);
@@ -620,7 +615,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async reactAggregate(
     traineeId: string,
     request: schemas.ReactAggregateRequest,
-  ): Promise<LabelResponse<shims.ReactAggregateResponse>> {
+  ): Promise<ClientResponse<shims.ReactAggregateResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.ReactAggregateResponse>(trainee.id, "react_aggregate", request);
     this.autoPersistTrainee(trainee.id);
@@ -640,7 +635,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactGroup(traineeId: string, request: schemas.ReactGroupRequest): Promise<LabelResponse<any>> {
+  public async reactGroup(traineeId: string, request: schemas.ReactGroupRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "react_group", request);
     this.autoPersistTrainee(trainee.id);
@@ -656,7 +651,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async reactIntoFeatures(
     traineeId: string,
     request: schemas.ReactIntoFeaturesRequest,
-  ): Promise<LabelResponse<null>> {
+  ): Promise<ClientResponse<null>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<null>(trainee.id, "react_into_features", request);
     this.autoPersistTrainee(trainee.id);
@@ -671,7 +666,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactSeries(traineeId: string, request: schemas.ReactSeriesRequest): Promise<LabelResponse<any>> {
+  public async reactSeries(traineeId: string, request: schemas.ReactSeriesRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "react_series", request);
     this.autoPersistTrainee(trainee.id);
@@ -685,7 +680,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reduceData(traineeId: string, request: schemas.ReduceDataRequest): Promise<LabelResponse<any>> {
+  public async reduceData(traineeId: string, request: schemas.ReduceDataRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "reduce_data", request);
     this.autoPersistTrainee(trainee.id);
@@ -698,7 +693,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async removeCases(traineeId: string, request: schemas.RemoveCasesRequest): Promise<LabelResponse<any>> {
+  public async removeCases(traineeId: string, request: schemas.RemoveCasesRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "remove_cases", request);
     this.autoPersistTrainee(trainee.id);
@@ -713,7 +708,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest): Promise<LabelResponse<any>> {
+  public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "remove_feature", request);
     this.autoPersistTrainee(trainee.id);
@@ -729,7 +724,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async removeSeriesStore(
     traineeId: string,
     request: schemas.RemoveSeriesStoreRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "remove_series_store", request);
     this.autoPersistTrainee(trainee.id);
@@ -745,7 +740,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async renameSubtrainee(
     traineeId: string,
     request: schemas.RenameSubtraineeRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "rename_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -758,7 +753,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async resetParams(traineeId: string): Promise<LabelResponse<any>> {
+  public async resetParams(traineeId: string): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "reset_params", {});
     this.autoPersistTrainee(trainee.id);
@@ -771,7 +766,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async saveSubtrainee(traineeId: string, request: schemas.SaveSubtraineeRequest): Promise<LabelResponse<any>> {
+  public async saveSubtrainee(traineeId: string, request: schemas.SaveSubtraineeRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "save_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
@@ -787,7 +782,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setAutoAblationParams(
     traineeId: string,
     request: schemas.SetAutoAblationParamsRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_auto_ablation_params", request);
     this.autoPersistTrainee(trainee.id);
@@ -803,7 +798,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setAutoAnalyzeParams(
     traineeId: string,
     request: schemas.SetAutoAnalyzeParamsRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_auto_analyze_params", request);
     this.autoPersistTrainee(trainee.id);
@@ -819,7 +814,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setFeatureAttributes(
     traineeId: string,
     request: schemas.SetFeatureAttributesRequest,
-  ): Promise<LabelResponse<shims.FeatureAttributesIndex>> {
+  ): Promise<ClientResponse<shims.FeatureAttributesIndex>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.FeatureAttributesIndex>(trainee.id, "set_feature_attributes", request);
     this.autoPersistTrainee(trainee.id);
@@ -836,7 +831,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setInfluenceWeightThreshold(
     traineeId: string,
     request: schemas.SetInfluenceWeightThresholdRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_influence_weight_threshold", request);
     this.autoPersistTrainee(trainee.id);
@@ -849,7 +844,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setMetadata(traineeId: string, request: schemas.SetMetadataRequest): Promise<LabelResponse<any>> {
+  public async setMetadata(traineeId: string, request: schemas.SetMetadataRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_metadata", request);
     this.autoPersistTrainee(trainee.id);
@@ -862,7 +857,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setParams(traineeId: string, request: schemas.SetParamsRequest): Promise<LabelResponse<any>> {
+  public async setParams(traineeId: string, request: schemas.SetParamsRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_params", request);
     this.autoPersistTrainee(trainee.id);
@@ -875,7 +870,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setParentId(traineeId: string, request: schemas.SetParentIdRequest): Promise<LabelResponse<any>> {
+  public async setParentId(traineeId: string, request: schemas.SetParentIdRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_parent_id", request);
     this.autoPersistTrainee(trainee.id);
@@ -888,7 +883,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setRandomSeed(traineeId: string, request: schemas.SetRandomSeedRequest): Promise<LabelResponse<any>> {
+  public async setRandomSeed(traineeId: string, request: schemas.SetRandomSeedRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_random_seed", request);
     this.autoPersistTrainee(trainee.id);
@@ -904,7 +899,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setSessionMetadata(
     traineeId: string,
     request: schemas.SetSessionMetadataRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_session_metadata", request);
     this.autoPersistTrainee(trainee.id);
@@ -920,7 +915,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setSubstituteFeatureValues(
     traineeId: string,
     request: schemas.SetSubstituteFeatureValuesRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_substitute_feature_values", request);
     this.autoPersistTrainee(trainee.id);
@@ -933,7 +928,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setTraineeId(traineeId: string, request: schemas.SetTraineeIdRequest): Promise<LabelResponse<any>> {
+  public async setTraineeId(traineeId: string, request: schemas.SetTraineeIdRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "set_trainee_id", request);
     this.autoPersistTrainee(trainee.id);
@@ -955,7 +950,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async singleReact(traineeId: string, request: schemas.SingleReactRequest): Promise<LabelResponse<any>> {
+  public async singleReact(traineeId: string, request: schemas.SingleReactRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "single_react", request);
     this.autoPersistTrainee(trainee.id);
@@ -973,7 +968,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async singleReactSeries(
     traineeId: string,
     request: schemas.SingleReactSeriesRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "single_react_series", request);
     this.autoPersistTrainee(trainee.id);
@@ -996,7 +991,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async train(traineeId: string, request: schemas.TrainRequest): Promise<LabelResponse<shims.TrainResponse>> {
+  public async train(traineeId: string, request: schemas.TrainRequest): Promise<ClientResponse<shims.TrainResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<shims.TrainResponse>(trainee.id, "train", request);
     this.autoPersistTrainee(trainee.id);
@@ -1009,7 +1004,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async upgradeTrainee(traineeId: string, request: schemas.UpgradeTraineeRequest): Promise<LabelResponse<any>> {
+  public async upgradeTrainee(traineeId: string, request: schemas.UpgradeTraineeRequest): Promise<ClientResponse<any>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "upgrade_trainee", request);
     this.autoPersistTrainee(trainee.id);

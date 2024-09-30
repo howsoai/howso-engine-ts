@@ -3,7 +3,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { FeatureBoundsMap } from "./FeatureBoundsMap";
 
 export type FeatureAttributes = {
   /*

@@ -8,8 +8,8 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { Condition } from "./Condition";
-import { FeatureAttributes } from "./FeatureAttributes";
+import type { Condition } from "./Condition";
+import type { FeatureAttributes } from "./FeatureAttributes";
 
 export type AddFeatureRequest = {
   /*

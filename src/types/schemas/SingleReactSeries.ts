@@ -7,8 +7,8 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { FeatureBoundsMap } from "./FeatureBoundsMap";
-import { GenerateNewCases } from "./GenerateNewCases";
+import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { GenerateNewCases } from "./GenerateNewCases";
 
 export type SingleReactSeriesRequest = {
   /*

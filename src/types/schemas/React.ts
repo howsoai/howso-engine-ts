@@ -5,10 +5,10 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { CaseIndices } from "./CaseIndices";
-import { FeatureBoundsMap } from "./FeatureBoundsMap";
-import { GenerateNewCases } from "./GenerateNewCases";
-import { ReactDetails } from "./ReactDetails";
+import type { CaseIndices } from "./CaseIndices";
+import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { GenerateNewCases } from "./GenerateNewCases";
+import type { ReactDetails } from "./ReactDetails";
 
 export type ReactRequest = {
   /*

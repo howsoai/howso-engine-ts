@@ -6,8 +6,8 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { Condition } from "./Condition";
-import { Precision } from "./Precision";
+import type { Condition } from "./Condition";
+import type { Precision } from "./Precision";
 
 export type GetMarginalStatsRequest = {
   /*

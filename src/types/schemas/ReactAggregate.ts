@@ -6,7 +6,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { ReactAggregateDetails } from "./ReactAggregateDetails";
+import type { ReactAggregateDetails } from "./ReactAggregateDetails";
 
 export type ReactAggregateRequest = {
   /*

@@ -5,8 +5,8 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import { FullHyperparameterMap } from "./FullHyperparameterMap";
-import { HyperparameterMap } from "./HyperparameterMap";
+import type { FullHyperparameterMap } from "./FullHyperparameterMap";
+import type { HyperparameterMap } from "./HyperparameterMap";
 
 export type SetParamsRequest = {
   /*
