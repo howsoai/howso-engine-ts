@@ -7,11 +7,11 @@ export interface ClientCache {
   feature_attributes?: FeatureAttributesIndex;
 }
 
-export interface ExecuteResponse<R = unknown> {
+export type ExecuteResponse<R = unknown> = {
   payload: R;
   errors: HowsoError[];
   warnings: string[];
-}
+};
 
 export abstract class AbstractHowsoClient {
   protected abstract cache: CacheMap<ClientCache>;

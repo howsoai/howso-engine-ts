@@ -5,7 +5,7 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
-import type { FeatureAttributes } from "./FeatureAttributes";
+import type { FeatureAttributesIndex } from "./FeatureAttributesIndex";
 
 export type SetFeatureAttributesRequest = {
   /*
@@ -162,5 +162,5 @@ export type SetFeatureAttributesRequest = {
    *           if there is any possibility of global relevancy of time, it is generally recommended to set this value to true, which is the default.
    * @default {}
    */
-  feature_attributes?: Record<string, FeatureAttributes>;
+  feature_attributes?: FeatureAttributesIndex;
 };

@@ -1,4 +1,4 @@
-export interface ClientResponse<R = unknown> {
+export type ClientResponse<R = unknown> = {
   payload: R;
   warnings: string[];
-}
+};
