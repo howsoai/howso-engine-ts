@@ -1,9 +1,9 @@
 /**
  * NOTE: This file is auto generated, do not modify manually.
  */
-import type { Session, Trainee } from "@/types";
-import type * as schemas from "@/types/schemas";
-import type * as shims from "@/types/shims";
+import type { Session, Trainee } from "../types";
+import type * as schemas from "../types/schemas";
+import type * as shims from "../types/shims";
 import { AbstractHowsoClient } from "./base";
 
 export interface LabelResponse<R = unknown> {

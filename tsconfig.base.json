@@ -14,10 +14,7 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "useDefineForClassFields": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "useDefineForClassFields": true
   },
   "references": [{ "path": "./tsconfig.node.json" }]
 }

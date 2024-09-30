@@ -1,5 +1,3 @@
-import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "@/types";
-import type * as schemas from "@/types/schemas";
 import {
   AmalgamError,
   type AmalgamCommand,
@@ -8,6 +6,8 @@ import {
   type AmalgamResponseBody,
 } from "@howso/amalgam-lang";
 import { v4 as uuid } from "uuid";
+import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "../../types";
+import type * as schemas from "../../types/schemas";
 import { ClientCache, ExecuteResponse } from "../base";
 import { HowsoError, RequiredError } from "../errors";
 import { TraineeClient } from "../trainee";
