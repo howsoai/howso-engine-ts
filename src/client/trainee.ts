@@ -384,7 +384,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getMarginalStats(
     traineeId: string,
     request: schemas.GetMarginalStatsRequest,
-  ): Promise<LabelResponse<any>> {
+  ): Promise<shims.GetMarginalStatsResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_marginal_stats", request);
     this.autoPersistTrainee(trainee.id);
