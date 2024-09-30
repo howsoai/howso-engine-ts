@@ -5,4 +5,4 @@
  */
 import type { EditHistoryRecord } from "./EditHistoryRecord";
 
-export type EditHistory = Record<string, EditHistoryRecord>;
+export type EditHistory = Record<string, EditHistoryRecord[]>;
