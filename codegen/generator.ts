@@ -12,7 +12,7 @@ export class Generator {
   schemaDir: string;
   clientDir: string;
   ignoredLabels: string[];
-  responseShims: string[];
+  responseShims: Record<string, string>;
 
   /**
    * Construct a new Generator.
@@ -39,7 +39,18 @@ export class Generator {
     ];
 
     // Temporary shims until return values are defined
-    this.responseShims = ["get_cases", "react", "train"];
+    this.responseShims = {
+      analyze: "null",
+      get_cases: "shims.GetCasesResponse",
+      get_feature_attributes: "shims.FeatureAttributesIndex",
+      set_feature_attributes: "shims.FeatureAttributesIndex",
+      get_marginal_stats: "shims.GetMarginalStatsResponse",
+      get_params: "shims.GetParamsResponse",
+      react: "shims.ReactResponse",
+      react_aggregate: "shims.ReactAggregateResponse",
+      react_into_features: "null",
+      train: "shims.TrainResponse",
+    };
 
     // Setup template engine
     const loader = new nunjucks.FileSystemLoader(path.join(__dirname, "templates"));

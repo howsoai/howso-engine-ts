@@ -1,10 +1,8 @@
-import { FeatureAttributes } from "../schemas";
-
+export * from "./FeatureAttributes";
 export * from "./FeatureOriginalType";
 export * from "./GetCases";
 export * from "./GetMarginalStats";
+export * from "./GetParams";
 export * from "./React";
 export * from "./ReactAggregate";
 export * from "./Train";
-
-export type FeatureAttributesIndex = { [key: string]: FeatureAttributes };

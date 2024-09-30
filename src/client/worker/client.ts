@@ -10,7 +10,7 @@ import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "..
 import type * as schemas from "../../types/schemas";
 import { ClientCache, ExecuteResponse } from "../base";
 import { HowsoError, RequiredError } from "../errors";
-import { LabelResponse, TraineeClient } from "../trainee";
+import { TraineeClient } from "../trainee";
 import { batcher, BatchOptions, CacheMap } from "../utilities";
 import { FileSystemClient } from "./files";
 
@@ -156,8 +156,8 @@ export class HowsoWorkerClient extends TraineeClient {
    */
   protected async getTraineeFromEngine(traineeId: string): Promise<[Trainee, FeatureAttributesIndex]> {
     const [metadata, features] = await Promise.all([
-      this.execute<any>(traineeId, "get_metadata", {}),
-      this.getFeatureAttributes(traineeId),
+      this.execute<Record<string, any>>(traineeId, "get_metadata", {}),
+      this.execute<FeatureAttributesIndex>(traineeId, "get_feature_attributes", {}),
     ]);
     if (!metadata?.payload) {
       throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
@@ -171,16 +171,6 @@ export class HowsoWorkerClient extends TraineeClient {
       },
       features?.payload,
     ];
-  }
-
-  /**
-   * Returns a trainee's Feature Attributes
-   *
-   * @param traineeId The Trainee identifier.
-   * @returns The Trainee object's feature attributes.
-   */
-  public async getFeatureAttributes(traineeId: string): Promise<LabelResponse<FeatureAttributesIndex>> {
-    return this.execute<FeatureAttributesIndex>(traineeId, "get_feature_attributes", {});
   }
 
   /**
