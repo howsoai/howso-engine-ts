@@ -40,6 +40,7 @@ export * from "./LoadSubtrainee";
 export * from "./MoveCases";
 export * from "./NewCaseThreshold";
 export * from "./Precision";
+export * from "./PredictionStat";
 export * from "./React";
 export * from "./ReactAggregate";
 export * from "./ReactAggregateDetails";

@@ -3,17 +3,6 @@
  *
  * NOTE: This file is auto generated, do not modify manually.
  */
+import type { PredictionStat } from "./PredictionStat";
 
-export type SelectedPredictionStats = (
-  | "mae"
-  | "confusion_matrix"
-  | "r2"
-  | "rmse"
-  | "spearman_coeff"
-  | "precision"
-  | "recall"
-  | "accuracy"
-  | "mcc"
-  | "all"
-  | "missing_value_accuracy"
-)[];
+export type SelectedPredictionStats = PredictionStat[];
