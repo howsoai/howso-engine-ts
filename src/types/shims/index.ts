@@ -1,4 +1,3 @@
-export * from "./FeatureAttributes";
 export * from "./FeatureOriginalType";
 export * from "./GetCases";
 export * from "./GetMarginalStats";

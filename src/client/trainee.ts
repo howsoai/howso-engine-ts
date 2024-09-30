@@ -334,9 +334,9 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getFeatureAttributes(traineeId: string): Promise<ClientResponse<shims.FeatureAttributesIndex>> {
+  public async getFeatureAttributes(traineeId: string): Promise<ClientResponse<schemas.FeatureAttributesIndex>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<shims.FeatureAttributesIndex>(trainee.id, "get_feature_attributes", {});
+    const response = await this.execute<schemas.FeatureAttributesIndex>(trainee.id, "get_feature_attributes", {});
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -814,9 +814,9 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async setFeatureAttributes(
     traineeId: string,
     request: schemas.SetFeatureAttributesRequest,
-  ): Promise<ClientResponse<shims.FeatureAttributesIndex>> {
+  ): Promise<ClientResponse<schemas.FeatureAttributesIndex>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<shims.FeatureAttributesIndex>(trainee.id, "set_feature_attributes", request);
+    const response = await this.execute<schemas.FeatureAttributesIndex>(trainee.id, "set_feature_attributes", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }

@@ -42,8 +42,8 @@ export class Generator {
     this.responseShims = {
       analyze: "null",
       get_cases: "shims.GetCasesResponse",
-      get_feature_attributes: "shims.FeatureAttributesIndex",
-      set_feature_attributes: "shims.FeatureAttributesIndex",
+      get_feature_attributes: "schemas.FeatureAttributesIndex",
+      set_feature_attributes: "schemas.FeatureAttributesIndex",
       get_marginal_stats: "shims.GetMarginalStatsResponse",
       get_params: "shims.GetParamsResponse",
       react: "shims.ReactResponse",
