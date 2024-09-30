@@ -1,5 +1,3 @@
-import { LabelResponse } from "../../client/trainee";
-
 export type GetMarginalStatsDetails = {
   /** Ex: null; */
   skew: number | null;
@@ -33,6 +31,6 @@ export type GetMarginalStatsDetails = {
   percentile_25: number | null;
 };
 
-export type GetMarginalStatsResponse = LabelResponse<{
+export type GetMarginalStatsResponse = {
   payload: { [key: string]: GetMarginalStatsDetails };
-}>;
+};

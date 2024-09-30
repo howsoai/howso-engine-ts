@@ -384,7 +384,7 @@ export abstract class TraineeClient extends AbstractHowsoClient {
   public async getMarginalStats(
     traineeId: string,
     request: schemas.GetMarginalStatsRequest,
-  ): Promise<shims.GetMarginalStatsResponse> {
+  ): Promise<LabelResponse<shims.GetMarginalStatsResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "get_marginal_stats", request);
     this.autoPersistTrainee(trainee.id);
@@ -614,7 +614,10 @@ export abstract class TraineeClient extends AbstractHowsoClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactAggregate(traineeId: string, request: schemas.ReactAggregateRequest): Promise<LabelResponse<any>> {
+  public async reactAggregate(
+    traineeId: string,
+    request: schemas.ReactAggregateRequest,
+  ): Promise<LabelResponse<shims.ReactAggregateResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const response = await this.execute<any>(trainee.id, "react_aggregate", request);
     this.autoPersistTrainee(trainee.id);
