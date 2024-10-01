@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetAutoAnalyzeParams
  *
  * Sets the model to auto-analyze by tracking its size and notifying the clients in train responses when it should be analyzed
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SetAutoAnalyzeParamsRequest = {

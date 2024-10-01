@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * GetFeatureConviction
  *
  * Computes the conviction for each feature and returns an assoc of feature -> conviction value
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type GetFeatureConvictionRequest = {

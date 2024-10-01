@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * React
  *
  * Run reacts in a batch, output a an assoc of list of outputs from each individual react.
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";

@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * RemoveCases
  *
  * Removes all cases that match the specified conditions from trainee
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";

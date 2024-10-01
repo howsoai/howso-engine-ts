@@ -1,12 +1,12 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * EditCases
  *
  * Edit feature values for the specified cases.
  * cases are specified by either case_indices or by the condition. if neither is provided, edits all cases.
  * updates the accumulated data mass for the model proportional to the number of cases and features modified.
  * returns null if invalid features specified or an assoc with "count"
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";

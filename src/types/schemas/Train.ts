@@ -1,4 +1,6 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * Train
  *
  * Train the passed in cases, filtering out cases that match optionally passed in ablation parameters
@@ -12,8 +14,6 @@
  *     (null) - default output, no status output
  *     "analyzed" - if auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed
  *     "analyze" - if auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type TrainRequest = {

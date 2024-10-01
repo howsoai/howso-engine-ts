@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetRandomSeed
  *
  * Set the random seed on a trainee
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SetRandomSeedRequest = {

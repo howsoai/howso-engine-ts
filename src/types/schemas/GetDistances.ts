@@ -1,4 +1,6 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * GetDistances
  *
  * Returns an assoc with case distances, containing a list of case session indices and a list of lists (matrix) of the computed distances.
@@ -8,8 +10,6 @@
  *   'row_case_indices' : [ session-indices ],
  *   'distances': [ [ pairwise distances ] ]
  *  }
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 

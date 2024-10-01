@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetSubstituteFeatureValues
  *
  * Sets substitution feature values used in case generation
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SetSubstituteFeatureValuesRequest = {

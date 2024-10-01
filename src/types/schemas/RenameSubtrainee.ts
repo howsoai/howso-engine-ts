@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * RenameSubtrainee
  *
  * Rename a contained trainee
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type RenameSubtraineeRequest = {

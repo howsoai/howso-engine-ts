@@ -1,4 +1,6 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * LoadSubtrainee
  *
  * Attempts to load a subtrainee with the following optional parameters.
@@ -6,8 +8,6 @@
  * if the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
  * assumes loaded trainee filenames need to be escaped
  * returns the trainee name if successful, null if not
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type LoadSubtraineeRequest = {

@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * CreateSubtrainee
  *
  * Creates a new instance of a contained trainee as specified by the entity label "trainee".
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type CreateSubtraineeRequest = {

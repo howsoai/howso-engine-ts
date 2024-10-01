@@ -1,4 +1,6 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * ReactGroup
  *
  * Computes the convictions of an average case for each given hypothetical set of cases specified
@@ -9,8 +11,6 @@
  *   "combined_model_average_distance_contribution" (list 4.05 3.9)
  *   "distance_contributions" (list 4.5 3.2)
  *  )
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type ReactGroupRequest = {

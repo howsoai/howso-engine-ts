@@ -1,7 +1,7 @@
 /**
- * Precision
+ * WARNING: This file is auto generated, do not modify manually.
  *
- * NOTE: This file is auto generated, do not modify manually.
+ * Precision
  */
 
 export type Precision = "exact" | "similar";

@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetParentId
  *
  * Set trainee's unique parent id
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SetParentIdRequest = {

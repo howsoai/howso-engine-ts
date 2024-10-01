@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * ReactIntoFeatures
  *
  * Computes various data, such as familiarity convictions and distance contribution for each case in the model and stores them into specified features.
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type ReactIntoFeaturesRequest = {

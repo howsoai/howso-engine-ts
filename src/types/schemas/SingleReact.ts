@@ -1,4 +1,6 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SingleReact
  *
  * React to a provided context. if desired_conviction is provided, it does a generative react.
@@ -11,8 +13,6 @@
  *    details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
  *     'influential_cases' : etc... }
  *   see api docs for documentation of all output properties
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
 import type { GenerateNewCases } from "./GenerateNewCases";

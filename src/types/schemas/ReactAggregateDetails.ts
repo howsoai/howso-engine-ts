@@ -1,7 +1,7 @@
 /**
- * ReactAggregateDetails
+ * WARNING: This file is auto generated, do not modify manually.
  *
- * NOTE: This file is auto generated, do not modify manually.
+ * ReactAggregateDetails
  */
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";

@@ -1,7 +1,7 @@
 /**
- * FeatureAttributesIndex
+ * WARNING: This file is auto generated, do not modify manually.
  *
- * NOTE: This file is auto generated, do not modify manually.
+ * FeatureAttributesIndex
  */
 import type { FeatureAttributes } from "./FeatureAttributes";
 

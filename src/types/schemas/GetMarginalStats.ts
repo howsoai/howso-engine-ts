@@ -1,10 +1,10 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * GetMarginalStats
  *
  * Outputs all marginal stats (min, max, median, mean, mode, count, uniques, mean_absdev, variance, stddev, skew, kurtosis, entropy)
  * for all features in the format of feature -> assoc stat -> value. the marginal stats can be computed for a subset of the data using condition, precision, and num_cases
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";

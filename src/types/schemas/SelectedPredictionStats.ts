@@ -1,7 +1,7 @@
 /**
- * SelectedPredictionStats
+ * WARNING: This file is auto generated, do not modify manually.
  *
- * NOTE: This file is auto generated, do not modify manually.
+ * SelectedPredictionStats
  */
 import type { PredictionStat } from "./PredictionStat";
 

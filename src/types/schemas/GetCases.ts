@@ -1,11 +1,11 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * GetCases
  *
  * Returns assoc with features and cases - a list of lists of all feature values. retrieves all feature values for cases for
  * all (unordered) sessions in the order they were trained within each session. if a session is specified, only that session's
  * cases wil be output.
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";

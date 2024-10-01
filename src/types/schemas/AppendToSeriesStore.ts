@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * AppendToSeriesStore
  *
  * Append cases to a series
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type AppendToSeriesStoreRequest = {

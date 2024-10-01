@@ -131,7 +131,7 @@ export class Generator {
    * @param context Context to pass to template renderer.
    */
   private renderFile(parent: string, filename: string, template: string, context: object) {
-    const output = this.env.render(template, context);
+    const output = this.env.render(template, { version: this.doc.version, ...context });
     const filepath = path.join(parent, filename);
     if (!fs.existsSync(path.dirname(filepath))) {
       fs.mkdirSync(path.dirname(filepath), { recursive: true });

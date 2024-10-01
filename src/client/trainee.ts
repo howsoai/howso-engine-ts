@@ -1,5 +1,6 @@
 /**
- * NOTE: This file is auto generated, do not modify manually.
+ * WARNING: This file is auto generated, do not modify manually.
+ * Generated via Howso Engine 86.1.0+alpha
  */
 import type { ClientResponse, Session, Trainee } from "../types";
 import type * as schemas from "../types/schemas";

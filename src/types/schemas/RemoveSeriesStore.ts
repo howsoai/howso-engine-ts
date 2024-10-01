@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * RemoveSeriesStore
  *
  * Clears stored series
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type RemoveSeriesStoreRequest = {

@@ -1,11 +1,11 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * ReactSeries
  *
  * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
  * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";

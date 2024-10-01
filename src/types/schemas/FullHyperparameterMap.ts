@@ -1,7 +1,7 @@
 /**
- * FullHyperparameterMap
+ * WARNING: This file is auto generated, do not modify manually.
  *
- * NOTE: This file is auto generated, do not modify manually.
+ * FullHyperparameterMap
  */
 import type { HyperparameterMap } from "./HyperparameterMap";
 

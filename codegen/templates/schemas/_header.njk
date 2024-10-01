@@ -1,11 +1,11 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * {{ name }}
 {%- if description %}
  *
  * {{ description | capitalize | blockComment | safe }}
 {%- endif %}
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 {%- for item in imports %}
 import type { {{ item }} } from "./{{ item }}";

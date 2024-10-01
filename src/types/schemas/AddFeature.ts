@@ -1,12 +1,12 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * AddFeature
  *
  * Adds the specified feature on all cases for a trainee that match the specified condition. overwrites features that
  * if condition are not specified, adds feature for all cases and to the model.  if condition is an empty assoc, will not modify feature metadata in the model.
  * if feature attributes are passed in, will also set the model's feature attributes.
  * updates the accumulated data mass for the model proportional to the number of cases modified.
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { Condition } from "./Condition";
 import type { FeatureAttributes } from "./FeatureAttributes";

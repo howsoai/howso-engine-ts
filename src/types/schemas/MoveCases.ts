@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * MoveCases
  *
  * Moves all cases that match the specified conditions in the hierarchy of the specified trainee
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";

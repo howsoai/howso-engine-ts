@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SaveSubtrainee
  *
  * Saves a subtrainee with the following optional parameters, escapes trainee filenames on save
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SaveSubtraineeRequest = {

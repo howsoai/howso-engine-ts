@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * CopySubtrainee
  *
  * Creates a copy of a trainee and stores it a subtrainee, returns the name of the copied trainee on success
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type CopySubtraineeRequest = {

@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * ClearImputedData
  *
  * Clear values that were imputed during a specified session, but won't clear values that were manually set by user after the impute
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type ClearImputedDataRequest = {

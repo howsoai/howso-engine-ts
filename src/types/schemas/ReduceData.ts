@@ -1,10 +1,10 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * ReduceData
  *
  * Reduce the trained data by removing cases which have an influence weight entropy that falls above
  *  a threshold.
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type ReduceDataRequest = {

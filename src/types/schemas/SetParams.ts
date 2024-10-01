@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetParams
  *
  * Sets internal hyperparameters
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 import type { FullHyperparameterMap } from "./FullHyperparameterMap";
 import type { HyperparameterMap } from "./HyperparameterMap";

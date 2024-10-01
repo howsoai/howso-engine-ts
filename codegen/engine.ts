@@ -43,6 +43,7 @@ export interface EngineApi {
   readonly labels: Record<string, LabelDefinition>;
   readonly schemas: Record<string, Schema>;
   readonly description: string;
+  readonly version: string;
 }
 
 export async function getEngineApi(): Promise<EngineApi> {

@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetMetadata
  *
  * Set metadata for model
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SetMetadataRequest = {

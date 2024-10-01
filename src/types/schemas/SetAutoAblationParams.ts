@@ -1,9 +1,9 @@
 /**
+ * WARNING: This file is auto generated, do not modify manually.
+ *
  * SetAutoAblationParams
  *
  * Sets the model to auto-ablate by tracking its size and training certain cases as weights
- *
- * NOTE: This file is auto generated, do not modify manually.
  */
 
 export type SetAutoAblationParamsRequest = {
