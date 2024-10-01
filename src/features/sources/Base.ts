@@ -34,9 +34,13 @@ export abstract class InferFeatureAttributesBase {
 
   /* Entrypoint */
   public async infer(options: InferFeatureAttributesOptions = {}): Promise<FeatureAttributesIndex> {
-    const attributes: Record<string, FeatureAttributes> = options.defaults || {};
-    const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
+    // Loop the columns into attributes immediately to get order assigned. Probably should be a Map...
     const columns = await this.getFeatureNames();
+    const attributes: FeatureAttributesIndex = columns.reduce((attributes, column) => {
+      attributes[column] = (options.defaults?.[column] || {}) as FeatureAttributes;
+      return attributes;
+    }, {} as FeatureAttributesIndex);
+    const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
 
     const getFeatureAttributes = async (featureName: string): Promise<FeatureAttributes | undefined> => {
       const originalFeatureType = await this.getOriginalFeatureType(featureName);

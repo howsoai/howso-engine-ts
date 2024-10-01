@@ -19,11 +19,9 @@ export class InferFeatureAttributesFromCSV extends InferFeatureAttributesFromArr
     options.samplesLimit ||= 5;
 
     const raw = csvParse(dataset);
-    console.info("raw", raw);
     const limited = raw.slice(0, options.limit).map((row) => ({ ...row }));
     // @ts-expect-error I'll assign column immediately below
     const data: typeof raw = limited.map(autoType);
-    console.info("data", data);
     data.columns = raw.columns;
 
     super({
