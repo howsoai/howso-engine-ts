@@ -14,7 +14,7 @@ const wasmUri = require.resolve("@howso/amalgam-lang/lib/amalgam-st.wasm");
         } else if (path.endsWith("amalgam-st.data")) {
           return wasmDataUri;
         }
-        return self.location.href + path;
+        return globalThis.location.href + path;
       },
     });
   });

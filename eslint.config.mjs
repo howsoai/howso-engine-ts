@@ -32,4 +32,7 @@ export default tsEslint.config(
     files: ["**/*.js"],
     ...tsEslint.configs.disableTypeChecked,
   },
+  {
+    ignores: ["codegen/build/**/*"],
+  },
 );

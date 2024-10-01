@@ -23,6 +23,8 @@ This major change refactors the client and types for all Howso Engine operations
 - `ValidationError` has been renamed to `HowsoValidationError`.
 - `ApiError`, `TimeoutError`, and `RetriableError` have been removed.
 - The client's `ClientOptions.libDir` property has been removed.
+- The client constructor now expects an instance of an `AbstractFileSystem` as its second parameter.
+  A `BrowserFileSystem` and `NodeFileSystem` are provided for use in their respective environments.
 - The `train` method no longer batches requests to the Amalgam worker service automatically. Use `batchTrain` instead.
 - The `createTrainee` method no longer sets feature attributes. Call `setFeatureAttributes` manually instead
   (this also returns the updated object back).
