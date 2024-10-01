@@ -232,7 +232,7 @@ export abstract class InferFeatureAttributesBase {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
     featureName: string,
   ): Promise<FeatureAttributes> {
-    return { type: "nominal" };
+    return { type: "continuous", data_type: "number", bounds: { allow_null: true } };
   }
 
   /* Feature properties */
@@ -256,7 +256,7 @@ export abstract class InferFeatureAttributesBase {
     if (!this.statistics[featureName]) {
       throw new Error(`this.statistics[${featureName}] is undefined`);
     }
-    return this.statistics[featureName]?.samples.at(0);
+    return this.statistics[featureName]?.samples.filter((sample) => sample !== null || sample !== undefined).at(0);
   }
 
   /* Descriptive operations */
