@@ -2,6 +2,7 @@ import { ProblemError } from "../client/errors";
 import type { FeatureAttributesIndex } from "../types";
 import {
   AbstractDataType,
+  CSVData,
   FeatureSourceFormat,
   type ArrayData,
   type InferFeatureAttributesOptions,
@@ -12,6 +13,7 @@ import {
   InferFeatureAttributesFromArray,
   InferFeatureAttributesFromParsedArray,
 } from "./sources";
+import { InferFeatureAttributesFromCSV } from "./sources/CSV";
 
 export * from "./utils";
 
@@ -24,6 +26,8 @@ export const getFeatureAttributesInferrer = (
       return new InferFeatureAttributesFromArray(data as ArrayData);
     case "parsed_array":
       return new InferFeatureAttributesFromParsedArray(data as ParsedArrayData);
+    case "csv":
+      return new InferFeatureAttributesFromCSV(data as CSVData);
     default:
       throw new ProblemError("Unexpected data format.");
   }

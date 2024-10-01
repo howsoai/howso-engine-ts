@@ -1,6 +1,6 @@
 import type { FeatureAttributesIndex } from "../types";
 
-export type FeatureSourceFormat = "unknown" | "array" | "parsed_array";
+export type FeatureSourceFormat = "unknown" | "array" | "parsed_array" | "csv";
 
 export interface InferFeatureBoundsOptions {
   tightBounds?: boolean | string[];
@@ -30,7 +30,9 @@ export interface ParsedArrayData<T extends Record<string, any> = object> extends
   readonly columns: Array<keyof T>;
 }
 
-export type AbstractDataType = ArrayData | ParsedArrayData;
+export type CSVData = string;
+
+export type AbstractDataType = ArrayData | ParsedArrayData | CSVData;
 
 export function isArrayData(data: any): data is ArrayData {
   return Array.isArray(data?.columns) && Array.isArray(data?.data);
@@ -38,4 +40,8 @@ export function isArrayData(data: any): data is ArrayData {
 
 export function isParsedArrayData(data: any): data is ParsedArrayData {
   return Array.isArray(data?.columns) && Array.isArray(data) && !Array.isArray(data[0]);
+}
+
+export function isCSVData(data: any): data is CSVData {
+  return typeof data === "string";
 }
