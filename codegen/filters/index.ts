@@ -13,6 +13,7 @@ export function registerFilters(env: Environment) {
   env.addFilter(strings.pascalCase.name, strings.pascalCase);
   env.addFilter(strings.camelCase.name, strings.camelCase);
   env.addFilter(strings.toJson.name, strings.toJson);
+  env.addFilter(strings.autoQuote.name, strings.autoQuote);
   env.addFilter(types.isString.name, types.isString);
   env.addFilter(types.isArray.name, types.isArray);
   env.addFilter(types.convertType.name, types.convertType);

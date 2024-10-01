@@ -4,6 +4,7 @@
 export * from "./AddFeature";
 export * from "./Analyze";
 export * from "./AppendToSeriesStore";
+export * from "./BuiltInFeatures";
 export * from "./CaseIndices";
 export * from "./ClearImputedData";
 export * from "./Condition";

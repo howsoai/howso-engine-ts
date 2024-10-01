@@ -5,14 +5,15 @@ import {
   type AmalgamRequest,
   type AmalgamResponseBody,
 } from "@howso/amalgam-lang";
+import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "../../types";
 import type * as schemas from "../../types/schemas";
-import { ClientCache, ExecuteResponse } from "../base";
+import { ClientCache, ExecuteResponse } from "../AbstractBaseClient";
+import { AbstractTraineeClient } from "../AbstractTraineeClient";
 import { HowsoError, RequiredError } from "../errors";
-import { TraineeClient } from "../trainee";
 import { batcher, BatchOptions, CacheMap } from "../utilities";
-import { FileSystemClient } from "./files";
+import { AbstractFileSystem } from "./filesystem";
 
 export interface ClientOptions {
   trace?: boolean;
@@ -22,13 +23,13 @@ export interface ClientOptions {
   migrationsUrl?: string | URL;
 }
 
-export class HowsoWorkerClient extends TraineeClient {
-  public readonly fs: FileSystemClient;
+export class HowsoWorkerClient extends AbstractTraineeClient {
   protected activeSession?: Session;
   protected cache: CacheMap<Required<ClientCache>>;
 
   constructor(
-    protected readonly worker: Worker,
+    protected readonly worker: Worker | NodeWorker,
+    public readonly fs: AbstractFileSystem<Worker | NodeWorker>,
     protected readonly options: ClientOptions,
   ) {
     super();
@@ -39,7 +40,6 @@ export class HowsoWorkerClient extends TraineeClient {
       throw new RequiredError("options", "Client options are required.");
     }
     this.cache = new CacheMap();
-    this.fs = new FileSystemClient(this.worker);
   }
 
   /**
@@ -102,7 +102,10 @@ export class HowsoWorkerClient extends TraineeClient {
           reject();
         }
       };
-      this.worker.postMessage(request, [channel.port2]);
+      this.worker.postMessage(request, [
+        // @ts-expect-error The port will match browser/nodejs depending on the context
+        channel.port2,
+      ]);
     });
   }
 

@@ -5,9 +5,9 @@
 import type { ClientResponse, Session, Trainee } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
-import { AbstractHowsoClient } from "./base";
+import { AbstractBaseClient } from "./AbstractBaseClient";
 
-export abstract class TraineeClient extends AbstractHowsoClient {
+export abstract class AbstractTraineeClient extends AbstractBaseClient {
   /** Create a new Trainee. */
   public abstract createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee>;
 

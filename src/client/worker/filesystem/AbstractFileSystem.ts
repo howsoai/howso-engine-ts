@@ -5,18 +5,12 @@ import type {
   FileSystemResponseBody,
   IFileSystem,
 } from "@howso/amalgam-lang";
-import { isNode } from "../utilities";
+import type { Worker as NodeWorker } from "node:worker_threads";
 
-export class FileSystemClient implements IFileSystem {
-  protected readonly baseDir: string;
+export abstract class AbstractFileSystem<T extends Worker | NodeWorker> implements IFileSystem {
+  protected abstract readonly baseDir: string;
+  protected abstract readonly worker: T;
   public readonly entityExt = "caml";
-
-  constructor(
-    private readonly worker: Worker,
-    baseDir?: string,
-  ) {
-    this.baseDir = baseDir ?? "/app/";
-  }
 
   public get libDir(): string {
     return this.baseDir;
@@ -29,6 +23,8 @@ export class FileSystemClient implements IFileSystem {
   public get migrationsDir(): string {
     return this.join(this.libDir, "migrations", "/");
   }
+
+  public abstract prepareFile(parent: string, name: string, url: string): Promise<void>;
 
   public join(...parts: string[]): string {
     const segments = [];
@@ -59,18 +55,11 @@ export class FileSystemClient implements IFileSystem {
           reject(ev.data?.error);
         }
       };
-      this.worker.postMessage(request, [channel.port2]);
+      this.worker.postMessage(request, [
+        // @ts-expect-error The port will match browser/nodejs depending on the context
+        channel.port2,
+      ]);
     });
-  }
-
-  public async prepareFile(parent: string, name: string, url: string): Promise<void> {
-    if (isNode) {
-      const { readFile } = await import("node:fs/promises");
-      const data = await readFile(url);
-      this.writeFile(this.join(parent, name), data);
-    } else {
-      this.createLazyFile(parent, name, url);
-    }
   }
 
   public async analyzePath(path: string, dontResolveLastLink?: boolean): Promise<FS.Analyze> {

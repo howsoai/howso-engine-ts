@@ -75,6 +75,10 @@ export type FeatureAttributes = {
    */
   locale?: string;
   /*
+   * The number of time steps traced back by the maximum lag feature created for this feature.
+   */
+  max_row_lag?: number;
+  /*
    * Flag a categorical nominal feature as non-sensitive. it is recommended that all nominal features be represented with either an `int-id` subtype or another available nominal subtype using the `subtype` attribute. however, if the nominal feature is non-sensitive, setting this parameter to true will bypass the `subtype` requirement. only applicable to nominal features.
    */
   non_sensitive?: boolean;
@@ -104,9 +108,21 @@ export type FeatureAttributes = {
     data_type: "object" | "string" | "numeric" | "integer" | "boolean" | "datetime" | "time" | "date" | "timedelta";
   } & Record<string, any>;
   /*
+   * The feature whose values this time-series feature's values are derived from.
+   */
+  parent?: string;
+  /*
+   * The type of time-series processing used by the parent feature.
+   */
+  parent_type?: "delta" | "rate";
+  /*
    * Custom amalgam code that is called on resulting values of this feature during react operations.
    */
   post_process?: string;
+  /*
+   * A sample of a value for the feature.
+   */
+  sample?: any;
   /*
    * Round to the specified significant digits, default is no rounding.
    */
@@ -166,12 +182,20 @@ export type FeatureAttributes = {
     /*
      * When `rate` is specified, uses the difference of the current value from its previous value divided by the change in time since the previous value. when `delta` is specified, uses the difference of the current value from its previous value regardless of the elapsed time. set to `delta` if feature has `time_feature` set to true.
      */
-    type: "rate" | "delta";
+    type?: "rate" | "delta";
     /*
      * Controls whether future values of independent time series are considered. applicable only to the time feature. when false, the time feature is not universal and allows using future data from other series in decisions; this is applicable when the time is not globally relevant and is independent for each time series. when true, universally excludes using any data with from the future from all series; this is applicable when time is globally relevant and there are events that may affect all time series. if there is any possibility of global relevancy of time, it is generally recommended to set this value to true, which is the default.
      */
     universal?: boolean;
   };
+  /*
+   * The order of rate/delta being described by this time-series feature.
+   */
+  ts_order?: number;
+  /*
+   * The type of value being captured by this time-series feature.
+   */
+  ts_type?: "lag" | "delta" | "rate";
   /*
    * The type of the feature.
    *
@@ -184,4 +208,4 @@ export type FeatureAttributes = {
    * Flag feature as only having unique values. only applicable to nominals features.
    */
   unique?: boolean;
-} & Record<string, any>;
+};

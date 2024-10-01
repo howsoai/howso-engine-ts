@@ -76,7 +76,7 @@ export class Generator {
         targetLabels[label] = definition;
       }
     }
-    this.renderFile(this.clientDir, "trainee.ts", "client/trainee.njk", {
+    this.renderFile(this.clientDir, "AbstractTraineeClient.ts", "client/AbstractTraineeClient.njk", {
       labels: targetLabels,
       shims: this.responseShims,
     });

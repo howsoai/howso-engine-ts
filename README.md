@@ -79,11 +79,12 @@ You can then create the worker client using a url import:
 ```ts
 import howsoUrl from "@howso/engine/lib/howso.caml?url";
 import migrationsUrl from "@howso/engine/lib/migrations.caml?url";
-import { type ClientOptions, HowsoWorkerClient } from "@howso/engine";
+import { type ClientOptions, HowsoWorkerClient, BrowserFileSystem } from "@howso/engine";
 
 const getClient = async (options?: ClientOptions): Promise<HowsoWorkerClient> => {
   const worker = new Worker(new URL("@/workers/AmalgamWorker", import.meta.url), { type: "module" });
-  const client = new HowsoWorkerClient(worker, {
+  const fs = new BrowserFileSystem(worker);
+  const client = new HowsoWorkerClient(worker, fs, {
     howsoUrl,
     migrationsUrl,
     ...options,

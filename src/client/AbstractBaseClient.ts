@@ -13,7 +13,7 @@ export type ExecuteResponse<R = unknown> = {
   warnings: string[];
 };
 
-export abstract class AbstractHowsoClient {
+export abstract class AbstractBaseClient {
   protected abstract cache: CacheMap<ClientCache>;
 
   /**

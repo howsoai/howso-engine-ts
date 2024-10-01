@@ -1,2 +1,2 @@
-export * from "./client";
-export * from "./files";
+export * from "./filesystem";
+export * from "./HowsoWorkerClient";
