@@ -25,6 +25,7 @@ export interface Schema extends BaseSchema {
   max_size?: number;
   values?: SchemaType | Schema | Ref;
   indices?: Record<string, SchemaType | Schema | Ref>;
+  dynamic_indices?: Record<string, SchemaType | Schema | Ref>;
   additional_indices?: SchemaType | Schema | Ref;
 }
 
@@ -78,7 +79,9 @@ export async function getEngineApi(): Promise<EngineApi> {
     if (!Array.isArray(response) || response[0] != 1) {
       throw new Error("Failed to retrieve API documentation from the Howso Engine.");
     }
-    return response[1].payload;
+    const doc: EngineApi = response[1].payload;
+    console.log(`Howso Engine Version: ${doc.version}`);
+    return doc;
   } finally {
     amalgam.destroyEntity(handle);
   }

@@ -5,7 +5,6 @@ import type {
   FileSystemResponseBody,
   IFileSystem,
 } from "@howso/amalgam-lang";
-import { readFile } from "node:fs/promises";
 import { isNode } from "../utilities";
 
 export class FileSystemClient implements IFileSystem {
@@ -66,6 +65,7 @@ export class FileSystemClient implements IFileSystem {
 
   public async prepareFile(parent: string, name: string, url: string): Promise<void> {
     if (isNode) {
+      const { readFile } = await import("node:fs/promises");
       const data = await readFile(url);
       this.writeFile(this.join(parent, name), data);
     } else {
