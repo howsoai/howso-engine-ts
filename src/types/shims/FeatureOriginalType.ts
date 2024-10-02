@@ -1,11 +1,11 @@
-export interface BooleanType {
+export interface OriginalTypeBoolean {
   /**
    * The name of the data type.
    */
   data_type: "boolean";
 }
 
-export interface DatetimeType {
+export interface OriginalTypeDatetime {
   /**
    * The name of the data type.
    */
@@ -16,14 +16,14 @@ export interface DatetimeType {
   timezone?: string | null;
 }
 
-export interface DateType {
+export interface OriginalTypeDate {
   /**
    * The name of the data type.
    */
   data_type: "date";
 }
 
-export interface IntegerType {
+export interface OriginalTypeInteger {
   /**
    * The name of the data type.
    */
@@ -38,7 +38,7 @@ export interface IntegerType {
   unsigned?: boolean;
 }
 
-export interface NumericType {
+export interface OriginalTypeNumeric {
   /**
    * The name of the data type.
    */
@@ -53,14 +53,14 @@ export interface NumericType {
   size?: number;
 }
 
-export interface ObjectType {
+export interface OriginalTypeObject {
   /**
    * The name of the data type.
    */
   data_type: "object";
 }
 
-export interface StringType {
+export interface OriginalTypeString {
   /**
    * The name of the data type.
    */
@@ -75,7 +75,7 @@ export interface StringType {
   encoding?: string | null;
 }
 
-export interface TimeType {
+export interface OriginalTypeTime {
   /**
    * The name of the data type.
    */
@@ -86,7 +86,7 @@ export interface TimeType {
   timezone?: string | null;
 }
 
-export interface TimedeltaType {
+export interface OriginalTypeTimedelta {
   /**
    * The name of the data type.
    */
@@ -101,12 +101,12 @@ export interface TimedeltaType {
  * Original data type details. Used by clients to determine how to serialize and deserialize feature data.
  */
 export type FeatureOriginalType =
-  | BooleanType
-  | DateType
-  | DatetimeType
-  | IntegerType
-  | NumericType
-  | ObjectType
-  | StringType
-  | TimeType
-  | TimedeltaType;
+  | OriginalTypeBoolean
+  | OriginalTypeDate
+  | OriginalTypeDatetime
+  | OriginalTypeInteger
+  | OriginalTypeNumeric
+  | OriginalTypeObject
+  | OriginalTypeString
+  | OriginalTypeTime
+  | OriginalTypeTimedelta;
