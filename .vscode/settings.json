@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["caml", "coeff", "rmse", "Subtrainee"],
+  "cSpell.words": ["absdev", "caml", "coeff", "datetime", "rmse", "Subtrainee", "targetless", "timedelta"],
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
