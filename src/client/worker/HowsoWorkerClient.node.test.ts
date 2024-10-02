@@ -18,7 +18,7 @@ describe("Node HowsoWorkerClient", () => {
     const fs = new NodeFileSystem(worker);
     client = new HowsoWorkerClient(worker, fs, {
       trace: false,
-      howsoUrl: resolve(__dirname, "../../engine/howso.caml"),
+      howsoUrl: resolve(__dirname, "../../assets/howso.caml"),
     });
     await client.setup();
     const dataPath = resolve(__dirname, "../../tests/assets/iris.json");

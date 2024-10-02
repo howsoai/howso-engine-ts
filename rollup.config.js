@@ -17,7 +17,7 @@ export default {
     copy({
       targets: [
         {
-          src: ["src/engine/howso.caml", "src/engine/migrations.caml"],
+          src: ["src/assets/howso.caml", "src/assets/migrations.caml"],
           dest: "lib",
         },
       ],

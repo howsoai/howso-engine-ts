@@ -15,7 +15,7 @@ export default {
     copy({
       targets: [
         {
-          src: ["src/engine/howso.caml"],
+          src: ["src/assets/howso.caml"],
           dest: "./codegen/build",
         },
         {

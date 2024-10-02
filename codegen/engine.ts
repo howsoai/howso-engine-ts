@@ -26,7 +26,7 @@ export interface Schema extends BaseSchema {
   values?: SchemaType | Schema | Ref;
   indices?: Record<string, SchemaType | Schema | Ref>;
   dynamic_indices?: Record<string, SchemaType | Schema | Ref>;
-  additional_indices?: SchemaType | Schema | Ref;
+  additional_indices?: SchemaType | Schema | Ref | false;
 }
 
 export interface LabelDefinition {
@@ -49,7 +49,7 @@ export interface EngineApi {
 
 export async function getEngineApi(): Promise<EngineApi> {
   const handle = "default";
-  const enginePath = require.resolve("../../src/engine/howso.caml");
+  const enginePath = require.resolve("../../src/assets/howso.caml");
   const dataPath = require.resolve("@howso/amalgam-lang/lib/amalgam-st.data");
   const wasmPath = require.resolve("@howso/amalgam-lang/lib/amalgam-st.wasm");
 
@@ -101,6 +101,7 @@ export function isSchema(value: SchemaType | Schema | Ref | null | undefined): v
   return !isRef(value) && "type" in value && typeof value.type === "string";
 }
 
-export function isSchemaOrRef(value: SchemaType | Schema | Ref | null | undefined): value is Schema | Ref {
+export function isSchemaOrRef(value: SchemaType | Schema | Ref | boolean | null | undefined): value is Schema | Ref {
+  if (typeof value === "boolean") return false;
   return isRef(value) || isSchema(value);
 }
