@@ -1,8 +1,8 @@
 import { readFileSync } from "fs";
-import { FeatureAttributes, FeatureAttributesIndex } from "../../types";
-import { AbstractDataType } from "../base";
-import { expectFeatureAttributesIndex } from "../infer.test";
-import { InferFeatureAttributesFromCSV, InferFeatureAttributesFromCSVOptions } from "./CSV";
+import type { FeatureAttributes, FeatureAttributesIndex } from "../../../types";
+import type { AbstractDataType } from "../../base";
+import { expectFeatureAttributesIndex } from "../../infer.test";
+import { InferFeatureAttributesFromCSV, type InferFeatureAttributesFromCSVOptions } from "./CSV";
 
 describe("features/sources/CSV", () => {
   describe("InferFeatureAttributesFromArray", () => {

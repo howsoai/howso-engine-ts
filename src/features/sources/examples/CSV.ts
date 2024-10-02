@@ -5,8 +5,8 @@
  */
 
 import { autoType, csvParse } from "d3-dsv";
-import { AbstractDataType, FeatureSourceFormat } from "../base";
-import { InferFeatureAttributesFromArray } from "./Array";
+import type { AbstractDataType, FeatureSourceFormat } from "../../base";
+import { InferFeatureAttributesFromArray } from "../Array";
 
 export type InferFeatureAttributesFromCSVOptions = {
   limit?: number;
