@@ -120,7 +120,7 @@ export type FeatureAttributes = {
    */
   post_process?: string;
   /*
-   * A sample of a value for the feature.
+   * An sample of a value for the feature.
    */
   sample?: any;
   /*

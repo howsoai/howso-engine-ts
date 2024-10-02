@@ -8,21 +8,26 @@ import {
 import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import { Session, Trainee } from "../../engine";
-import type { BaseTrainee, TrainResponse } from "../../types";
+import type { BaseTrainee, ClientBatchResponse, TrainResponse } from "../../types";
 import type * as schemas from "../../types/schemas";
-import { AbstractBaseClient, type ClientCache, type ExecuteResponse } from "../AbstractBaseClient";
+import {
+  AbstractBaseClient,
+  type AbstractBaseClientOptions,
+  type ClientCache,
+  type ExecuteResponse,
+} from "../AbstractBaseClient";
 import { HowsoError, RequiredError } from "../errors";
 import { batcher, BatchOptions, CacheMap } from "../utilities";
 import { AbstractFileSystem } from "./filesystem";
 
-export interface ClientOptions {
+export type ClientOptions = AbstractBaseClientOptions & {
   /** The Howso Engine caml file. This will not be loaded unless a function requires it, such as `createTrainee` */
   howsoUrl: string | URL;
   /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
   migrationsUrl?: string | URL;
   /** Enable tracing all Trainee operations for debugging. */
   trace?: boolean;
-}
+};
 
 export class HowsoWorkerClient extends AbstractBaseClient {
   protected activeSession?: Session;
@@ -33,7 +38,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     public readonly fs: AbstractFileSystem<Worker | NodeWorker>,
     protected readonly options: ClientOptions,
   ) {
-    super();
+    super(options);
     if (worker == null) {
       throw new RequiredError("worker", "A worker is required to instantiate a client.");
     }
@@ -537,7 +542,10 @@ export class HowsoWorkerClient extends AbstractBaseClient {
    * @param request The train parameters.
    * @returns The train result.
    */
-  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<TrainResponse> {
+  public async batchTrain(
+    traineeId: string,
+    request: schemas.TrainRequest,
+  ): Promise<ClientBatchResponse<TrainResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { cases = [], ...rest } = request;
 
@@ -548,20 +556,26 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     let num_trained = 0;
     let status = null;
     const ablated_indices: number[] = [];
+    const warnings: string[][] = [];
 
     // Batch scale the requests
     await batcher(
       async function* (this: HowsoWorkerClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          const { payload: response } = await this.train(trainee.id, {
+          const response = await this.train(trainee.id, {
             ...rest,
             cases: cases.slice(offset, offset + size),
           });
           offset += size;
-          if (response.status) status = response.status;
-          if (response.num_trained) num_trained += response.num_trained;
-          if (response.ablated_indices) ablated_indices.push(...response.ablated_indices);
+          if (response.payload.status) status = response.payload.status;
+          if (response.payload.num_trained) num_trained += response.payload.num_trained;
+          if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
+
+          // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
+          if (response.warnings.length > 0) {
+            warnings.push(response.warnings);
+          }
           size = yield;
         }
       }.bind(this),
@@ -569,6 +583,6 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     );
 
     await this.autoPersistTrainee(trainee.id);
-    return { num_trained, status, ablated_indices };
+    return { payload: { num_trained, status, ablated_indices }, warnings };
   }
 }
