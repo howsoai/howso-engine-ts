@@ -8,7 +8,7 @@ import {
 import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import { Session, Trainee } from "../../engine";
-import type { BaseTrainee, BatchTrainResponse } from "../../types";
+import type { BaseTrainee, ClientBatchResponse, TrainResponse } from "../../types";
 import type * as schemas from "../../types/schemas";
 import {
   AbstractBaseClient,
@@ -542,7 +542,10 @@ export class HowsoWorkerClient extends AbstractBaseClient {
    * @param request The train parameters.
    * @returns The train result.
    */
-  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<BatchTrainResponse> {
+  public async batchTrain(
+    traineeId: string,
+    request: schemas.TrainRequest,
+  ): Promise<ClientBatchResponse<TrainResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { cases = [], ...rest } = request;
 
@@ -580,6 +583,6 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     );
 
     await this.autoPersistTrainee(trainee.id);
-    return { num_trained, status, ablated_indices, warnings };
+    return { payload: { num_trained, status, ablated_indices }, warnings };
   }
 }

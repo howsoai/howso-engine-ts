@@ -3,7 +3,3 @@ export type TrainResponse = {
   num_trained: number;
   status?: "analyze" | "analyzed" | null;
 };
-
-export type BatchTrainResponse = TrainResponse & {
-  warnings: string[][];
-};
