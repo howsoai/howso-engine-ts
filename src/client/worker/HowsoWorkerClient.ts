@@ -8,7 +8,7 @@ import {
 import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import { Session, Trainee } from "../../engine";
-import type { BaseTrainee, TrainResponse } from "../../types";
+import type { BaseTrainee, BatchTrainResponse } from "../../types";
 import type * as schemas from "../../types/schemas";
 import {
   AbstractBaseClient,
@@ -25,6 +25,8 @@ export type ClientOptions = AbstractBaseClientOptions & {
   howsoUrl: string | URL;
   /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
   migrationsUrl?: string | URL;
+  /** Enable tracing all Trainee operations for debugging. */
+  trace?: boolean;
 };
 
 export class HowsoWorkerClient extends AbstractBaseClient {
@@ -540,7 +542,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
    * @param request The train parameters.
    * @returns The train result.
    */
-  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<TrainResponse> {
+  public async batchTrain(traineeId: string, request: schemas.TrainRequest): Promise<BatchTrainResponse> {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { cases = [], ...rest } = request;
 
