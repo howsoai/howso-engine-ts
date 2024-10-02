@@ -9,19 +9,19 @@ import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "../../types";
 import type * as schemas from "../../types/schemas";
-import { ClientCache, ExecuteResponse } from "../AbstractBaseClient";
+import { AbstractBaseClientOptions, ClientCache, ExecuteResponse } from "../AbstractBaseClient";
 import { AbstractTraineeClient } from "../AbstractTraineeClient";
 import { HowsoError, RequiredError } from "../errors";
 import { batcher, BatchOptions, CacheMap } from "../utilities";
 import { AbstractFileSystem } from "./filesystem";
 
-export interface ClientOptions {
+export type ClientOptions = AbstractBaseClientOptions & {
   trace?: boolean;
   /** The Howso Engine caml file. This will not be loaded unless a function requires it, such as `createTrainee` */
   howsoUrl?: string | URL;
   /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
   migrationsUrl?: string | URL;
-}
+};
 
 export class HowsoWorkerClient extends AbstractTraineeClient {
   protected activeSession?: Session;
@@ -32,7 +32,7 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     public readonly fs: AbstractFileSystem<Worker | NodeWorker>,
     protected readonly options: ClientOptions,
   ) {
-    super();
+    super(options);
     if (worker == null) {
       throw new RequiredError("worker", "A worker is required to instantiate a client.");
     }
