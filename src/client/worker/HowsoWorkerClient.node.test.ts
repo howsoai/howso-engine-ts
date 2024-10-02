@@ -10,7 +10,6 @@ import { Logger } from "../utilities/logger";
 import { HowsoWorkerClient } from "./HowsoWorkerClient";
 import { NodeFileSystem } from "./filesystem";
 
-global.structuredClone = (val) => JSON.parse(JSON.stringify(val));
 describe("Node HowsoWorkerClient", () => {
   let worker: Worker;
   let client: TestHowsoWorkerClient;

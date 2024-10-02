@@ -34,9 +34,13 @@ export abstract class InferFeatureAttributesBase {
 
   /* Entrypoint */
   public async infer(options: InferFeatureAttributesOptions = {}): Promise<FeatureAttributesIndex> {
-    const attributes: Record<string, FeatureAttributes> = options.defaults || {};
-    const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
+    // Loop the columns into attributes immediately to get order assigned. Probably should be a Map...
     const columns = await this.getFeatureNames();
+    const attributes: FeatureAttributesIndex = columns.reduce((attributes, column) => {
+      attributes[column] = (options.defaults?.[column] || {}) as FeatureAttributes;
+      return attributes;
+    }, {} as FeatureAttributesIndex);
+    const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
 
     const getFeatureAttributes = async (featureName: string): Promise<FeatureAttributes | undefined> => {
       const originalFeatureType = await this.getOriginalFeatureType(featureName);
@@ -232,7 +236,7 @@ export abstract class InferFeatureAttributesBase {
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
     featureName: string,
   ): Promise<FeatureAttributes> {
-    return { type: "nominal" };
+    return { type: "continuous", data_type: "number", bounds: { allow_null: true } };
   }
 
   /* Feature properties */
@@ -256,7 +260,7 @@ export abstract class InferFeatureAttributesBase {
     if (!this.statistics[featureName]) {
       throw new Error(`this.statistics[${featureName}] is undefined`);
     }
-    return this.statistics[featureName]?.samples.at(0);
+    return this.statistics[featureName]?.samples.filter((sample) => sample !== null || sample !== undefined).at(0);
   }
 
   /* Descriptive operations */

@@ -1,0 +1,169 @@
+/**
+ * WARNING: This file is auto generated, do not modify directly, instead modify the template.
+ * Generated via Howso Engine {{ version }}
+ */
+import type { Session, Trainee } from "../engine";
+import type { ClientResponse, FeatureAttributesIndex } from "../types";
+import type * as schemas from "../types/schemas";
+import type * as shims from "../types/shims";
+import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
+import type { CacheMap } from "./utilities/cache";
+
+export interface ClientCache {
+  trainee: Trainee;
+  feature_attributes?: FeatureAttributesIndex;
+}
+
+export type ExecuteResponse<R = unknown> = {
+  payload: R;
+  errors: HowsoError[];
+  warnings: string[];
+};
+
+export abstract class AbstractBaseClient {
+  protected abstract cache: CacheMap<ClientCache>;
+
+  /**
+   * Prepare payload for an Engine request.
+   * @param payload The Engine payload.
+   * @returns The updated Engine payload.
+   */
+  protected prepareRequest(payload: any) {
+    if (!payload) {
+      return payload;
+    }
+
+    // Remove null properties from payload
+    const filtered = { ...payload };
+    for (const key in filtered) {
+      if (filtered[key as keyof typeof filtered] == null) {
+        delete filtered[key as keyof typeof filtered];
+      }
+    }
+
+    return filtered;
+  }
+
+  /**
+   * Process payload from an Engine response.
+   * @param data The Engine response.
+   * @returns The updated Engine response.
+   */
+  protected processResponse<R = unknown>(data: any): ExecuteResponse<R> {
+    if (!data) {
+      throw new HowsoError("Null or empty response received from Engine.");
+    }
+
+    if (Array.isArray(data) && data.length == 2) {
+      const errors: HowsoError[] = [];
+      const warnings: string[] = [];
+      const isSuccess = data[0];
+      const value = data[1];
+
+      if (isSuccess) {
+        // Collect warnings
+        if (Array.isArray(value?.warnings)) {
+          for (const msg of value.warnings) {
+            if (msg != null) warnings.push(msg);
+          }
+        }
+      } else {
+        // Collect errors
+        if (value?.errors) {
+          errors.push(new HowsoValidationError(value.detail, value.code, value.errors));
+        } else {
+          errors.push(new HowsoError(value.detail, value.code));
+        }
+        if (errors.length == 0) {
+          errors.push(new HowsoError(DEFAULT_ERROR_MESSAGE));
+        }
+      }
+
+      return {
+        errors,
+        warnings,
+        payload: isSuccess ? value?.payload : undefined,
+      };
+    } else if (["string", "number", "bigint", "boolean"].indexOf(typeof data) != -1) {
+      return { errors: [], warnings: [], payload: data };
+    }
+
+    throw new HowsoError("Malformed response received from Engine.");
+  }
+
+  /** Setup the client instance for interacting with the Howso Engine. */
+  public abstract setup(): Promise<void>;
+
+  /**
+   * Execute a label of an Engine entity.
+   * @param handle The identifier of the entity.
+   * @param label The name of the method to execute.
+   * @param data The data to pass to the method.
+   * @param throwErrors If errors should be thrown automatically.
+   */
+  public abstract execute<R, D = unknown>(
+    handle: string,
+    label: string,
+    data: D,
+    throwErrors?: boolean,
+  ): Promise<ExecuteResponse<R>>;
+
+  /** Create a new Trainee. */
+  public abstract createTrainee(properties: Omit<Trainee, "id">): Promise<Trainee>;
+
+  /** Update an existing Trainee. */
+  public abstract updateTrainee(trainee: Trainee): Promise<Trainee>;
+
+  /** Copy an existing Trainee. */
+  public abstract copyTrainee(traineeId: string, name?: string): Promise<Trainee>;
+
+  /** Get an existing Trainee by Id. */
+  public abstract getTrainee(traineeId: string): Promise<Trainee>;
+
+  /** Search existing Trainees. */
+  public abstract queryTrainees(keywords: string | string[]): Promise<Trainee[]>;
+
+  /** Delete a Trainee. */
+  public abstract deleteTrainee(traineeId: string): Promise<void>;
+
+  /** Acquire the resources for a Trainee. */
+  public abstract acquireTraineeResources(traineeId: string): Promise<void>;
+
+  /** Release the resources for a Trainee. */
+  public abstract releaseTraineeResources(traineeId: string): Promise<void>;
+
+  /** Persist a Trainee to storage. **/
+  public abstract persistTrainee(traineeId: string): Promise<void>;
+
+  /** Automatically resolve a Trainee and ensure it is loaded. */
+  protected abstract autoResolveTrainee(traineeId: string): Promise<Trainee>;
+
+  /** Automatically persist Trainee object when appropriate based on persistence level. */
+  protected abstract autoPersistTrainee(traineeId: string): Promise<void>;
+
+  /** Get active Session. */
+  public abstract getActiveSession(): Promise<Readonly<Session>>;
+
+  /** Begin a new Session. */
+  public abstract beginSession(name?: string, metadata?: Record<string, any>): Promise<Session>;
+{% for label, def in labels | dictsort %}
+{% set requestName = "schemas." + label | pascalCase + "Request" %}
+{% set responseName = "schemas." + label | pascalCase + "Response" %}
+  /**
+   * {{ def.description | capitalize | blockComment | safe | indent(2) }}
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: {{ requestName }}{% endif %}): Promise<ClientResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
+    const trainee = await this.autoResolveTrainee(traineeId);
+    const response = await this.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});
+    {%- if not def.read_only %}
+    this.autoPersistTrainee(trainee.id);
+    {%- endif %}
+    return { payload: response.payload, warnings: response.warnings };
+  }
+{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+}
