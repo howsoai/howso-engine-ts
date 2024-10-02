@@ -556,20 +556,24 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     let num_trained = 0;
     let status = null;
     const ablated_indices: number[] = [];
+    const warnings: string[][] = [];
 
     // Batch scale the requests
     await batcher(
       async function* (this: HowsoWorkerClient, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          const { payload: response } = await this.train(trainee.id, {
+          const response = await this.train(trainee.id, {
             ...rest,
             cases: cases.slice(offset, offset + size),
           });
           offset += size;
-          if (response.status) status = response.status;
-          if (response.num_trained) num_trained += response.num_trained;
-          if (response.ablated_indices) ablated_indices.push(...response.ablated_indices);
+          if (response.payload.status) status = response.payload.status;
+          if (response.payload.num_trained) num_trained += response.payload.num_trained;
+          if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
+
+          // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
+          response.warnings.length > 0 && warnings.push(response.warnings);
           size = yield;
         }
       }.bind(this),
@@ -577,6 +581,6 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     );
 
     await this.autoPersistTrainee(trainee.id);
-    return { num_trained, status, ablated_indices };
+    return { num_trained, status, ablated_indices, warnings };
   }
 }
