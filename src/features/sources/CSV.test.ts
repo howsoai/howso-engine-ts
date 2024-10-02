@@ -1,27 +1,19 @@
 import { readFileSync } from "fs";
-import { join } from "path";
 import { FeatureAttributes, FeatureAttributesIndex } from "../../types";
-import { getFeatureAttributesInferrer } from "../infer";
+import { AbstractDataType } from "../base";
 import { expectFeatureAttributesIndex } from "../infer.test";
 import { InferFeatureAttributesFromCSV, InferFeatureAttributesFromCSVOptions } from "./CSV";
 
 describe("features/sources/CSV", () => {
-  describe("getFeatureAttributesInferrer", () => {
-    it("should return an instance of InferFeatureAttributesFromArray for array data", () => {
-      const service = getFeatureAttributesInferrer("", "csv");
-      expect(service).toBeInstanceOf(InferFeatureAttributesFromCSV);
-    });
-  });
-
   describe("InferFeatureAttributesFromArray", () => {
     it("isAcceptedSourceFormat should accept csv only", () => {
-      expect(InferFeatureAttributesFromCSV.isAcceptedSourceFormat("")).toBe(true);
+      expect(InferFeatureAttributesFromCSV.isAcceptedSourceFormat("" as unknown as AbstractDataType)).toBe(true);
       // @ts-expect-error Invalid data type on purpose
       expect(InferFeatureAttributesFromCSV.isAcceptedSourceFormat([{}, {}])).toBe(false);
     });
 
     describe("infer", () => {
-      const data = readFileSync(join(__dirname, "asteroids-sample.csv")).toString();
+      const data = readFileSync("src/tests/assets/asteroids-sample.csv").toString();
       describe("asteroids", () => {
         const columns = [
           "full_name",

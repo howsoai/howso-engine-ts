@@ -1,5 +1,11 @@
+/*
+ * This class is an example implementation of a CSV parser.
+ * It provides inspiration, and an easy means for testing our own CSV files.
+ * Your implementation will vary, especially in options.
+ */
+
 import { autoType, csvParse } from "d3-dsv";
-import { AbstractDataType, CSVData, FeatureSourceFormat, isCSVData } from "../base";
+import { AbstractDataType, FeatureSourceFormat } from "../base";
 import { InferFeatureAttributesFromArray } from "./Array";
 
 export type InferFeatureAttributesFromCSVOptions = {
@@ -12,10 +18,10 @@ export class InferFeatureAttributesFromCSV extends InferFeatureAttributesFromArr
   public readonly samples: ReturnType<typeof samplesAutoType>[] | undefined;
 
   public static isAcceptedSourceFormat(data: AbstractDataType): boolean {
-    return isCSVData(data);
+    return typeof data === "string";
   }
 
-  constructor(dataset: CSVData, options: InferFeatureAttributesFromCSVOptions = {}) {
+  constructor(dataset: string, options: InferFeatureAttributesFromCSVOptions = {}) {
     options.samplesLimit ||= 5;
 
     const raw = csvParse(dataset);
