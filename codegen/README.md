@@ -10,7 +10,7 @@ Note that by running this utility, files will be added/updated/deleted in the
 `src` directory. Once generated, files should then be committed back to the
 repository.
 
-Ensure that the Howso Engine caml file located at `src/engine/howso.caml` is
+Ensure that the Howso Engine caml file located at `src/assets/howso.caml` is
 up to date before generation.
 
 ### Generating the code
