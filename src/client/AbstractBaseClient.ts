@@ -22,6 +22,8 @@ export type ExecuteResponse<R = unknown> = {
 };
 
 export type AbstractBaseClientOptions = {
+  /** Enable tracing all Trainee operations for debugging. */
+  trace?: boolean;
   logger?: Logger;
 };
 
