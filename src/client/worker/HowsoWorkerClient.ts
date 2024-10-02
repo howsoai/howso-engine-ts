@@ -568,7 +568,9 @@ export class HowsoWorkerClient extends AbstractBaseClient {
           if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
 
           // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
-          response.warnings.length > 0 && warnings.push(response.warnings);
+          if (response.warnings.length > 0) {
+            warnings.push(response.warnings);
+          }
           size = yield;
         }
       }.bind(this),

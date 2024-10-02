@@ -8,7 +8,7 @@ import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
 import type { CacheMap } from "./utilities/cache";
-import { Logger, nullLogger } from "./utilities/logger";
+import { type Logger, nullLogger } from "./utilities/logger";
 
 export interface ClientCache {
   trainee: Trainee;
@@ -24,6 +24,7 @@ export type ExecuteResponse<R = unknown> = {
 export type AbstractBaseClientOptions = {
   /** Enable tracing all Trainee operations for debugging. */
   trace?: boolean;
+  /** Enable logging for operations through your own methods */
   logger?: Logger;
 };
 

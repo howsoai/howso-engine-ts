@@ -13,6 +13,7 @@ import { NodeFileSystem } from "./filesystem";
 describe("Node HowsoWorkerClient", () => {
   let worker: Worker;
   let client: TestHowsoWorkerClient;
+
   beforeAll(async () => {
     worker = new Worker(resolve(__dirname, "../../tests/assets/NodeWorker.js"));
     const fs = new NodeFileSystem(worker);
@@ -28,6 +29,7 @@ describe("Node HowsoWorkerClient", () => {
     const trainee = await client.createTrainee({ name: "My Trainee" });
     await client.setFeatureAttributes(trainee.id, { feature_attributes });
   });
+
   afterAll(() => {
     worker?.terminate();
   });
