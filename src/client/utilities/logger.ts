@@ -1,7 +1,6 @@
 export type Args = (...args: any[]) => void;
 
 export type Logger = {
-  fatal: Args;
   error: Args;
   warn: Args;
   info: Args;
@@ -9,7 +8,6 @@ export type Logger = {
 };
 
 export const nullLogger: Logger = {
-  fatal: () => {},
   error: () => {},
   warn: () => {},
   info: () => {},

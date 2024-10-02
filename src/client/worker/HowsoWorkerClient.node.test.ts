@@ -44,7 +44,6 @@ describe("Node HowsoWorkerClient", () => {
     const value = [Math.random(), Math.random()];
     client.callLogs(value);
 
-    expect(fatal).toHaveBeenLastCalledWith(value);
     expect(error).toHaveBeenLastCalledWith(value);
     expect(warn).toHaveBeenLastCalledWith(value);
     expect(info).toHaveBeenLastCalledWith(value);
@@ -54,7 +53,6 @@ describe("Node HowsoWorkerClient", () => {
 
 class TestHowsoWorkerClient extends HowsoWorkerClient {
   public callLogs(...args: any) {
-    this.logger.fatal(...args);
     this.logger.error(...args);
     this.logger.warn(...args);
     this.logger.info(...args);
@@ -62,9 +60,8 @@ class TestHowsoWorkerClient extends HowsoWorkerClient {
   }
 }
 
-const fatal = jest.fn();
 const error = jest.fn();
 const warn = jest.fn();
 const info = jest.fn();
 const debug = jest.fn();
-const logger: Logger = { fatal, error, warn, info, debug };
+const logger: Logger = { error, warn, info, debug };
