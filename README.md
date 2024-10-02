@@ -49,6 +49,7 @@ This process can be CPU intensive, you are encouraged to use a web `Worker` if r
 #### Through a web Worker
 
 ```ts
+// @/workers/AmalgamWorker
 import { AmalgamWasmService, initRuntime } from "@howso/amalgam-lang";
 import wasmDataUri from "@howso/amalgam-lang/lib/amalgam-st.data?url";
 import wasmUri from "@howso/amalgam-lang/lib/amalgam-st.wasm?url";
@@ -86,7 +87,7 @@ const getClient = async (options?: ClientOptions): Promise<HowsoWorkerClient> =>
   const fs = new BrowserFileSystem(worker);
   const client = new HowsoWorkerClient(worker, fs, {
     howsoUrl,
-    migrationsUrl,
+    migrationsUrl, // Optional, used for upgrading Trainees saved to disk.
     ...options,
   });
   return client.setup();
