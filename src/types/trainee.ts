@@ -1,4 +1,4 @@
-export interface TraineeIdentity {
+export type BaseTrainee = {
   /**
    * The unique identifier of the Trainee.
    */
@@ -8,9 +8,7 @@ export interface TraineeIdentity {
    * The name of the Trainee.
    */
   name?: string | null;
-}
 
-export interface Trainee extends TraineeIdentity {
   /**
    * The type of persistence schedule to use.
    * If allow, the trainee may be manually persisted and will be persisted automatically only when unloaded.
@@ -24,4 +22,4 @@ export interface Trainee extends TraineeIdentity {
    * Any key-value pair to be stored with the Trainee.
    */
   metadata?: { [key: string]: any };
-}
+};

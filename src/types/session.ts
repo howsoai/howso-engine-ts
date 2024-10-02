@@ -1,4 +1,4 @@
-export interface SessionIdentity {
+export type BaseSession = {
   /**
    * The Session's unique identifier.
    */
@@ -7,10 +7,8 @@ export interface SessionIdentity {
   /**
    * The name given to the Session.
    */
-  name?: string;
-}
+  name?: string | null;
 
-export interface Session extends SessionIdentity {
   /**
    * Any key-value pair to be stored with the Session.
    */
@@ -25,4 +23,4 @@ export interface Session extends SessionIdentity {
    * The timestamp of when the Session was last modified.
    */
   modified_date?: Date;
-}
+};

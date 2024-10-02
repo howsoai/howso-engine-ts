@@ -7,25 +7,26 @@ import {
 } from "@howso/amalgam-lang";
 import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
-import type { FeatureAttributesIndex, Session, Trainee, TrainResponse } from "../../types";
+import { Session, Trainee } from "../../engine";
+import type { BaseTrainee, TrainResponse } from "../../types";
 import type * as schemas from "../../types/schemas";
-import { ClientCache, ExecuteResponse } from "../AbstractBaseClient";
-import { AbstractTraineeClient } from "../AbstractTraineeClient";
+import { AbstractBaseClient, type ClientCache, type ExecuteResponse } from "../AbstractBaseClient";
 import { HowsoError, RequiredError } from "../errors";
 import { batcher, BatchOptions, CacheMap } from "../utilities";
 import { AbstractFileSystem } from "./filesystem";
 
 export interface ClientOptions {
-  trace?: boolean;
   /** The Howso Engine caml file. This will not be loaded unless a function requires it, such as `createTrainee` */
-  howsoUrl?: string | URL;
+  howsoUrl: string | URL;
   /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
   migrationsUrl?: string | URL;
+  /** Enable tracing all Trainee operations for debugging. */
+  trace?: boolean;
 }
 
-export class HowsoWorkerClient extends AbstractTraineeClient {
+export class HowsoWorkerClient extends AbstractBaseClient {
   protected activeSession?: Session;
-  protected cache: CacheMap<Required<ClientCache>>;
+  protected cache: CacheMap<ClientCache>;
 
   constructor(
     protected readonly worker: Worker | NodeWorker,
@@ -40,6 +41,19 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
       throw new RequiredError("options", "Client options are required.");
     }
     this.cache = new CacheMap();
+  }
+
+  /**
+   * Create a new client instance and run the required client setup process.
+   */
+  public static async create(
+    worker: Worker | NodeWorker,
+    fs: AbstractFileSystem<Worker | NodeWorker>,
+    options: ClientOptions,
+  ): Promise<HowsoWorkerClient> {
+    const client = new HowsoWorkerClient(worker, fs, options);
+    await client.setup();
+    return client;
   }
 
   /**
@@ -157,23 +171,17 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
    * @param traineeId The Trainee identifier.
    * @returns The Trainee object and its feature attributes.
    */
-  protected async getTraineeFromEngine(traineeId: string): Promise<[Trainee, FeatureAttributesIndex]> {
-    const [metadata, features] = await Promise.all([
-      this.execute<Record<string, any>>(traineeId, "get_metadata", {}),
-      this.execute<FeatureAttributesIndex>(traineeId, "get_feature_attributes", {}),
-    ]);
-    if (!metadata?.payload) {
+  protected async getTraineeFromEngine(traineeId: string): Promise<Trainee> {
+    const { payload } = await this.execute<Record<string, any>>(traineeId, "get_metadata", {});
+    if (!payload) {
       throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
     }
-    return [
-      {
-        id: traineeId,
-        name: metadata?.payload?.name,
-        persistence: metadata?.payload?.persistence ?? "allow",
-        metadata: metadata?.payload?.metadata,
-      },
-      features?.payload,
-    ];
+    return new Trainee(this, {
+      id: traineeId,
+      name: payload?.name,
+      persistence: payload?.persistence ?? "allow",
+      metadata: payload?.metadata,
+    });
   }
 
   /**
@@ -245,7 +253,13 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
    * @returns The session object.
    */
   public async beginSession(name = "default", metadata: Record<string, unknown> = {}): Promise<Session> {
-    this.activeSession = { id: uuid(), name, metadata, created_date: new Date(), modified_date: new Date() };
+    this.activeSession = new Session(this, {
+      id: uuid(),
+      name,
+      metadata,
+      created_date: new Date(),
+      modified_date: new Date(),
+    });
     return this.activeSession;
   }
 
@@ -300,9 +314,9 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     }
 
     // Get Trainee details. Use the internal method to prevent auto resolution loops.
-    const [trainee, feature_attributes] = await this.getTraineeFromEngine(traineeId);
+    const trainee = await this.getTraineeFromEngine(traineeId);
     // Cache the Trainee
-    this.cache.set(traineeId, { trainee, feature_attributes });
+    this.cache.set(traineeId, { trainee });
   }
 
   /**
@@ -337,11 +351,11 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
 
   /**
    * Create a new Trainee.
-   * @param trainee The Trainee identifier.
+   * @param properties The Trainee properties.
    * @returns The new Trainee object.
    */
-  public async createTrainee(trainee: Omit<Trainee, "id">): Promise<Trainee> {
-    const traineeId = trainee.name || uuid();
+  public async createTrainee(properties: Omit<BaseTrainee, "id">): Promise<Trainee> {
+    const traineeId = properties.name || uuid();
     // Load the Engine entity
     const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
     const status = await this.dispatch({
@@ -361,23 +375,24 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
 
     // Set Trainee metadata
     const metadata = {
-      name: trainee.name,
-      metadata: trainee.metadata || {},
-      persistence: trainee.persistence || "allow",
+      name: properties.name,
+      metadata: properties.metadata || {},
+      persistence: properties.persistence || "allow",
     };
     await this.execute(traineeId, "set_metadata", { metadata });
 
     // Build, cache and return new trainee object
-    const newTrainee: Trainee = { id: traineeId, ...metadata };
-    this.cache.set(traineeId, { trainee: structuredClone(newTrainee), feature_attributes: {} });
+    const newTrainee = new Trainee(this, { id: traineeId, ...metadata });
+    this.cache.set(traineeId, { trainee: newTrainee });
     return newTrainee;
   }
 
   /**
    * Update a Trainee's properties.
-   * @param trainee The Trainee identifier.
+   * @param trainee The Trainee to update.
+   * @returns The updated Trainee object.
    */
-  public async updateTrainee(trainee: Trainee): Promise<Trainee> {
+  public async updateTrainee(trainee: BaseTrainee): Promise<Trainee> {
     await this.autoResolveTrainee(trainee.id);
 
     // Set Trainee metadata
@@ -388,8 +403,8 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     };
     await this.execute(trainee.id, "set_metadata", { metadata });
 
-    const [updatedTrainee, feature_attributes] = await this.getTraineeFromEngine(trainee.id);
-    this.cache.set(trainee.id, { trainee: structuredClone(updatedTrainee), feature_attributes });
+    const updatedTrainee = await this.getTraineeFromEngine(trainee.id);
+    this.cache.set(trainee.id, { trainee: updatedTrainee });
     return updatedTrainee;
   }
 
@@ -400,22 +415,22 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
    */
   public async getTrainee(traineeId: string): Promise<Trainee> {
     await this.autoResolveTrainee(traineeId);
-    const [trainee] = await this.getTraineeFromEngine(traineeId); // Get latest Trainee from Engine
-    return trainee;
+    return await this.getTraineeFromEngine(traineeId); // Get latest Trainee from Engine
   }
 
   /**
    * Copy a Trainee.
    * @param traineeId The Trainee identifier.
    * @param name The new Trainee name.
+   * @returns The new Trainee object.
    */
   public async copyTrainee(traineeId: string, name?: string): Promise<Trainee> {
-    const trainee = structuredClone(await this.autoResolveTrainee(traineeId));
+    await this.autoResolveTrainee(traineeId);
     const newTraineeId = name || uuid();
     const cloned = await this.dispatch({
       type: "request",
       command: "cloneEntity",
-      parameters: [trainee.id, newTraineeId],
+      parameters: [traineeId, newTraineeId],
     });
     if (!cloned) {
       throw new HowsoError(
@@ -428,8 +443,8 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     await this.execute(newTraineeId, "set_metadata", { metadata });
 
     // Get fresh copy of the trainee object
-    const [newTrainee, feature_attributes] = await this.getTraineeFromEngine(newTraineeId);
-    this.cache.set(newTraineeId, { trainee: structuredClone(newTrainee), feature_attributes });
+    const newTrainee = await this.getTraineeFromEngine(newTraineeId);
+    this.cache.set(newTraineeId, { trainee: newTrainee });
     return newTrainee;
   }
 
@@ -451,6 +466,7 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
   /**
    * Search existing Trainees.
    * @param keywords Keywords to filter the list of Trainees by.
+   * @returns A list of Trainee objects.
    */
   public async queryTrainees(keywords?: string | string[]): Promise<Trainee[]> {
     const cache = this.cache.values();
@@ -480,16 +496,6 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
     }, []);
   }
 
-  public async setFeatureAttributes(traineeId: string, request: schemas.SetFeatureAttributesRequest) {
-    const response = await super.setFeatureAttributes(traineeId, request);
-    // Also update cached Trainee
-    const cached = this.cache.get(traineeId);
-    if (cached) {
-      cached.feature_attributes = structuredClone(response.payload);
-    }
-    return response;
-  }
-
   public async impute(traineeId: string, request: schemas.ImputeRequest) {
     request = await this.includeSession(request);
     return await super.impute(traineeId, request);
@@ -512,26 +518,12 @@ export class HowsoWorkerClient extends AbstractTraineeClient {
 
   public async addFeature(traineeId: string, request: schemas.AddFeatureRequest) {
     request = await this.includeSession(request);
-    const response = await super.addFeature(traineeId, request);
-    // Also update cached Trainee
-    const cached = this.cache.get(traineeId);
-    if (cached) {
-      const { payload: features } = await this.getFeatureAttributes(traineeId);
-      cached.feature_attributes = features;
-    }
-    return response;
+    return await super.addFeature(traineeId, request);
   }
 
   public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest) {
     request = await this.includeSession(request);
-    const response = await super.removeFeature(traineeId, request);
-    // Also update cached Trainee
-    const cached = this.cache.get(traineeId);
-    if (cached) {
-      const { payload: features } = await this.getFeatureAttributes(traineeId);
-      cached.feature_attributes = features;
-    }
-    return response;
+    return await super.removeFeature(traineeId, request);
   }
 
   public async train(traineeId: string, request: schemas.TrainRequest) {

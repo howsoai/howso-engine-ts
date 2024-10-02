@@ -18,6 +18,6 @@ export class NodeFileSystem extends AbstractFileSystem<Worker> {
   public async prepareFile(parent: string, name: string, url: string): Promise<void> {
     const { readFile } = await import("node:fs/promises");
     const data = await readFile(url);
-    this.writeFile(this.join(parent, name), data);
+    await this.writeFile(this.join(parent, name), data);
   }
 }

@@ -11,6 +11,6 @@ export class BrowserFileSystem extends AbstractFileSystem<Worker> {
   }
 
   public async prepareFile(parent: string, name: string, url: string): Promise<void> {
-    return await this.createLazyFile(parent, name, url);
+    await this.createLazyFile(parent, name, url);
   }
 }
