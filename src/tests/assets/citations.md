@@ -10,6 +10,4 @@
 
 ### Asteroid
 
-[Open Asteroid Dataset - kaggle.com](https://www.kaggle.com/datasets/basu369victor/prediction-of-asteroid-diameter)
-
 [Jet Propulsion Laboratory of California Institute of Technology - nasa.gov](https://ssd.jpl.nasa.gov/tools/sbdb_query.html)
