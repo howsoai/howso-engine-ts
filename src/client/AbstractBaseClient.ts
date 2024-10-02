@@ -1,6 +1,7 @@
 import type { FeatureAttributesIndex, Trainee } from "../types";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
 import type { CacheMap } from "./utilities/cache";
+import { Logger, nullLogger } from "./utilities/logger";
 
 export interface ClientCache {
   trainee: Trainee;
@@ -13,8 +14,17 @@ export type ExecuteResponse<R = unknown> = {
   warnings: string[];
 };
 
+export type AbstractBaseClientOptions = {
+  logger?: Logger;
+};
+
 export abstract class AbstractBaseClient {
   protected abstract cache: CacheMap<ClientCache>;
+  protected logger: Logger;
+
+  constructor(options?: AbstractBaseClientOptions) {
+    this.logger = options?.logger || nullLogger;
+  }
 
   /**
    * Setup the client instance for interacting with the Howso Engine.
@@ -90,6 +100,9 @@ export abstract class AbstractBaseClient {
           errors.push(new HowsoError(DEFAULT_ERROR_MESSAGE));
         }
       }
+
+      errors.forEach(this.logger.error);
+      warnings.forEach(this.logger.warn);
 
       return {
         errors,
