@@ -20,7 +20,7 @@ export type ReduceDataRequest = {
 
   /**
    * The number of cases to ablate between analyses and influence weight entropy recalculation
-   * @default "!ablationBatchSize"
+   * @default 2000
    */
   batch_size?: number;
 
@@ -35,20 +35,20 @@ export type ReduceDataRequest = {
 
   /**
    * Name of feature whose values to use as case weights, defaults to ".case_weight"
-   * @default "!autoAblationWeightFeature"
+   * @default ".case_weight"
    */
   distribute_weight_feature?: string;
 
   /**
    * List of features to use when computing influence weight entropies, defaults to all trained features
-   * @default "!trainedFeatures"
+   * @default []
    */
   features?: string[];
 
   /**
    * Numeric maximum threshold for influence weight entropy of cases to keep, defaults to the value
    *  influence weight entropy threshold stored within the trainee
-   * @default "!autoAblationInfluenceWeightEntropyThreshold"
+   * @default 0.15
    */
   influence_weight_entropy_threshold?: number;
 

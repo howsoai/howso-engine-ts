@@ -76,6 +76,12 @@ export async function getEngineApi(): Promise<EngineApi> {
     amalgam.loadEntity(handle, "howso.caml");
     console.log(`Amalgam Version: ${amalgam.getVersion()}`);
 
+    // Initialize the Engine
+    const initialized = amalgam.executeEntityJson(handle, "initialize", { trainee_id: handle });
+    if (!initialized) {
+      throw new Error("Failed to initialize the Howso Engine.");
+    }
+
     // Get the api documentation from the Engine
     const response = amalgam.executeEntityJson(handle, "get_api", "");
     if (!Array.isArray(response) || response[0] != 1) {
