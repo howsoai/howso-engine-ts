@@ -10,7 +10,8 @@ This major change refactors the client and types for all Howso Engine operations
   the board. However, most of the type's properties should remain the same.
 - `types/shims` have been added as a stop gap for types lost from this migration. These will be transitioned out as
   types improve in the Howso Engine API specification.
-- The `Trainee` type no longer has a `features` property. Instead use `getFeatureAttributes`.
+- The existing `Trainee` type has been renamed to `BaseTrainee` and no longer has a `features` property. Request
+  features via the method `getFeatureAttributes` instead.
 
 ### Client Changes
 
