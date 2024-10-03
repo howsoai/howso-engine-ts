@@ -7,7 +7,7 @@
  */
 
 export type GetSessionMetadataRequest = {
-  /*
+  /**
    * Name of session to return metadata for
    */
   session?: string;

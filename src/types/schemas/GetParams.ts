@@ -8,22 +8,22 @@
  */
 
 export type GetParamsRequest = {
-  /*
+  /**
    * The target feature of the desired hyperparameters
    */
   action_feature?: string;
 
-  /*
+  /**
    * The set of context features used for the desired hyperparameters
    */
   context_features?: string[];
 
-  /*
+  /**
    * The method of calculation used to find the desired hyperparameters
    */
   mode?: "robust" | "full";
 
-  /*
+  /**
    * The weight feature used in the calculation of the desired hyperparameters
    */
   weight_feature?: string;

@@ -12,7 +12,7 @@ import type { Condition } from "./Condition";
 import type { FeatureAttributes } from "./FeatureAttributes";
 
 export type AddFeatureRequest = {
-  /*
+  /**
    * Assoc of feature->value(s).
    *     no value = must have feature
    *   - for continuous or numeric ordinal features:
@@ -23,45 +23,45 @@ export type AddFeatureRequest = {
    */
   condition?: Condition;
 
-  /*
+  /**
    * If specified ignores condition and returns cases for the specified session id
    */
   condition_session?: string;
 
-  /*
+  /**
    * List of case ids to operate on. if specified, conditions will be ignored
    */
   entities?: string[];
 
-  /*
+  /**
    * Name of feature to odd
    * @default ""
    */
   feature?: string;
 
-  /*
+  /**
    * Assoc of feature specific attributes for this feature. if unspecified and conditions are not specified, will assume feature type as 'continuous'.
    */
   feature_attributes?: FeatureAttributes;
 
-  /*
+  /**
    * Value for the feature
    */
   feature_value?: any;
 
-  /*
+  /**
    * Flag, if set to true, will not update hyperparameter metadata map
    * @default false
    */
   internal_feature?: boolean;
 
-  /*
+  /**
    * {type "boolean"}
    * @default true
    */
   overwrite?: boolean;
 
-  /*
+  /**
    * The session id when this call is being made
    * @default "none"
    */

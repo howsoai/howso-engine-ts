@@ -7,13 +7,13 @@
  */
 
 export type SetSessionMetadataRequest = {
-  /*
+  /**
    * Any arbitrary metadata.
    * @default {}
    */
   metadata?: Record<string, any>;
 
-  /*
+  /**
    * Id of session to modify.
    * @default "none"
    */

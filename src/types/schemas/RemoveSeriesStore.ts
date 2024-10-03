@@ -7,7 +7,7 @@
  */
 
 export type RemoveSeriesStoreRequest = {
-  /*
+  /**
    * Series id to clear. if not provided, removes entire store
    */
   series?: string;

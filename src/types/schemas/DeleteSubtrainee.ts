@@ -7,7 +7,7 @@
  */
 
 export type DeleteSubtraineeRequest = {
-  /*
+  /**
    * Name path of trainee
    * @default ""
    */

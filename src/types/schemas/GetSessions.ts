@@ -7,7 +7,7 @@
  */
 
 export type GetSessionsRequest = {
-  /*
+  /**
    * List of metadata attributes to return from the session
    * @default []
    */

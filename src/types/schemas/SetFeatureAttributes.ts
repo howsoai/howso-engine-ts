@@ -8,13 +8,13 @@
 import type { FeatureAttributesIndex } from "./FeatureAttributesIndex";
 
 export type SetFeatureAttributesRequest = {
-  /*
+  /**
    * Flag, default to true. create time series feature attributes if necessary
    * @default true
    */
   create_ts_attributes?: boolean;
 
-  /*
+  /**
    * Assoc of feature -> attributes, attributes defined below:
    *
    *   'type': string, one of 'continuous', 'ordinal' or 'nominal'. default is 'continuous'.

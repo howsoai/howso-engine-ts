@@ -12,14 +12,14 @@ import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 
 export type EditCasesRequest = {
-  /*
+  /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the case as
    *   it was trained. if specified, ignores condition and condition_session
    * @default []
    */
   case_indices?: CaseIndices;
 
-  /*
+  /**
    * Assoc of feature->value(s)
    *     no value = must have feature
    *      - for continuous or numeric ordinal features:
@@ -31,36 +31,36 @@ export type EditCasesRequest = {
    */
   condition?: Condition;
 
-  /*
+  /**
    * If specified ignores condition and operates on cases for the specified session id
    */
   condition_session?: string;
 
-  /*
+  /**
    * List of names of feature to edit
    * @default []
    */
   features?: string[];
 
-  /*
+  /**
    * List of values corresponding to features
    * @default []
    */
   feature_values?: any[];
 
-  /*
+  /**
    * Limit on the number of cases to edit; if set to zero there will be no limit.
    *   if null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
    */
   num_cases?: number;
 
-  /*
+  /**
    * Enum used only with 'condition' parameter, will find exact matches if 'exact' and similar cases if 'similar'.
    * @default "exact"
    */
   precision?: "exact" | "similar";
 
-  /*
+  /**
    * The session id when this call is being made
    * @default "none"
    */

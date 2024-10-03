@@ -7,7 +7,7 @@
  */
 
 export type SetParentIdRequest = {
-  /*
+  /**
    * The unique string identifier for the parent of the trainee
    */
   parent_id?: string;

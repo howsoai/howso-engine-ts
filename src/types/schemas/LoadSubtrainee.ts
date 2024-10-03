@@ -11,25 +11,25 @@
  */
 
 export type LoadSubtraineeRequest = {
-  /*
+  /**
    * Name to load (without extension)
    * @default ""
    */
   filename?: string;
 
-  /*
+  /**
    * Base path to load from
    * @default ""
    */
   filepath?: string;
 
-  /*
+  /**
    * Flag, default to false. if set to true will load each case from its individual file
    * @default false
    */
   separate_files?: boolean;
 
-  /*
+  /**
    * Name path of trainee to load
    * @default ""
    */

@@ -9,19 +9,19 @@
 import type { ReactAggregateDetails } from "./ReactAggregateDetails";
 
 export type ReactAggregateRequest = {
-  /*
+  /**
    * Target feature for which to do computations. if "prediction_stats_action_feature" and "feature_influences_action_feature"
    *   are not provided, they will default to this value.
    */
   action_feature?: string;
 
-  /*
+  /**
    * List of features to do residuals and prediction stats computations for. default is the value of context_features
    * @default []
    */
   action_features?: string[];
 
-  /*
+  /**
    * Number, optional, default is 10. applicable only to confusion matrices when computing residuals, the number of predictions
    *   a class should have (value of a cell in the matrix) for it to remain in the confusion matrix. if the count is less than this value, it will
    *   be accumulated into a single value of all insignificant predictions for the class and removed from the confusion matrix.
@@ -29,13 +29,13 @@ export type ReactAggregateRequest = {
    */
   confusion_matrix_min_count?: number;
 
-  /*
+  /**
    * List of features to use as contexts for computations. default is all features if unspecified.
    * @default []
    */
   context_features?: string[];
 
-  /*
+  /**
    * Assoc, optional. an assoc of flags for which type of audit data to return, and corresponding values to return (if applicable) in the format of:
    *    (assoc
    *     prediction_stats: optional true/false. if true outputs full feature prediction stats for all (context and action)
@@ -112,43 +112,43 @@ export type ReactAggregateRequest = {
    */
   details?: ReactAggregateDetails;
 
-  /*
+  /**
    * When feature influences such as contributions and mda, use this feature as the action feature.
    *   if not provided, will default to the "action_feature" if provided.
    */
   feature_influences_action_feature?: string;
 
-  /*
+  /**
    * Full path for hyperparameters to use for computation.
    *   if specified for any residual computations, takes precendence over action_feature parameter.
    */
   hyperparameter_param_path?: string[];
 
-  /*
+  /**
    * Total sample size of model to use (using sampling with replacement) for robust contribution computation.
    *   defaults to 300.
    */
   num_robust_influence_samples?: number;
 
-  /*
+  /**
    * Specifies the number of robust samples to use for each case for robust contribution computations.
    *   defaults to 300 + 2 * (number of features).
    */
   num_robust_influence_samples_per_case?: number;
 
-  /*
+  /**
    * Total sample size of model to use (using sampling with replacement) for robust feature_mda and residual computation.
    *   defaults to 1000 * (1 + log(number of features)).  note: robust feature_mda will be updated to use num_robust_influence_samples in a future release.
    */
   num_robust_residual_samples?: number;
 
-  /*
+  /**
    * Total sample size of model to use (using sampling with replacement) for all non-robust computation.
    *   defaults to 1000. if specified overrides sample_model_fraction.
    */
   num_samples?: number;
 
-  /*
+  /**
    * When calculating residuals and prediction stats, uses this target features's hyperparameters. the trainee must
    *   have been analyzed with this feature as the action feature first. if both "prediction_stats_action_feature" and "action_feature" are not provided,
    *   by default residuals and prediction stats uses ".targetless" hyperparameters. if "action_feature" is provided, and this value is not provided, will
@@ -156,31 +156,31 @@ export type ReactAggregateRequest = {
    */
   prediction_stats_action_feature?: string;
 
-  /*
+  /**
    * Flag, optional. if specified, will attempt to return stats that were computed using hyperpparameters with the
    *   specified robust or non-robust type.
    */
   robust_hyperparameters?: boolean;
 
-  /*
+  /**
    * Value 0.0 - 1.0, percent of model to use in sampling (using sampling without replacement).
    *   applicable only to non-robust computation. ignored if num_samples is specified.
    */
   sample_model_fraction?: number;
 
-  /*
+  /**
    * If specified will calculate only on a sub model of the specified size from the full model.
    *   applicable only to models > 1000 cases.
    */
   sub_model_size?: number;
 
-  /*
+  /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: boolean;
 
-  /*
+  /**
    * Name of feature whose values to use as case weights
    *   "generate_attempts" true or false. if true, outputs the total number of attempts to generate the unique case. only applicable for generative
    *   reacts where generate_new_cases is "always" or "attempt". when used with reactseries, "series_generate_attempts" is also returned.

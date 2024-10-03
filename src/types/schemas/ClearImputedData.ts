@@ -7,12 +7,12 @@
  */
 
 export type ClearImputedDataRequest = {
-  /*
+  /**
    * Session id of the impute for which to clear the data. if null, will clear all imputed
    */
   impute_session?: string;
 
-  /*
+  /**
    * Session id of this action
    * @default "clear_impute_none"
    */

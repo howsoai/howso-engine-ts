@@ -10,7 +10,7 @@ import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 
 export type GetMarginalStatsRequest = {
-  /*
+  /**
    * Assoc of feature->value(s)
    *     no value = must have feature
    *      - for continuous or numeric ordinal features:
@@ -21,19 +21,19 @@ export type GetMarginalStatsRequest = {
    */
   condition?: Condition;
 
-  /*
+  /**
    * Limit on the number of cases to use in calculating conditional prediction stats; if set to zero there will be no limit.
    *   if null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
    */
   num_cases?: number;
 
-  /*
+  /**
    * Default is 'exact', used only with 'condition' parameter, will find exact matches if 'exact' and similar cases if 'similar'.
    * @default "exact"
    */
   precision?: Precision;
 
-  /*
+  /**
    * Name of case weight feature
    */
   weight_feature?: string;

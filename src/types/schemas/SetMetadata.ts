@@ -7,7 +7,7 @@
  */
 
 export type SetMetadataRequest = {
-  /*
+  /**
    * Arbitary map of metadata to store in a trainee
    */
   metadata?: Record<string, any>;

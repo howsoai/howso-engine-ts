@@ -8,7 +8,7 @@
  */
 
 export type GetSessionTrainingIndicesRequest = {
-  /*
+  /**
    * Id of session
    * @default ""
    */

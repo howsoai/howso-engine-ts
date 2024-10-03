@@ -8,7 +8,7 @@
  */
 
 export type SetInfluenceWeightThresholdRequest = {
-  /*
+  /**
    * Number, amount of total influence weight to accumulate among nearest
    * neighbors before stopping (for influential cases)
    * @default 0.99

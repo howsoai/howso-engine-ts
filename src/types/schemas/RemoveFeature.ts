@@ -10,7 +10,7 @@
 import type { Condition } from "./Condition";
 
 export type RemoveFeatureRequest = {
-  /*
+  /**
    * Assoc of feature->value(s).
    *     no value = must have feature
    *   - for continuous or numeric ordinal features:
@@ -21,18 +21,18 @@ export type RemoveFeatureRequest = {
    */
   condition?: Condition;
 
-  /*
+  /**
    * If specified ignores condition and operates on cases for the specified session id
    */
   condition_session?: string;
 
-  /*
+  /**
    * The feature name to remove
    * @default ""
    */
   feature?: string;
 
-  /*
+  /**
    * The session id when this call is being made
    * @default "none"
    */
