@@ -54,7 +54,7 @@ export type ReactIntoFeaturesRequest = {
   similarity_conviction?: boolean | string;
 
   /**
-   * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
+   * Flag, if set to true will scale influence weights by each case's weight_feature weight. If unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;

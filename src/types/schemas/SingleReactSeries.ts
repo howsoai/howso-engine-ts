@@ -3,8 +3,8 @@
  *
  * SingleReactSeries
  *
- * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
- * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
+ * React in a series until a series_stop_map condition is met. Aggregates rows of data corresponding to the specified context, action,
+ * derived_context and derived_action features, utilizing previous rows to derive values as necessary. Outputs an assoc of "action_features" and
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
  */
 import type { DesiredConviction } from "./DesiredConviction";
@@ -38,16 +38,16 @@ export type SingleReactSeriesRequest = {
   context_values?: any[];
 
   /**
-   * Flag, default is false.  when true will attempt to continue existing series instead of starting new series.
-   *   if initial_values provide series ids, it will continue those explicitly specified ids, otherwise it will randomly select series to continue.
-   *   note: terminated series with terminators cannot be continued and will result in null output.
+   * Flag, default is false.  When true will attempt to continue existing series instead of starting new series.
+   *   If initial_values provide series IDs, it will continue those explicitly specified IDs, otherwise it will randomly select series to continue.
+   *   Note: terminated series with terminators cannot be continued and will result in null output.
    * @default false
    */
   continue_series?: boolean;
 
   /**
    * List of features corresponding to the values in each row of continue_series_values.
-   *   this value is ignored if continue_series_values is not specified.
+   *   This value is ignored if continue_series_values is not specified.
    */
   continue_series_features?: string[];
 
@@ -59,23 +59,23 @@ export type SingleReactSeriesRequest = {
 
   /**
    * List of action features whose values should be computed from the resulting last row in series, in the specified
-   *   order. must be a subset of action_features.
-   *   note: both of these derived feature lists rely on the features' "derived_feature_code" attribute to compute the values.
-   *   if 'derived_feature_code' attribute is undefined or references non-existing feature indices, the derived value will be null.
+   *   order. Must be a subset of action_features.
+   *   Note: both of these derived feature lists rely on the features' "derived_feature_code" attribute to compute the values.
+   *   If 'derived_feature_code' attribute is undefined or references non-existing feature indices, the derived value will be null.
    * @default []
    */
   derived_action_features?: string[];
 
   /**
    * List of context features whose values should be computed from the entire series in the specified order.
-   *   must be different than context_features.
+   *   Must be different than context_features.
    * @default []
    */
   derived_context_features?: string[];
 
   /**
-   * If null, will do a discriminative react. if specified, will do a generative react
-   *   for generative react, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
+   * If null, will do a discriminative react. If specified, will do a generative react
+   *   For Generative React, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
    *   larger values will increase the variance (or creativity) of the generated case from the existing model
    *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
    */
@@ -107,8 +107,8 @@ export type SingleReactSeriesRequest = {
 
   /**
    * List of features to condition just the first case in a series, overwrites context_features and
-   *   derived_context_features for that first case. all specified initial features must be in one of: context_features, action_features,
-   *   derived_context_features or derived_action_features. if provided a value that isn't in one of those lists, it will be ignored.
+   *   derived_context_features for that first case. All specified initial features must be in one of: context_features, action_features,
+   *   derived_context_features or derived_action_features. If provided a value that isn't in one of those lists, it will be ignored.
    * @default []
    */
   initial_features?: string[];
@@ -125,13 +125,13 @@ export type SingleReactSeriesRequest = {
   input_is_substituted?: boolean;
 
   /**
-   * Maximum size a series is allowed to be.  default is 3 * model_size, a 0 or less is no limit.
-   *   if forecasting with 'continue_series', this defines the maximum length of the forecast.
+   * Maximum size a series is allowed to be.  Default is 3 * model_size, a 0 or less is no limit.
+   *   If forecasting with 'continue_series', this defines the maximum length of the forecast.
    */
   max_series_length?: number;
 
   /**
-   * Distance to determine privacy cutoff. used to query the local minimum distance used in the distance ratio
+   * Distance to determine privacy cutoff. Used to query the local minimum distance used in the distance ratio
    *    accepted values:
    *      'max': the maximum local distance
    *      'min': the minimum local distance
@@ -142,15 +142,15 @@ export type SingleReactSeriesRequest = {
   new_case_threshold?: string;
 
   /**
-   * Flag, default to true. if true, series ids are replaced with unique values on output.
-   *   if false, will maintain or replace ids with existing trained values, but also allows output of series with duplicate existing ids.
+   * Flag, default to True. If true, series ids are replaced with unique values on output.
+   *   If False, will maintain or replace ids with existing trained values, but also allows output of series with duplicate existing ids.
    * @default true
    */
   output_new_series_ids?: boolean;
 
   /**
    * List of features that will preserve their values from the case specified by case_indices, appending and
-   *   overwriting the specified context and context features as necessary.  for generative reacts, if case_indices isn't specified,
+   *   overwriting the specified context and context features as necessary.  For generative reacts, if case_indices isn't specified,
    *   will preserve feature values of a random case.
    * @default []
    */
@@ -164,15 +164,15 @@ export type SingleReactSeriesRequest = {
 
   /**
    * 2d-list of values, context value for each feature for each row of the series.
-   *   if specified, max_series_length is ignored.
+   *   If specified, max_series_length is ignored.
    * @default []
    */
   series_context_values?: any[][];
 
   /**
    * Controls how closely generated series should follow existing series (plural).
-   *   choices are: "fixed", "dynamic" or "no". if "fixed", tracks the particular relevant series id. if "dynamic", tracks the particular
-   *   relevant series id, but is allowed to change the series id that it tracks based on its current context. if "no", does not track any particular series id.
+   *   Choices are: "fixed", "dynamic" or "no". If "fixed", tracks the particular relevant series ID. If "dynamic", tracks the particular
+   *   relevant series ID, but is allowed to change the series ID that it tracks based on its current context. If "no", does not track any particular series ID.
    * @default "fixed"
    */
   series_id_tracking?: "fixed" | "dynamic" | "no";
@@ -188,13 +188,13 @@ export type SingleReactSeriesRequest = {
   series_stop_map?: Record<string, any>;
 
   /**
-   * Flag, default is true, only applicable if a substitution value map has been set. if set to false, will not substitute categorical feature values.
+   * Flag, default is true, only applicable if a substitution value map has been set. If set to false, will not substitute categorical feature values.
    * @default true
    */
   substitute_output?: boolean;
 
   /**
-   * Flag, whether to use case weights or not. if unspecified will automatically select based on cached parameters
+   * Flag, whether to use case weights or not. If unspecified will automatically select based on cached parameters
    */
   use_case_weights?: UseCaseWeights;
 

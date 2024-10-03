@@ -32,7 +32,7 @@ export type SaveSubtraineeRequest = {
   trainee?: string | string[];
 
   /**
-   * Unique id for trainee. must be provided if trainee does not have one already specified.
+   * Unique id for trainee. Must be provided if trainee does not have one already specified.
    */
   trainee_id?: string;
 };

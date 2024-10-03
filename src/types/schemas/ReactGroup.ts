@@ -40,13 +40,13 @@ export type ReactGroupRequest = {
   features?: string[];
 
   /**
-   * Calculate and output the kl divergence of adding the specified new_cases in the output assoc
+   * Calculate and output the KL divergence of adding the specified new_cases in the output assoc
    * @default false
    */
   kl_divergence_addition?: boolean;
 
   /**
-   * Calculate and output the kl divergence of removing the specified new_cases in the output assoc
+   * Calculate and output the KL divergence of removing the specified new_cases in the output assoc
    * @default false
    */
   kl_divergence_removal?: boolean;
@@ -71,7 +71,7 @@ export type ReactGroupRequest = {
 
   /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
-   *    if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
+   *    If a weight is missing, uses 1 as the weight. If unspecified, case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
 

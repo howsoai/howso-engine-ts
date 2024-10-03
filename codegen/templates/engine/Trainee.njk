@@ -1,0 +1,100 @@
+/**
+ * WARNING: This file is auto generated, do not modify directly, instead modify the template.
+ * Generated via Howso Engine {{ version }}
+ */
+import { AbstractBaseClient } from "../client/AbstractBaseClient";
+import { batcher, BatchOptions } from "../client/utilities";
+import type { BaseTrainee, ClientBatchResponse } from "../types";
+import type * as schemas from "../types/schemas";
+
+/**
+ * The interface for interacting with a Trainee. Should not be instantiated directly. Instead create or request a
+ * Trainee using the client.
+ */
+export class Trainee implements BaseTrainee {
+  public readonly id: string;
+  protected readonly client: AbstractBaseClient;
+  protected _name: BaseTrainee["name"];
+  protected _persistence: BaseTrainee["persistence"];
+  protected _metadata: BaseTrainee["metadata"];
+
+  constructor(client: AbstractBaseClient, obj: BaseTrainee) {
+    this.client = client;
+    this.id = obj.id;
+    this._name = obj.name;
+    this._metadata = obj.metadata;
+    this._persistence = obj.persistence;
+  }
+
+  public get name() {
+    return this._name ?? null;
+  }
+
+  public get persistence() {
+    return this._persistence || "allow";
+  }
+
+  public get metadata(): Readonly<{ [key: string]: any }> {
+    return this._metadata || {};
+  }
+
+  /**
+   * Train data into the Trainee using batched requests to the Engine.
+   * @param traineeId The Trainee identifier.
+   * @param request The train parameters.
+   * @returns The train result.
+   */
+  public async batchTrain(request: schemas.TrainRequest): Promise<ClientBatchResponse<schemas.TrainResponse>> {
+    const { cases = [], ...rest } = request;
+
+    // Limit to 10,000 cases at once maximum
+    const batchOptions: BatchOptions = { startSize: 100, limits: [1, 10000] };
+
+    let num_trained = 0;
+    let status = null;
+    const ablated_indices: number[] = [];
+    const warnings: string[][] = [];
+
+    // Batch scale the requests
+    await batcher(
+      async function* (this: Trainee, size: number) {
+        let offset = 0;
+        while (offset < cases.length) {
+          const response = await this.client.train(this.id, {
+            ...rest,
+            cases: cases.slice(offset, offset + size),
+          });
+          offset += size;
+          if (response.payload.status) status = response.payload.status;
+          if (response.payload.num_trained) num_trained += response.payload.num_trained;
+          if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
+
+          // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
+          if (response.warnings.length > 0) {
+            warnings.push(response.warnings);
+          }
+          size = yield;
+        }
+      }.bind(this),
+      batchOptions,
+    );
+
+    return { payload: { num_trained, status, ablated_indices }, warnings };
+  }
+
+{% for label, def in labels | dictsort %}
+{%- set requestName = "schemas." + label | pascalCase + "Request" %}
+{%- set responseName = "schemas." + label | pascalCase + "Response" %}
+  /**
+   * {{ def.description | blockComment | safe | indent(2) }}
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async {{ label | camelCase }}({% if def.parameters %}request: {{ requestName }}{% endif %}) {
+    return this.client.{{ label | camelCase }}(this.id, {% if def.parameters %}request{% endif %});
+  }
+{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+}

@@ -3,7 +3,7 @@
  * Generated via Howso Engine 86.1.0+alpha
  */
 import type { Session, Trainee } from "../engine";
-import type { ClientResponse, FeatureAttributesIndex } from "../types";
+import type { ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
@@ -12,7 +12,7 @@ import { type Logger, nullLogger } from "./utilities/logger";
 
 export interface ClientCache {
   trainee: Trainee;
-  feature_attributes?: FeatureAttributesIndex;
+  feature_attributes?: schemas.FeatureAttributesIndex;
 }
 
 export type ExecuteResponse<R = unknown> = {
@@ -163,9 +163,9 @@ export abstract class AbstractBaseClient {
 
   /**
    * Adds the specified feature on all cases for a trainee that match the specified condition. overwrites features that
-   * if condition are not specified, adds feature for all cases and to the model.  if condition is an empty assoc, will not modify feature metadata in the model.
-   * if feature attributes are passed in, will also set the model's feature attributes.
-   * updates the accumulated data mass for the model proportional to the number of cases modified.
+   * If condition are not specified, adds feature for all cases and to the model.  If condition is an empty assoc, will not modify feature metadata in the model.
+   * If feature attributes are passed in, will also set the model's feature attributes.
+   * Updates the accumulated data mass for the model proportional to the number of cases modified.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -295,8 +295,8 @@ export abstract class AbstractBaseClient {
 
   /**
    * Edit feature values for the specified cases.
-   * cases are specified by either case_indices or by the condition. if neither is provided, edits all cases.
-   * updates the accumulated data mass for the model proportional to the number of cases and features modified.
+   * Cases are specified by either case_indices or by the condition. If neither is provided, edits all cases.
+   * Updates the accumulated data mass for the model proportional to the number of cases and features modified.
    * returns null if invalid features specified or an assoc with "count"
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -310,7 +310,7 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * Evaluate custom amalgam code for feature values of every case in the model and returns
+   * Evaluate custom Amalgam code for feature values of every case in the model and returns
    * a list of the custom code's return values for each feature specified.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -323,7 +323,7 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * Execute any method in the api directly on any child trainee of this trainee, used for hierarchy operations.
+   * Execute any method in the API directly on any child trainee of this trainee, used for hierarchy operations.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -365,8 +365,8 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * Returns assoc with features and cases - a list of lists of all feature values. retrieves all feature values for cases for
-   * all (unordered) sessions in the order they were trained within each session. if a session is specified, only that session's
+   * Returns assoc with features and cases - a list of lists of all feature values. Retrieves all feature values for cases for
+   * all (unordered) sessions in the order they were trained within each session. If a session is specified, only that session's
    * cases wil be output.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -401,7 +401,7 @@ export abstract class AbstractBaseClient {
 
   /**
    * Returns the full entity path to a child trainee provided its unique trainee id if it is contained in the hierarchy.
-   * iterates down the hierarchy searching for a trainee that matches the specified id, returns null if not found or
+   * Iterates down the hierarchy searching for a trainee that matches the specified id, returns null if not found or
    * a string error if found but trainee is stored externally as an independent trainee.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -486,7 +486,7 @@ export abstract class AbstractBaseClient {
 
   /**
    * Outputs all marginal stats (min, max, median, mean, mode, count, uniques, mean_absdev, variance, stddev, skew, kurtosis, entropy)
-   * for all features in the format of feature -> assoc stat -> value. the marginal stats can be computed for a subset of the data using condition, precision, and num_cases
+   * for all features in the format of feature -> assoc stat -> value. The marginal stats can be computed for a subset of the data using condition, precision, and num_cases
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -527,7 +527,7 @@ export abstract class AbstractBaseClient {
 
   /**
    * Returns a list of computed distances between respective cases specified in either from_values or from_case_indices to to_values or to_case_indices.
-   *  if one case is specified in any of the lists, all respective distances are computed to/from that one case.
+   *  If one case is specified in any of the lists, all respective distances are computed to/from that one case.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -543,7 +543,7 @@ export abstract class AbstractBaseClient {
 
   /**
    * Return the full internal parameters map if no parameters are specified.
-   * if any of the parameters are specified, then gethyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
+   * if any of the parameters are specified, then GetHyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -679,8 +679,8 @@ export abstract class AbstractBaseClient {
 
   /**
    * Attempts to load a subtrainee with the following optional parameters.
-   * if a parameter is not specified, it will look to this entity's own label of the same name.
-   * if the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
+   * If a parameter is not specified, it will look to this entity's own label of the same name.
+   * If the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
    * assumes loaded trainee filenames need to be escaped
    * returns the trainee name if successful, null if not
    * @param traineeId The Trainee identifier.
@@ -721,8 +721,8 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * Computes, caches, and returns specified details and feature prediction statistics such as mean decrease in accuracy (mda), residuals (accuracy, mean absolute error),
-   *  precision, recall, etc. returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
+   * Computes, caches, and returns specified details and feature prediction statistics such as Mean Decrease in Accuracy (MDA), residuals (accuracy, Mean Absolute Error),
+   *  precision, recall, etc. Returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -774,8 +774,8 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
-   * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
+   * React in a series until a series_stop_map condition is met. Aggregates rows of data corresponding to the specified context, action,
+   * derived_context and derived_action features, utilizing previous rows to derive values as necessary. Outputs an assoc of "action_features" and
    * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -818,7 +818,7 @@ export abstract class AbstractBaseClient {
   /**
    * Removes the specified feature on all cases for a trainee that match the specified condition
    * if conditions are not specified, removes feature for all cases and from the model, if condition is an empty assoc, leaves the feature metadata in the model.
-   * updates the accumulated data mass for the model proportional to the number of cases modified.
+   * Updates the accumulated data mass for the model proportional to the number of cases modified.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -937,7 +937,7 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * Set the influence weight threshold for outputting only the k neighbors whose influence weight is <= to this threshold
+   * Set the influence weight threshold for outputting only the K neighbors whose influence weight is <= to this threshold
    * default value is 0.99
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -1051,16 +1051,16 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * React to a provided context. if desired_conviction is provided, it does a generative react.
+   * React to a provided context. If desired_conviction is provided, it does a generative react.
    *
-   * output:
-   *  default output of this method is a react object in the format of
+   * Output:
+   *  Default output of this method is a react object in the format of
    *  , where all_action_values is a list of all action
    *  values, reacted/generated and derived, in the same order as all_action_features, e.g., [2, "a", .75384] to match ['width','name','height']
-   *  if details is specified, the react object will contain appropriate additional details properties and values,
-   *    details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
+   *  If details is specified, the react object will contain appropriate additional details properties and values,
+   *    Details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
    *     'influential_cases' : etc... }
-   *   see api docs for documentation of all output properties
+   *   See API docs for documentation of all output properties
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -1073,8 +1073,8 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * React in a series until a series_stop_map condition is met. aggregates rows of data corresponding to the specified context, action,
-   * derived_context and derived_action features, utilizing previous rows to derive values as necessary. outputs an assoc of "action_features" and
+   * React in a series until a series_stop_map condition is met. Aggregates rows of data corresponding to the specified context, action,
+   * derived_context and derived_action features, utilizing previous rows to derive values as necessary. Outputs an assoc of "action_features" and
    * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -1091,24 +1091,14 @@ export abstract class AbstractBaseClient {
   }
 
   /**
-   * Train the passed in cases, filtering out cases that match optionally passed in ablation parameters
-   *  returns a response object in the following format:
-   *   (associate
-   *     "num_trained" num_trained_cases
-   *     "ablated_indices" (list of session training indices for the ablated cases)
-   *     "status" "status output message"
-   *   )
-   *    list of 'status' values:
-   *     (null) - default output, no status output
-   *     "analyzed" - if auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed
-   *     "analyze" - if auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed
+   * Train the provided cases, filtering out cases that match optionally passed in ablation parameters.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async train(traineeId: string, request: schemas.TrainRequest): Promise<ClientResponse<shims.TrainResponse>> {
+  public async train(traineeId: string, request: schemas.TrainRequest): Promise<ClientResponse<schemas.TrainResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<shims.TrainResponse>(trainee.id, "train", request);
+    const response = await this.execute<schemas.TrainResponse>(trainee.id, "train", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }

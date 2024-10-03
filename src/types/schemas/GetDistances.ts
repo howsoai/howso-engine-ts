@@ -22,13 +22,13 @@ export type GetDistancesRequest = {
 
   /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the case as it was
-   *   trained. if specified, returns pairwise distances for all of these cases. ignored if feature_values is provided. if neither feature_values nor
+   *   trained. If specified, returns pairwise distances for all of these cases. Ignored if feature_values is provided. If neither feature_values nor
    *   case_indices is specified, runs on the full dataset.
    */
   case_indices?: CaseIndices;
 
   /**
-   * Number of columns to compute in the matrix.  if unspecified, is set to the same number as all the cases.
+   * Number of columns to compute in the matrix.  If unspecified, is set to the same number as all the cases.
    */
   column_count?: number;
 
@@ -39,7 +39,7 @@ export type GetDistancesRequest = {
   column_offset?: number;
 
   /**
-   * Which features to use when computing case distances. if unspecified uses all features.
+   * Which features to use when computing case distances. If unspecified uses all features.
    */
   features?: string[];
 
@@ -49,7 +49,7 @@ export type GetDistancesRequest = {
   feature_values?: any[];
 
   /**
-   * Number of rows to compute in the matrix.  if unspecified, is set to the same number as all the cases.
+   * Number of rows to compute in the matrix.  If unspecified, is set to the same number as all the cases.
    */
   row_count?: number;
 
@@ -60,7 +60,7 @@ export type GetDistancesRequest = {
   row_offset?: number;
 
   /**
-   * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
+   * Flag, if set to true will scale influence weights by each case's weight_feature weight. If unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;

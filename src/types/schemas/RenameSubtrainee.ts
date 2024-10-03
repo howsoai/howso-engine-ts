@@ -8,7 +8,7 @@
 
 export type RenameSubtraineeRequest = {
   /**
-   * Id of child trainee to rename. ignored if child_name_path is specified
+   * Id of child trainee to rename. Ignored if child_name_path is specified
    */
   child_id?: string;
 

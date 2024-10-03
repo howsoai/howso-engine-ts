@@ -11,6 +11,7 @@ export class Generator {
   basePath: string;
   schemaDir: string;
   clientDir: string;
+  engineDir: string;
   ignoredLabels: string[];
   responseShims: Record<string, string>;
 
@@ -22,6 +23,7 @@ export class Generator {
     this.basePath = path.resolve(__dirname, "../../src");
     this.schemaDir = path.resolve(this.basePath, "types/schemas");
     this.clientDir = path.resolve(this.basePath, "client");
+    this.engineDir = path.resolve(this.basePath, "engine");
     this.doc = doc;
     this.ignoredLabels = [
       "root_filepath",
@@ -77,6 +79,10 @@ export class Generator {
       }
     }
     this.renderFile(this.clientDir, "AbstractBaseClient.ts", "client/AbstractBaseClient.njk", {
+      labels: targetLabels,
+      shims: this.responseShims,
+    });
+    this.renderFile(this.engineDir, "Trainee.ts", "engine/Trainee.njk", {
       labels: targetLabels,
       shims: this.responseShims,
     });

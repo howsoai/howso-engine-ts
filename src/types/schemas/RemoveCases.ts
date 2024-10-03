@@ -16,13 +16,13 @@ export type RemoveCasesRequest = {
   case_indices?: CaseIndices;
 
   /**
-   * Assoc of feature->value(s) (no value = must have feature, one value = must equal exactly the value, two values = inclusive between). ignored if case_indices is specified.
+   * Assoc of feature->value(s) (no value = must have feature, one value = must equal exactly the value, two values = inclusive between). Ignored if case_indices is specified.
    * @default {}
    */
   condition?: Condition;
 
   /**
-   * If specified, ignores condition and instead operates on all cases that were trained with this session id. ignored if case_indices is specified.
+   * If specified, ignores condition and instead operates on all cases that were trained with this session id. Ignored if case_indices is specified.
    */
   condition_session?: string;
 
@@ -32,13 +32,13 @@ export type RemoveCasesRequest = {
   distribute_weight_feature?: string;
 
   /**
-   * Limit on the number of cases to move; if set to zero there will be no limit. ignored if case_indices is specified.
-   *   if null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
+   * Limit on the number of cases to move; If set to zero there will be no limit. Ignored if case_indices is specified.
+   *   If null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
    */
   num_cases?: number;
 
   /**
-   * Flag, whether to query for 'exact' matches; if set to 'similar' will remove num_cases with the most similar values. ignored if case_indices is specified.
+   * Flag, whether to query for 'exact' matches; if set to 'similar' will remove num_cases with the most similar values. Ignored if case_indices is specified.
    * @default "exact"
    */
   precision?: Precision;

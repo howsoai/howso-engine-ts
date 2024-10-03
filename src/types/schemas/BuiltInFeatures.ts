@@ -6,7 +6,7 @@
 import type { EditHistory } from "./EditHistory";
 
 /**
- * The features and their values created by the howso engine automatically
+ * The features and their values created by the Howso Engine automatically
  */
 export type BuiltInFeatures = {
   ".case_edit_history"?: EditHistory;

@@ -8,7 +8,7 @@ import {
 import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import { Session, Trainee } from "../../engine";
-import type { BaseTrainee, ClientBatchResponse, TrainResponse } from "../../types";
+import type { BaseTrainee } from "../../types";
 import type * as schemas from "../../types/schemas";
 import {
   AbstractBaseClient,
@@ -17,7 +17,7 @@ import {
   type ExecuteResponse,
 } from "../AbstractBaseClient";
 import { HowsoError, RequiredError } from "../errors";
-import { batcher, BatchOptions, CacheMap } from "../utilities";
+import { CacheMap } from "../utilities";
 import { AbstractFileSystem } from "./filesystem";
 
 export type ClientOptions = AbstractBaseClientOptions & {
@@ -534,54 +534,5 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   public async train(traineeId: string, request: schemas.TrainRequest) {
     request = await this.includeSession(request);
     return await super.train(traineeId, request);
-  }
-
-  /**
-   * Train data into the Trainee using batched requests to the Engine.
-   * @param traineeId The Trainee identifier.
-   * @param request The train parameters.
-   * @returns The train result.
-   */
-  public async batchTrain(
-    traineeId: string,
-    request: schemas.TrainRequest,
-  ): Promise<ClientBatchResponse<TrainResponse>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { cases = [], ...rest } = request;
-
-    // Limit to 10,000 cases at once maximum
-    const batchOptions: BatchOptions = { startSize: 100, limits: [1, 10000] };
-
-    let num_trained = 0;
-    let status = null;
-    const ablated_indices: number[] = [];
-    const warnings: string[][] = [];
-
-    // Batch scale the requests
-    await batcher(
-      async function* (this: HowsoWorkerClient, size: number) {
-        let offset = 0;
-        while (offset < cases.length) {
-          const response = await this.train(trainee.id, {
-            ...rest,
-            cases: cases.slice(offset, offset + size),
-          });
-          offset += size;
-          if (response.payload.status) status = response.payload.status;
-          if (response.payload.num_trained) num_trained += response.payload.num_trained;
-          if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
-
-          // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
-          if (response.warnings.length > 0) {
-            warnings.push(response.warnings);
-          }
-          size = yield;
-        }
-      }.bind(this),
-      batchOptions,
-    );
-
-    await this.autoPersistTrainee(trainee.id);
-    return { payload: { num_trained, status, ablated_indices }, warnings };
   }
 }

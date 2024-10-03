@@ -8,8 +8,8 @@
 
 export type CopySubtraineeRequest = {
   /**
-   * Id of source trainee to copy. ignored if source_name_path is specified.
-   *   if neither source_name_path nor source_id are specified, copies the trainee itself.
+   * Id of source trainee to copy. Ignored if source_name_path is specified.
+   *   If neither source_name_path nor source_id are specified, copies the trainee itself.
    */
   source_id?: string;
 
@@ -19,8 +19,8 @@ export type CopySubtraineeRequest = {
   source_name_path?: string[];
 
   /**
-   * Id of target trainee to copy trainee into.  ignored if target_name_path is specified.
-   *   if neither target_name_path nor target_id are specified, copies as a direct child of trainee
+   * Id of target trainee to copy trainee into.  Ignored if target_name_path is specified.
+   *   If neither target_name_path nor target_id are specified, copies as a direct child of trainee
    */
   target_id?: string;
 

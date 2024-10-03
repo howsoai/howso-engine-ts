@@ -3,16 +3,16 @@
  *
  * SingleReact
  *
- * React to a provided context. if desired_conviction is provided, it does a generative react.
+ * React to a provided context. If desired_conviction is provided, it does a generative react.
  *
- * output:
- *  default output of this method is a react object in the format of
+ * Output:
+ *  Default output of this method is a react object in the format of
  *  , where all_action_values is a list of all action
  *  values, reacted/generated and derived, in the same order as all_action_features, e.g., [2, "a", .75384] to match ['width','name','height']
- *  if details is specified, the react object will contain appropriate additional details properties and values,
- *    details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
+ *  If details is specified, the react object will contain appropriate additional details properties and values,
+ *    Details example: { 'action_values': [2, "a", .75384], 'action_features' : ['width','name','height'], 'residual_conviction': 1.3,
  *     'influential_cases' : etc... }
- *   see api docs for documentation of all output properties
+ *   See API docs for documentation of all output properties
  */
 import type { DesiredConviction } from "./DesiredConviction";
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
@@ -29,13 +29,13 @@ export type SingleReactRequest = {
   action_features?: string[];
 
   /**
-   * Values of action features. if specified will bypass react and only do the explanation if details is set
+   * Values of action features. If specified will bypass react and only do the explanation if details is set
    * @default []
    */
   action_values?: any[];
 
   /**
-   * Flag, if set to true will allow return of null values if there are nulls in the local model for the action features. applicable
+   * Flag, if set to true will allow return of null values if there are nulls in the local model for the action features. Applicable
    *   only to discriminative reacts.
    * @default false
    */
@@ -43,41 +43,41 @@ export type SingleReactRequest = {
 
   /**
    * Pair (list) of session id and index, where index is the original 0-based session_training_index of the case as it was
-   *       trained into the session. if this case does not exist, discriminative react outputs null, generative react ignores it.
+   *       trained into the session. If this case does not exist, discriminative react outputs null, generative react ignores it.
    */
   case_indices?: (string | number)[];
 
   /**
-   * List of context features. for generative react, features used to condition the generated case
+   * List of context features. For generative react, features used to condition the generated case
    * @default []
    */
   context_features?: string[];
 
   /**
-   * List of context values, for generative react, values used to condition the generated case
+   * List of context values, For generative react, values used to condition the generated case
    * @default []
    */
   context_values?: any[];
 
   /**
    * List of action features whose values should be computed from the resulting action prior to output, in the specified
-   *   order. must be a subset of action_features.
-   *   note: both of these derived feature lists rely on the features' "derived_feature_code" attribute to compute the values.
-   *   if 'derived_feature_code' attribute is undefined or references non-0 feature indices, the derived value will be null.
+   *   order. Must be a subset of action_features.
+   *   Note: both of these derived feature lists rely on the features' "derived_feature_code" attribute to compute the values.
+   *   If 'derived_feature_code' attribute is undefined or references non-0 feature indices, the derived value will be null.
    * @default []
    */
   derived_action_features?: string[];
 
   /**
    * List of context features whose values should be computed from the provided contexts in the specified order.
-   *   must be different than context_features.
+   *   Must be different than context_features.
    * @default []
    */
   derived_context_features?: string[];
 
   /**
-   * If null, will do a discriminative react. if specified, will do a generative react
-   *   for generative react, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
+   * If null, will do a discriminative react. If specified, will do a generative react
+   *   For Generative React, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
    *   larger values will increase the variance (or creativity) of the generated case from the existing model
    *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
    */
@@ -91,7 +91,7 @@ export type SingleReactRequest = {
   /**
    * If true will exclude sensitive features whose values will be
    *   replaced after synthesis from uniqueness check.
-   *  only applicable when desired_conviction is specified.
+   *  Only applicable when desired_conviction is specified.
    * @default false
    */
   exclude_novel_nominals_from_uniqueness_check?: boolean;
@@ -107,7 +107,7 @@ export type SingleReactRequest = {
    *     to ensure that specified features' generated values stay in bounds
    *   for nominal features instead of min/max it's a set of allowed values, ie:
    *     allow_null - default is true, if true nulls may be generated per their distribution in the data
-   *  only used when desired_conviction is specified
+   *  Only used when desired_conviction is specified
    * @default {}
    */
   feature_bounds_map?: Record<string, FeatureBoundsMap>;
@@ -122,7 +122,7 @@ export type SingleReactRequest = {
   generate_new_cases?: GenerateNewCases;
 
   /**
-   * Case_id, if set will query for k+1 cases and ignore the perfect matching case during the reaction
+   * Case_id, if set will query for K+1 cases and ignore the perfect matching case during the reaction
    */
   ignore_case?: string;
 
@@ -143,7 +143,7 @@ export type SingleReactRequest = {
   leave_case_out?: boolean;
 
   /**
-   * Distance to determine privacy cutoff. used to query the local minimum distance used in the distance ratio
+   * Distance to determine privacy cutoff. Used to query the local minimum distance used in the distance ratio
    *    accepted values:
    *      'max': the maximum local distance
    *      'min': the minimum local distance
@@ -173,27 +173,27 @@ export type SingleReactRequest = {
 
   /**
    * List of features that will preserve their values from the case specified by case_indices, appending and
-   *   overwriting the specified context and context features as necessary.  for generative reacts, if case_indices isn't specified,
+   *   overwriting the specified context and context features as necessary.  For generative reacts, if case_indices isn't specified,
    *   will preserve feature values of a random case.
    * @default []
    */
   preserve_feature_values?: string[];
 
   /**
-   * Flag, default is true, only applicable if a substitution value map has been set. if set to false, will not substitute categorical feature values.
-   *  only used when desired_conviction is specified
+   * Flag, default is true, only applicable if a substitution value map has been set. If set to false, will not substitute categorical feature values.
+   *  Only used when desired_conviction is specified
    * @default true
    */
   substitute_output?: boolean;
 
   /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
-   *   if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
+   *   If a weight is missing, uses 1 as the weight. If unspecified, case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
 
   /**
-   * Flag, if false uses model feature residuals, if true recalculates regional model residuals. only used when desired_conviction is specified
+   * Flag, if false uses model feature residuals, if true recalculates regional model residuals. Only used when desired_conviction is specified
    * @default true
    */
   use_regional_model_residuals?: boolean;

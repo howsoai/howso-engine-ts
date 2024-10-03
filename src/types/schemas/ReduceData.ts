@@ -47,7 +47,7 @@ export type ReduceDataRequest = {
 
   /**
    * Numeric maximum threshold for influence weight entropy of cases to keep, defaults to the value
-   *  influence weight entropy threshold stored within the trainee
+   *  influence weight entropy threshold stored within the Trainee
    * @default 0.15
    */
   influence_weight_entropy_threshold?: number;

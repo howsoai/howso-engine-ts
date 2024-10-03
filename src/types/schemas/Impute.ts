@@ -9,7 +9,7 @@
 export type ImputeRequest = {
   /**
    * A positive integer, specifying how many rows to fill before recomputing entropy. default is 1 which should return the
-   *   best accuracy since it'll recompute it everytime.  higher values should improve performance but may decrease accuracy of results
+   *   best accuracy since it'll recompute it everytime.  Higher values should improve performance but may decrease accuracy of results
    * @default 1
    */
   batch_size?: number;

@@ -4,8 +4,8 @@
  * LoadSubtrainee
  *
  * Attempts to load a subtrainee with the following optional parameters.
- * if a parameter is not specified, it will look to this entity's own label of the same name.
- * if the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
+ * If a parameter is not specified, it will look to this entity's own label of the same name.
+ * If the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
  * assumes loaded trainee filenames need to be escaped
  * returns the trainee name if successful, null if not
  */

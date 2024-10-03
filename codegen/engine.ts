@@ -83,7 +83,7 @@ export async function getEngineApi(): Promise<EngineApi> {
     }
 
     // Get the api documentation from the Engine
-    const response = amalgam.executeEntityJson(handle, "get_api", "");
+    const response = amalgam.executeEntityJson(handle, "get_api", {});
     if (!Array.isArray(response) || response[0] != 1) {
       throw new Error("Failed to retrieve API documentation from the Howso Engine.");
     }

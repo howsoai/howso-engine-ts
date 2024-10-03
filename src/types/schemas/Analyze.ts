@@ -50,7 +50,7 @@ export type AnalyzeRequest = {
   dt_values?: number[];
 
   /**
-   * Whether to use inverse residuals as feature weights. if unspecified, inverse residuals will be used as weights for
+   * Whether to use inverse residuals as feature weights. If unspecified, inverse residuals will be used as weights for
    *  targetless params, otherwise this method will not be used.
    */
   inverse_residuals_as_weights?: boolean | null;
@@ -77,7 +77,7 @@ export type AnalyzeRequest = {
   num_samples?: number;
 
   /**
-   * List of values for p (the parameter of the lebesgue space) to grid search during analysis
+   * List of values for p (the parameter of the Lebesgue space) to grid search during analysis
    */
   p_values?: number[];
 
@@ -97,8 +97,8 @@ export type AnalyzeRequest = {
   use_case_weights?: UseCaseWeights;
 
   /**
-   * Whether to use deviations for lk metric in queries. when true forces the use
-   *   of deviations, when false will not use deviations. if unspecified, the better performing option will be selected.
+   * Whether to use deviations for LK metric in queries. When true forces the use
+   *   of deviations, when false will not use deviations. If unspecified, the better performing option will be selected.
    */
   use_deviations?: boolean | null;
 

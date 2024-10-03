@@ -8,7 +8,7 @@
 
 export type UpgradeTraineeRequest = {
   /**
-   * Base path to howso engine core installation
+   * Base path to Howso Engine Core installation
    */
   root_filepath?: string;
 
@@ -25,7 +25,7 @@ export type UpgradeTraineeRequest = {
 
   /**
    * Path from which to load previously exported meta.json and exp.json files.
-   *   if unspecified, expects them to be located in the base installation /migrations/ directory.
+   *   If unspecified, expects them to be located in the base installation /migrations/ directory.
    */
   trainee_json_filepath?: string;
 };

@@ -20,13 +20,13 @@ export type ReactRequest = {
   action_features?: string[];
 
   /**
-   * ;values of action features. if specified will bypass react and only do the explanation if details is set.
-   * if specified must be either length of 1 or num_reacts. one list us used per individual reaction
+   * ;values of action features. If specified will bypass react and only do the explanation if details is set.
+   * if specified must be either length of 1 or num_reacts. One list us used per individual reaction
    */
   action_values?: any[][];
 
   /**
-   * Flag, if set to true will allow return of null values if there are nulls in the local model for the action features. applicable
+   * Flag, if set to true will allow return of null values if there are nulls in the local model for the action features. Applicable
    *   only to discriminative reacts.
    * @default false
    */
@@ -34,42 +34,42 @@ export type ReactRequest = {
 
   /**
    * Pair (list) of session id and index, where index is the original 0-based session_training_index of the case as it was
-   *   trained into the session. if this case does not exist, discriminative react outputs null, generative react ignores it.
-   *  if specified must be either length of 1 or num_reacts.
+   *   trained into the session. If this case does not exist, discriminative react outputs null, generative react ignores it.
+   *  If specified must be either length of 1 or num_reacts.
    */
   case_indices?: CaseIndices;
 
   /**
-   * List of context features. for generative react, features used to condition the generated case
+   * List of context features. For generative react, features used to condition the generated case
    * @default []
    */
   context_features?: string[];
 
   /**
-   * 2d-list of context values. for generative react, values used to condition the generated case
-   * if specified must be either length of 1 or num_reacts. one list is used per individual reaction
+   * 2d-list of context values. For generative react, values used to condition the generated case
+   * if specified must be either length of 1 or num_reacts. One list is used per individual reaction
    */
   context_values?: any[][];
 
   /**
    * List of action features whose values should be computed from the resulting action prior to output, in the specified
-   *   order. must be a subset of action_features.
-   *   note: both of these derived feature lists rely on the features' "derived_feature_code" attribute to compute the values.
-   *   if 'derived_feature_code' attribute is undefined or references non-0 feature indices, the derived value will be null.
+   *   order. Must be a subset of action_features.
+   *   Note: both of these derived feature lists rely on the features' "derived_feature_code" attribute to compute the values.
+   *   If 'derived_feature_code' attribute is undefined or references non-0 feature indices, the derived value will be null.
    * @default []
    */
   derived_action_features?: string[];
 
   /**
    * List of context features whose values should be computed from the provided contexts in the specified order.
-   *   must be different than context_features.
+   *   Must be different than context_features.
    * @default []
    */
   derived_context_features?: string[];
 
   /**
-   * If null, will do a discriminative react. if specified, will do a generative react
-   *   for generative react, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
+   * If null, will do a discriminative react. If specified, will do a generative react
+   *   For Generative React, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
    *   larger values will increase the variance (or creativity) of the generated case from the existing model
    *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
    */
@@ -78,182 +78,182 @@ export type ReactRequest = {
   /**
    * An assoc of flags for which type of audit data to return, and corresponding values to return (if applicable) in the format of:
    *   (assoc
-   *     "influential_cases" true or false. if true outputs the most influential cases and their influence weights
+   *     "influential_cases" true or false. If true outputs the most influential cases and their influence weights
    *             based on the surprisal of each case relative to the context being predicted among the
-   *             cases. uses only the context features of the reacted case.
+   *             cases. Uses only the context features of the reacted case.
    *
-   *     "influential_cases_familiarity_convictions" true or false. if true outputs familiarity conviction of
+   *     "influential_cases_familiarity_convictions" true or false. If true outputs familiarity conviction of
    *             addition for each of the influential cases.
    *
-   *      "influential_cases_raw_weights" true or false. if true outputs the surprisal for each of the influential cases.
-   *             not applicable to generative reacts.
+   *      "influential_cases_raw_weights" true or false. If true outputs the surprisal for each of the influential cases.
+   *             Not applicable to generative reacts.
    *
-   *      "derivation_parameters" true or false. if true outputs the parameters used during the react. these parameters
+   *      "derivation_parameters" true or false. If true outputs the parameters used during the react. These parameters
    *             include k, p, distance_transform, feature_weights, feature_deviations, nominal_class_counts, and flags to indicate
    *              if deviations or inverse residual weighting were used.
    *
-   *      "hypothetical_values"  assoc context feature -> values. if specified, shows how a prediction could change
+   *      "hypothetical_values"  assoc context feature -> values. If specified, shows how a prediction could change
    *             in a what-if scenario where the influential cases' context feature values are replaced with
-   *             the specified values.  iterates over all influential cases, predicting the action features
-   *             for each one using the updated hypothetical values. outputs the predicted arithmetic
+   *             the specified values.  Iterates over all influential cases, predicting the action features
+   *             for each one using the updated hypothetical values. Outputs the predicted arithmetic
    *             average over the influential cases for each action feature.
    *
-   *      "most_similar_cases" true or false. if true outputs an automatically determined (when
+   *      "most_similar_cases" true or false. If true outputs an automatically determined (when
    *             'num_most_similar_cases' is not specified) relevant number of similar cases, which will
-   *             first include the influential cases. uses only the context features of the reacted case.
+   *             first include the influential cases. Uses only the context features of the reacted case.
    *
-   *      "num_most_similar_cases" integer. outputs this manually specified number of most similar cases, which will
+   *      "num_most_similar_cases" integer. Outputs this manually specified number of most similar cases, which will
    *             first include the influential cases.
    *
-   *      "num_most_similar_case_indices" integer. outputs the specified number of most similar case indices when
+   *      "num_most_similar_case_indices" integer. Outputs the specified number of most similar case indices when
    *             'distance_ratio' is also set to true.
    *
-   *      "boundary_cases" true or false. if true outputs an automatically determined (when 'num_boundary_cases' is
-   *             not specified) relevant number of boundary cases. uses both context and action features
+   *      "boundary_cases" true or false. If true outputs an automatically determined (when 'num_boundary_cases' is
+   *             not specified) relevant number of boundary cases. Uses both context and action features
    *             of the reacted case to determine the counterfactual boundary based on action features,
    *             which maximize the dissimilarity of action features while maximizing the similarity of
-   *             context features. if action features aren't specified, uses familarity conviction to
+   *             context features. If action features aren't specified, uses familarity conviction to
    *             determine the boundary instead.
    *
-   *      "num_boundary_cases" integer. outputs this manually specified number of boundary cases.
+   *      "num_boundary_cases" integer. Outputs this manually specified number of boundary cases.
    *
-   *      'boundary_cases_familiarity_convictions" true or false. if true outputs familiarity conviction of addition for
+   *      'boundary_cases_familiarity_convictions" true or false. If true outputs familiarity conviction of addition for
    *             each of the boundary cases when 'boundary_cases' is also set to true.
    *
-   *      "distance_ratio" true or false. if true outputs the ratio of distance (relative surprisal) between this
+   *      "distance_ratio" true or false. If true outputs the ratio of distance (relative surprisal) between this
    *             reacted case and its nearest case to the minimum distance (relative surprisal) in between
-   *             the closest two cases in the local area. all distances are computed using only the
+   *             the closest two cases in the local area. All distances are computed using only the
    *             specified context features.
    *
-   *      "distance_contribution" true of false. if true outputs the distance contribution (expected total surprisal
-   *             contribution) for the reacted case. uses both context and action feature values.
+   *      "distance_contribution" true of false. If true outputs the distance contribution (expected total surprisal
+   *             contribution) for the reacted case. Uses both context and action feature values.
    *
-   *      "similarity_conviction" true or false. if true outputs similarity conviction for the reacted case.
-   *             uses both context and action feature values as the case values for all computations. this is
+   *      "similarity_conviction" true or false. If true outputs similarity conviction for the reacted case.
+   *             Uses both context and action feature values as the case values for all computations. This is
    *             defined as expected (weighted-local) distance contribution / reacted case distance contribution.
    *
-   *      "outlying_feature_values" true or false. if true outputs the reacted case's context feature values that are
+   *      "outlying_feature_values" true or false. If true outputs the reacted case's context feature values that are
    *             outside the min or max of the corresponding feature values of all the cases in the local
-   *             model area. uses only the context features of the reacted case to determine that area.
+   *             model area. Uses only the context features of the reacted case to determine that area.
    *
-   *      "categorical_action_probabilities" true or false. if true outputs probabilities for each class for the action
-   *             features. applicable only to categorical action features. single_react_series calls additionally
+   *      "categorical_action_probabilities" true or false. If true outputs probabilities for each class for the action
+   *             features. Applicable only to categorical action features. single_react_series calls additionally
    *             output "aggregate_categorical_action_probabilities" for each series.
    *
-   *      "observational_errors" true or false. if true outputs observational errors for all features as defined
+   *      "observational_errors" true or false. If true outputs observational errors for all features as defined
    *             in feature attributes.
    *
-   *      "feature_residuals_robust" true or false. if true outputs feature residuals for all (context and action) features
-   *             locally around the prediction. uses only the context features of the reacted case to
-   *             determine that area. uses robust calculations, which uses uniform sampling from
+   *      "feature_residuals_robust" true or false. If true outputs feature residuals for all (context and action) features
+   *             locally around the prediction. Uses only the context features of the reacted case to
+   *             determine that area. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "feature_residuals_full" true or false. if true outputs feature residuals for all (context and action) features
-   *             locally around the prediction. uses only the context features of the reacted case to
-   *             determine that area. uses full calculations, which uses leave-one-out context features for computations.
+   *      "feature_residuals_full" true or false. If true outputs feature residuals for all (context and action) features
+   *             locally around the prediction. Uses only the context features of the reacted case to
+   *             determine that area. Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "prediction_stats" true or false. if true outputs full feature prediction stats for all (context and action)
-   *             features locally around the prediction. the stats eligible to be returned are ("r2", "rmse", "spearman_coeff",
-   *             "precision", "recall", "accuracy", "mcc", "confusion_matrix", "missing_value_accuracy"). confusion matrices
-   *             may also be returned by setting 'confusion_matrices' to true. uses only the context features of the
-   *             reacted case to determine that area. uses full calculations, which uses leave-one-out context features for
+   *      "prediction_stats" true or false. If true outputs full feature prediction stats for all (context and action)
+   *             features locally around the prediction. The stats eligible to be returned are ("r2", "rmse", "spearman_coeff",
+   *             "precision", "recall", "accuracy", "mcc", "confusion_matrix", "missing_value_accuracy"). Confusion matrices
+   *             may also be returned by setting 'confusion_matrices' to true. Uses only the context features of the
+   *             reacted case to determine that area. Uses full calculations, which uses leave-one-out context features for
    *             computations.
    *
-   *      "feature_mda_robust" true or false. if true outputs each context feature's robust mean decrease in accuracy of predicting
-   *             the action feature given the context. uses only the context features of the reacted
-   *             case to determine that area.  uses robust calculations, which uses uniform sampling from
+   *      "feature_mda_robust" true or false. If true outputs each context feature's robust mean decrease in accuracy of predicting
+   *             the action feature given the context. Uses only the context features of the reacted
+   *             case to determine that area.  Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "feature_mda_full" true or false. if true outputs each context feature's full mean decrease in accuracy of predicting
-   *             the action feature given the context. uses only the context features of the reacted
-   *             case to determine that area. uses full calculations, which uses leave-one-out context features for computations.
+   *      "feature_mda_full" true or false. If true outputs each context feature's full mean decrease in accuracy of predicting
+   *             the action feature given the context. Uses only the context features of the reacted
+   *             case to determine that area. Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "feature_mda_ex_post_robust" true or false. if true outputs each context feature's mean decrease in accuracy of
+   *      "feature_mda_ex_post_robust" true or false. If true outputs each context feature's mean decrease in accuracy of
    *             predicting the action feature as a detail given that the specified prediction was
-   *             already made as specified by the action value. uses both context and action features of
-   *             the reacted case to determine that area. uses robust calculations, which uses uniform sampling from
+   *             already made as specified by the action value. Uses both context and action features of
+   *             the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "feature_mda_ex_post_full" true or false. if true outputs each context feature's mean decrease in accuracy of
+   *      "feature_mda_ex_post_full" true or false. If true outputs each context feature's mean decrease in accuracy of
    *             predicting the action feature as a detail given that the specified prediction was
-   *             already made as specified by the action value. uses both context and action features of
-   *             the reacted case to determine that area. uses full calculations, which uses leave-one-out for features for computations.
+   *             already made as specified by the action value. Uses both context and action features of
+   *             the reacted case to determine that area. Uses full calculations, which uses leave-one-out for features for computations.
    *
-   *      "feature_contributions_robust" true or false. if true outputs each context feature's differences between the
+   *      "feature_contributions_robust" true or false. If true outputs each context feature's differences between the
    *             predicted action feature value and the predicted action feature value if each context
-   *             feature were not in the model for all context features in the local model area. outputs
+   *             feature were not in the model for all context features in the local model area. Outputs
    *             both 'feature_contributions' and non-absolute 'directional_feature_contributions'.
-   *              uses robust calculations, which uses uniform sampling from the power set of features as
+   *              Uses robust calculations, which uses uniform sampling from the power set of features as
    *             the contexts for predictions.
    *
-   *      "feature_contributions_full" true or false. if true outputs each context feature's differences between the
+   *      "feature_contributions_full" true or false. If true outputs each context feature's differences between the
    *             predicted action feature value and the predicted action feature value if each context
-   *             feature were not in the model for all context features in the local model area. outputs
+   *             feature were not in the model for all context features in the local model area. Outputs
    *             both 'feature_contributions' and non-absolute 'directional_feature_contributions'.
-   *             uses full calculations, which uses leave-one-out context features for computations.
+   *             Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "case_mda_robust" true or false. if true outputs each influential case's mean decrease in accuracy of predicting
+   *      "case_mda_robust" true or false. If true outputs each influential case's mean decrease in accuracy of predicting
    *             the action feature in the local model area, as if each individual case were included
-   *             versus not included. uses only the context features of the reacted case to determine
-   *             that area. uses robust calculations, which uses uniform sampling from the power set of all combinations of cases.
+   *             versus not included. Uses only the context features of the reacted case to determine
+   *             that area. Uses robust calculations, which uses uniform sampling from the power set of all combinations of cases.
    *
-   *      "case_mda_full" true or false. if true outputs each influential case's mean decrease in accuracy of predicting
+   *      "case_mda_full" true or false. If true outputs each influential case's mean decrease in accuracy of predicting
    *             the action feature in the local model area, as if each individual case were included
-   *             versus not included. uses only the context features of the reacted case to determine
-   *             that area. uses full calculations, which uses leave-one-out for cases for computations.
+   *             versus not included. Uses only the context features of the reacted case to determine
+   *             that area. Uses full calculations, which uses leave-one-out for cases for computations.
    *
-   *      "case_contributions_robust" true or false. if true outputs each influential case's differences between the
+   *      "case_contributions_robust" true or false. If true outputs each influential case's differences between the
    *             predicted action feature value and the predicted action feature value if each
-   *             individual case were not included. uses only the context features of the reacted case
-   *             to determine that area. uses robust calculations, which uses uniform sampling from the power set of all
+   *             individual case were not included. Uses only the context features of the reacted case
+   *             to determine that area. Uses robust calculations, which uses uniform sampling from the power set of all
    *             combinations of cases.
    *
-   *      "case_contributions_full" true or false. if true outputs each influential case's differences between the
+   *      "case_contributions_full" true or false. If true outputs each influential case's differences between the
    *             predicted action feature value and the predicted action feature value if each
-   *             individual case were not included. uses only the context features of the reacted case
-   *             to determine that area. uses full calculations, which uses leave-one-out for cases for computations.
+   *             individual case were not included. Uses only the context features of the reacted case
+   *             to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
    *
-   *      "case_feature_residuals_robust"  true or false. if true outputs feature residuals for all (context and action)
-   *             features for just the specified case. uses leave-one-out for each feature, while
+   *      "case_feature_residuals_robust"  true or false. If true outputs feature residuals for all (context and action)
+   *             features for just the specified case. Uses leave-one-out for each feature, while
    *             using the others to predict the left out feature with their corresponding values
-   *             from this case. uses robust calculations, which uses uniform sampling from
+   *             from this case. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "case_feature_residuals_full"  true or false. if true outputs feature residuals for all (context and action)
-   *             features for just the specified case. uses leave-one-out for each feature, while
+   *      "case_feature_residuals_full"  true or false. If true outputs feature residuals for all (context and action)
+   *             features for just the specified case. Uses leave-one-out for each feature, while
    *             using the others to predict the left out feature with their corresponding values
-   *             from this case. uses full calculations, which uses leave-one-out context features for computations.
+   *             from this case. Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "case_feature_contributions_robust" true or false. if true outputs each context feature's differences between the
+   *      "case_feature_contributions_robust" true or false. If true outputs each context feature's differences between the
    *             predicted action feature value and the predicted action feature value if each context
    *             feature were not in the model for all context features in this case, using only the
-   *             values from this specific case. uses robust calculations, which uses uniform sampling from
+   *             values from this specific case. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "case_feature_contributions_full" true or false. if true outputs each context feature's differences between the
+   *      "case_feature_contributions_full" true or false. If true outputs each context feature's differences between the
    *             predicted action feature value and the predicted action feature value if each context
    *             feature were not in the model for all context features in this case, using only the
-   *             values from this specific case. uses full calculations, which uses leave-one-out context features for computations.
+   *             values from this specific case. Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "num_robust_influence_samples_per_case" integer. specifies the number of robust samples to use for each case.
-   *             applicable only for computing robust feature contributions or robust case feature contributions.
-   *             when unspecified, defaults to 2000. higher values will take longer but provide more stable results.
+   *      "num_robust_influence_samples_per_case" integer. Specifies the number of robust samples to use for each case.
+   *             Applicable only for computing robust feature contributions or robust case feature contributions.
+   *             When unspecified, defaults to 2000. Higher values will take longer but provide more stable results.
    *
-   *      "case_feature_residual_convictions_robust" true or false. if true outputs this case's robust feature residual
-   *             convictions for the region around the prediction. uses only the context features of
-   *             the reacted case to determine that region. computed as: region feature residual / case feature residual.
-   *             uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
+   *      "case_feature_residual_convictions_robust" true or false. If true outputs this case's robust feature residual
+   *             convictions for the region around the prediction. Uses only the context features of
+   *             the reacted case to determine that region. Computed as: region feature residual / case feature residual.
+   *             Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
    *
-   *      "case_feature_residual_convictions_full" true or false. if true outputs this case's full feature residual
-   *             convictions for the region around the prediction. uses only the context features of
-   *             the reacted case to determine that region. computed as: region feature residual / case feature residual.
-   *             uses full calculations, which uses leave-one-out context features for computations.
+   *      "case_feature_residual_convictions_full" true or false. If true outputs this case's full feature residual
+   *             convictions for the region around the prediction. Uses only the context features of
+   *             the reacted case to determine that region. Computed as: region feature residual / case feature residual.
+   *             Uses full calculations, which uses leave-one-out context features for computations.
    *
    *         "features" list of features that specifies what features to calculate per-feature details for. (contributions, mda, residuals, etc)
-   *              when robust computations are false. this should generally preserve compute, but will not when computing details robustly.
+   *              when robust computations are False. This should generally preserve compute, but will not when computing details robustly.
    *
-   *         "generate_attempts" true or false. if true, outputs the total number of attempts to generate the unique case. only applicable for generative
-   *                        reacts. when used with reactseries, "series_generate_attempts" is also returned.
+   *         "generate_attempts" true or false. If true, outputs the total number of attempts to generate the unique case. Only applicable for generative
+   *                        reacts. When used with ReactSeries, "series_generate_attempts" is also returned.
    *   )
    */
   details?: ReactDetails;
@@ -261,7 +261,7 @@ export type ReactRequest = {
   /**
    * If true will exclude sensitive features whose values will be
    *   replaced after synthesis from uniqueness check.
-   *  only applicable when desired_conviction is specified.
+   *  Only applicable when desired_conviction is specified.
    * @default false
    */
   exclude_novel_nominals_from_uniqueness_check?: boolean;
@@ -277,7 +277,7 @@ export type ReactRequest = {
    *     to ensure that specified features' generated values stay in bounds
    *   for nominal features instead of min/max it's a set of allowed values, ie:
    *     allow_null - default is true, if true nulls may be generated per their distribution in the data
-   *  only used when desired_conviction is specified
+   *  Only used when desired_conviction is specified
    * @default {}
    */
   feature_bounds_map?: Record<string, FeatureBoundsMap>;
@@ -308,7 +308,7 @@ export type ReactRequest = {
   leave_case_out?: boolean;
 
   /**
-   * Distance to determine privacy cutoff. used to query the local minimum distance used in the distance ratio
+   * Distance to determine privacy cutoff. Used to query the local minimum distance used in the distance ratio
    *    accepted values:
    *      'max': the maximum local distance
    *      'min': the minimum local distance
@@ -337,13 +337,13 @@ export type ReactRequest = {
 
   /**
    * 2d-list of values corresponding to post_process_features that will be made available during the execution of post_process feature attributes.
-   * if specified must be either length of 1 or num_reacts. one list is used per individual reaction.
+   * if specified must be either length of 1 or num_reacts. One list is used per individual reaction.
    */
   post_process_values?: any[][];
 
   /**
    * List of features that will preserve their values from the case specified by case_indices, appending and
-   *   overwriting the specified context and context features as necessary.  for generative reacts, if case_indices isn't specified,
+   *   overwriting the specified context and context features as necessary.  For generative reacts, if case_indices isn't specified,
    *   will preserve feature values of a random case.
    * @default []
    */
@@ -355,20 +355,20 @@ export type ReactRequest = {
   rand_seed?: any[];
 
   /**
-   * Flag, default is true, only applicable if a substitution value map has been set. if set to false, will not substitute categorical feature values.
-   *  only used when desired_conviction is specified
+   * Flag, default is true, only applicable if a substitution value map has been set. If set to false, will not substitute categorical feature values.
+   *  Only used when desired_conviction is specified
    * @default true
    */
   substitute_output?: boolean;
 
   /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
-   *   if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
+   *   If a weight is missing, uses 1 as the weight. If unspecified, case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
 
   /**
-   * Flag, if false uses model feature residuals, if true recalculates regional model residuals. only used when desired_conviction is specified
+   * Flag, if false uses model feature residuals, if true recalculates regional model residuals. Only used when desired_conviction is specified
    * @default true
    */
   use_regional_model_residuals?: boolean;

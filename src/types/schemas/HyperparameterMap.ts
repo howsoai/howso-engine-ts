@@ -14,11 +14,11 @@ export type HyperparameterMap = {
    */
   derivedAutoAnalyzed?: boolean;
   /**
-   * The distance transform. used as an exponent to convert distance to influence before normalization.
+   * The distance transform. Used as an exponent to convert distance to influence before normalization.
    */
   dt: number;
   /**
-   * Internal map of features to their deviations. includes null deviations and sparse deviation matrices.
+   * Internal map of features to their deviations. Includes null deviations and sparse deviation matrices.
    */
   featureDeviations?: Record<string, any>;
   /**
@@ -50,7 +50,7 @@ export type HyperparameterMap = {
    */
   nullUncertainties?: Record<string, any>;
   /**
-   * The parameter of the lebesgue space.
+   * The parameter of the Lebesgue space.
    */
   p: number;
   /**

@@ -3,7 +3,7 @@
  *
  * SetInfluenceWeightThreshold
  *
- * Set the influence weight threshold for outputting only the k neighbors whose influence weight is <= to this threshold
+ * Set the influence weight threshold for outputting only the K neighbors whose influence weight is <= to this threshold
  * default value is 0.99
  */
 

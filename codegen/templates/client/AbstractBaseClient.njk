@@ -3,7 +3,7 @@
  * Generated via Howso Engine {{ version }}
  */
 import type { Session, Trainee } from "../engine";
-import type { ClientResponse, FeatureAttributesIndex } from "../types";
+import type { ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
@@ -12,7 +12,7 @@ import { type Logger, nullLogger } from "./utilities/logger";
 
 export interface ClientCache {
   trainee: Trainee;
-  feature_attributes?: FeatureAttributesIndex;
+  feature_attributes?: schemas.FeatureAttributesIndex;
 }
 
 export type ExecuteResponse<R = unknown> = {
@@ -161,10 +161,10 @@ export abstract class AbstractBaseClient {
   /** Begin a new Session. */
   public abstract beginSession(name?: string, metadata?: Record<string, any>): Promise<Session>;
 {% for label, def in labels | dictsort %}
-{% set requestName = "schemas." + label | pascalCase + "Request" %}
-{% set responseName = "schemas." + label | pascalCase + "Response" %}
+{%- set requestName = "schemas." + label | pascalCase + "Request" %}
+{%- set responseName = "schemas." + label | pascalCase + "Response" %}
   /**
-   * {{ def.description | capitalize | blockComment | safe | indent(2) }}
+   * {{ def.description | blockComment | safe | indent(2) }}
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.

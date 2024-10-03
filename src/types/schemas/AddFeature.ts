@@ -4,9 +4,9 @@
  * AddFeature
  *
  * Adds the specified feature on all cases for a trainee that match the specified condition. overwrites features that
- * if condition are not specified, adds feature for all cases and to the model.  if condition is an empty assoc, will not modify feature metadata in the model.
- * if feature attributes are passed in, will also set the model's feature attributes.
- * updates the accumulated data mass for the model proportional to the number of cases modified.
+ * If condition are not specified, adds feature for all cases and to the model.  If condition is an empty assoc, will not modify feature metadata in the model.
+ * If feature attributes are passed in, will also set the model's feature attributes.
+ * Updates the accumulated data mass for the model proportional to the number of cases modified.
  */
 import type { Condition } from "./Condition";
 import type { FeatureAttributes } from "./FeatureAttributes";
@@ -39,7 +39,7 @@ export type AddFeatureRequest = {
   feature: string;
 
   /**
-   * Assoc of feature specific attributes for this feature. if unspecified and conditions are not specified, will assume feature type as 'continuous'.
+   * Assoc of feature specific attributes for this feature. If unspecified and conditions are not specified, will assume feature type as 'continuous'.
    */
   feature_attributes?: FeatureAttributes;
 

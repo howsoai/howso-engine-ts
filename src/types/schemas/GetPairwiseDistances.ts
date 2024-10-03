@@ -4,7 +4,7 @@
  * GetPairwiseDistances
  *
  * Returns a list of computed distances between respective cases specified in either from_values or from_case_indices to to_values or to_case_indices.
- *  if one case is specified in any of the lists, all respective distances are computed to/from that one case.
+ *  If one case is specified in any of the lists, all respective distances are computed to/from that one case.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { UseCaseWeights } from "./UseCaseWeights";
@@ -16,7 +16,7 @@ export type GetPairwiseDistancesRequest = {
   action_feature?: string;
 
   /**
-   * Which features to use when computing pairwise distances. if unspecified uses all features.
+   * Which features to use when computing pairwise distances. If unspecified uses all features.
    */
   features?: string[];
 
@@ -28,7 +28,7 @@ export type GetPairwiseDistancesRequest = {
   from_case_indices?: CaseIndices;
 
   /**
-   * List of cases (lists of values), i.e., a 2d-list of values. either from_values or from_case_indices must be specified, not both.
+   * List of cases (lists of values), i.e., a 2d-list of values. Either from_values or from_case_indices must be specified, not both.
    *   if specified must be either length of 1 or match length of to_values or to_case_indices.
    * @default []
    */
@@ -42,14 +42,14 @@ export type GetPairwiseDistancesRequest = {
   to_case_indices?: CaseIndices;
 
   /**
-   * List of cases (lists of values), i.e., a 2d-list of values. either to_values or to_case_indices must be specified, not both.
+   * List of cases (lists of values), i.e., a 2d-list of values. Either to_values or to_case_indices must be specified, not both.
    *   if specified must be either length of 1 or match length of from_values or from_case_indices.
    * @default []
    */
   to_values?: any[][];
 
   /**
-   * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
+   * Flag, if set to true will scale influence weights by each case's weight_feature weight. If unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
