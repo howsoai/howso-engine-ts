@@ -23,12 +23,13 @@ This major change refactors the client and types for all Howso Engine operations
 - The client's `ClientOptions.libDir` property has been removed.
 - The client constructor now expects an instance of an `AbstractFileSystem` as its second parameter.
   A `BrowserFileSystem` and `NodeFileSystem` are provided for use in their respective environments.
-- The `train` method no longer batches requests to the Amalgam worker service automatically. Use `batchTrain` instead.
 - The `createTrainee` method no longer sets feature attributes. Call `setFeatureAttributes` manually instead
   (this also returns the updated object back).
+- The `Trainee` object returned from the client now provides all Trainee operation methods directly. Such as train, react, etc.
 - The `client/capabilities/*` interfaces have been removed.
 - The return value of all Trainee operations has been changed to be an object with properties:
   `payload` (this matches the previous return value format) and `warnings` (a list of warning messages, if applicable).
+- The `train` method no longer batches requests to the Amalgam worker service automatically. Use `Trainee.batchTrain` instead.
 - The `react` method now uses `context_values` instead of `context` and `action_values` instead of `actions`.
 - `local_*` react features have been removed. Use their unqualified versions instead.
 

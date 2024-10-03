@@ -85,13 +85,27 @@ import { type ClientOptions, HowsoWorkerClient, BrowserFileSystem } from "@howso
 const getClient = async (options?: ClientOptions): Promise<HowsoWorkerClient> => {
   const worker = new Worker(new URL("@/workers/AmalgamWorker", import.meta.url), { type: "module" });
   const fs = new BrowserFileSystem(worker);
-  const client = new HowsoWorkerClient(worker, fs, {
+  return await HowsoWorkerClient.create(worker, fs, {
     howsoUrl,
     migrationsUrl, // Optional, used for upgrading Trainees saved to disk.
     ...options,
   });
-  return client.setup();
 };
+```
+
+Once you have a client you can then start creating your Trainees:
+
+```ts
+const client: HowsoWorkerClient = getClient();
+const trainee = await client.createTrainee({ name: "MyTrainee" });
+await trainee.setFeatureAttributes({ feature_attributes });
+await trainee.batchTrain({ cases: dataset.data, columns: dataset.columns });
+await trainee.analyze();
+const { payload, warnings } = await trainee.react({
+  context_values: [[1, 2], [3, 4]],
+  context_features: ["a", "b"],
+  action_features: ["target"],
+});
 ```
 
 ## Publishing
