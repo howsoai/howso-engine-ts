@@ -549,9 +549,8 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     const trainee = await this.autoResolveTrainee(traineeId);
     const { cases = [], ...rest } = request;
 
-    // WASM builds are currently sensitive to large request sizes and may throw memory errors,
-    // so we cap it to a smaller size for now
-    const batchOptions: BatchOptions = { startSize: 50, limits: [1, 50] };
+    // Limit to 10,000 cases at once maximum
+    const batchOptions: BatchOptions = { startSize: 100, limits: [1, 10000] };
 
     let num_trained = 0;
     let status = null;
