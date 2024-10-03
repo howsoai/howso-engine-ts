@@ -23,7 +23,7 @@ export type ExportTraineeRequest = {
   /**
    * Name of trainee, reference for filename
    */
-  trainee?: string;
+  trainee: string;
 
   /**
    * Path to save the exported meta.json and exp.json files.

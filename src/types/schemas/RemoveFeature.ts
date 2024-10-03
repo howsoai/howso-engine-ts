@@ -28,9 +28,8 @@ export type RemoveFeatureRequest = {
 
   /**
    * The feature name to remove
-   * @default ""
    */
-  feature?: string;
+  feature: string;
 
   /**
    * The session id when this call is being made

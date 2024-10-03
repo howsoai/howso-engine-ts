@@ -10,5 +10,5 @@ export type SetTraineeIdRequest = {
   /**
    * A unique string identifier for the trainee
    */
-  trainee_id?: string;
+  trainee_id?: string | null;
 };

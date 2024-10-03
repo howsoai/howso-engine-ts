@@ -1,6 +1,7 @@
 /**
  * NOTE: This file is auto generated, do not modify manually.
  */
+export * from "./AblationThresholdMap";
 export * from "./AddFeature";
 export * from "./Analyze";
 export * from "./AppendToSeriesStore";
@@ -12,6 +13,7 @@ export * from "./CopySubtrainee";
 export * from "./CreateSubtrainee";
 export * from "./DeleteSession";
 export * from "./DeleteSubtrainee";
+export * from "./DesiredConviction";
 export * from "./EditCases";
 export * from "./EditHistory";
 export * from "./EditHistoryRecord";
@@ -71,3 +73,4 @@ export * from "./SingleReact";
 export * from "./SingleReactSeries";
 export * from "./Train";
 export * from "./UpgradeTrainee";
+export * from "./UseCaseWeights";

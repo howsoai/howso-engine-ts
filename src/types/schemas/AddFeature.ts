@@ -35,9 +35,8 @@ export type AddFeatureRequest = {
 
   /**
    * Name of feature to odd
-   * @default ""
    */
-  feature?: string;
+  feature: string;
 
   /**
    * Assoc of feature specific attributes for this feature. if unspecified and conditions are not specified, will assume feature type as 'continuous'.

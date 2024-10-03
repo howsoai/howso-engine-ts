@@ -5,6 +5,7 @@
  *
  * Analyzes the data to compute the appropriate statistics, uncertainties, and select parameters as appropriate.
  */
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type AnalyzeRequest = {
   /**
@@ -20,17 +21,20 @@ export type AnalyzeRequest = {
 
   /**
    * Flag, if set to true will skip the computation of feature residuals
+   * @default false
    */
   bypass_calculate_feature_residuals?: boolean;
 
   /**
    * Flag, if set to true will skip the computation of feature weights
+   * @default false
    */
   bypass_calculate_feature_weights?: boolean;
 
   /**
    * Flag, if true will not do any search over k, p, and dt parameters, but still may compute feature residuals
    *  depending on other parameters.
+   * @default false
    */
   bypass_hyperparameter_analysis?: boolean;
 
@@ -49,7 +53,7 @@ export type AnalyzeRequest = {
    * Whether to use inverse residuals as feature weights. if unspecified, inverse residuals will be used as weights for
    *  targetless params, otherwise this method will not be used.
    */
-  inverse_residuals_as_weights?: boolean;
+  inverse_residuals_as_weights?: boolean | null;
 
   /**
    * Number of cross validation folds to do. value of 1 does hold-one-out instead of k-fold
@@ -90,13 +94,13 @@ export type AnalyzeRequest = {
    * When true will scale influence weights by each case's weight_feature weight. if use_case_weights isn't specified, it will
    *   be true if auto ablation is enabled and false otherwise
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Whether to use deviations for lk metric in queries. when true forces the use
    *   of deviations, when false will not use deviations. if unspecified, the better performing option will be selected.
    */
-  use_deviations?: boolean;
+  use_deviations?: boolean | null;
 
   /**
    * Name of feature whose values to use as case weights

@@ -64,3 +64,8 @@ export type GetCasesRequest = {
    */
   skip_decoding?: number;
 };
+
+export type GetCasesResponse = {
+  cases?: any[][];
+  features?: string[];
+};

@@ -10,5 +10,5 @@ export type DeleteSessionRequest = {
   /**
    * Session to remove
    */
-  session?: string;
+  session: string;
 };

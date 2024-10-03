@@ -8,10 +8,12 @@
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
  */
 import type { CaseIndices } from "./CaseIndices";
+import type { DesiredConviction } from "./DesiredConviction";
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
 import type { GenerateNewCases } from "./GenerateNewCases";
 import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { ReactDetails } from "./ReactDetails";
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type ReactSeriesRequest = {
   /**
@@ -85,7 +87,7 @@ export type ReactSeriesRequest = {
    *   larger values will increase the variance (or creativity) of the generated case from the existing model
    *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
    */
-  desired_conviction?: number;
+  desired_conviction?: DesiredConviction;
 
   /**
    * See the description for the details parameter of #react
@@ -239,7 +241,7 @@ export type ReactSeriesRequest = {
   /**
    * Flag, whether to use case weights or not. if unspecified will automatically select based on cached parameters
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Flag, if false uses model feature residuals, if true recalculates regional model residuals.

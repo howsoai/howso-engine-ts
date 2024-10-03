@@ -5,6 +5,7 @@
  *
  * Computes various data, such as familiarity convictions and distance contribution for each case in the model and stores them into specified features.
  */
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type ReactIntoFeaturesRequest = {
   /**
@@ -56,7 +57,7 @@ export type ReactIntoFeaturesRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
    *   case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Name of feature whose values to use as case weights

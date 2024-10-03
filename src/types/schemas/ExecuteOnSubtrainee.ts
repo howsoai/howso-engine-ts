@@ -31,9 +31,8 @@ export type ExecuteOnSubtraineeRequest = {
 
   /**
    * Name of method to execute
-   * @default ""
    */
-  method?: string;
+  method: string;
 
   /**
    * Payload to pass to the method

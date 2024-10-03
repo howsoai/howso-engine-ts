@@ -16,5 +16,5 @@ export type EvaluateRequest = {
   /**
    * A assoc of feature names to custom code
    */
-  features_to_code_map?: Record<string, string>;
+  features_to_code_map: Record<string, string>;
 };

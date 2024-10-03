@@ -12,10 +12,10 @@ export type GetEntityPathByIdRequest = {
   /**
    * Unique id of trainee
    */
-  id?: string;
+  id: string;
 
   /**
    * List of strings, entity path to parent of trainee
    */
-  path?: string[];
+  path: string[];
 };

@@ -10,15 +10,15 @@ export type AppendToSeriesStoreRequest = {
   /**
    * List of context features for the corresponding context_values
    */
-  context_features?: string[];
+  context_features: string[];
 
   /**
    * List of lists. case values corresponding to the context features to store into a series.
    */
-  context_values?: any[][];
+  context_values: any[][];
 
   /**
    * Series id, the key for storing series of react cases
    */
-  series?: string;
+  series: string;
 };

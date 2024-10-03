@@ -7,6 +7,7 @@
  *  if one case is specified in any of the lists, all respective distances are computed to/from that one case.
  */
 import type { CaseIndices } from "./CaseIndices";
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type GetPairwiseDistancesRequest = {
   /**
@@ -51,7 +52,7 @@ export type GetPairwiseDistancesRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
    *   case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Name of feature whose values to use as case weights

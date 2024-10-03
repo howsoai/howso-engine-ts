@@ -30,9 +30,8 @@ export type TrainRequest = {
 
   /**
    * List of cases, ie a list of lists of values.
-   * @default []
    */
-  cases?: any[][];
+  cases: any[][];
 
   /**
    * List of features to derive in the specified order. if this list is not provided, features with
@@ -43,9 +42,8 @@ export type TrainRequest = {
 
   /**
    * The list of features.
-   * @default []
    */
-  features?: string[];
+  features: string[];
 
   /**
    * Flag, if set to true assumes provided categorical (nominal or ordinal) feature values already been substituted.

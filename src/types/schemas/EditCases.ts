@@ -38,15 +38,13 @@ export type EditCasesRequest = {
 
   /**
    * List of names of feature to edit
-   * @default []
    */
-  features?: string[];
+  features: string[];
 
   /**
    * List of values corresponding to features
-   * @default []
    */
-  feature_values?: any[];
+  feature_values: any[];
 
   /**
    * Limit on the number of cases to edit; if set to zero there will be no limit.

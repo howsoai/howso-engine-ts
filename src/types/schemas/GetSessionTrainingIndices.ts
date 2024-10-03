@@ -10,7 +10,6 @@
 export type GetSessionTrainingIndicesRequest = {
   /**
    * Id of session
-   * @default ""
    */
-  session?: string;
+  session: string;
 };

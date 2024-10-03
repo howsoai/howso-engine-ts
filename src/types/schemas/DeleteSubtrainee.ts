@@ -9,7 +9,6 @@
 export type DeleteSubtraineeRequest = {
   /**
    * Name path of trainee
-   * @default ""
    */
-  trainee?: string | any[];
+  trainee: string | any[];
 };

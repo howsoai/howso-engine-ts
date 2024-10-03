@@ -12,6 +12,7 @@
  *   "distance_contributions" (list 4.5 3.2)
  *  )
  */
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type ReactGroupRequest = {
   /**
@@ -53,9 +54,8 @@ export type ReactGroupRequest = {
   /**
    * A list of lists of lists of values corresponding to a list of sets of feature values, where the values are ordered corresponding to
    *   the features
-   * @default []
    */
-  new_cases?: any[][][];
+  new_cases: any[][][];
 
   /**
    * If true will output p value of addition
@@ -73,7 +73,7 @@ export type ReactGroupRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
    *    if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Name of feature whose values to use as case weights

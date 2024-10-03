@@ -10,16 +10,15 @@ export type GetExtremeCasesRequest = {
   /**
    * The features for which values should be returned
    */
-  features?: string[];
+  features: string[];
 
   /**
    * Number of cases to return, positive value will return the top (largest value), negative will return smallest
-   * @default 0
    */
-  num?: number;
+  num: number;
 
   /**
    * The feature for which to sort the cases by
    */
-  sort_feature?: string;
+  sort_feature: string;
 };

@@ -8,7 +8,7 @@
 
 export type SetRandomSeedRequest = {
   /**
-   * The value of the random seed to set on the trainee, defaults to a system-provided 64-bit random number
+   * The value of the random seed to set on the trainee, assigns a system-provided 64-bit random number if null is provided
    */
-  seed?: number | string;
+  seed?: number | string | null;
 };

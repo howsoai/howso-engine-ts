@@ -21,7 +21,7 @@ export type UpgradeTraineeRequest = {
   /**
    * Name of trainee to import and update
    */
-  trainee?: string;
+  trainee: string;
 
   /**
    * Path from which to load previously exported meta.json and exp.json files.

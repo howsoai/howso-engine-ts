@@ -20,5 +20,5 @@ export type RenameSubtraineeRequest = {
   /**
    * New name of child trainee
    */
-  new_name?: string;
+  new_name: string;
 };

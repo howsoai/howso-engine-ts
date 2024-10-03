@@ -31,7 +31,6 @@ export type CopySubtraineeRequest = {
 
   /**
    * Name of new copied trainee
-   * @default ""
    */
-  target_trainee?: string | any[];
+  target_trainee: string | any[];
 };

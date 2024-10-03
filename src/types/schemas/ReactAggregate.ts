@@ -7,6 +7,7 @@
  *  precision, recall, etc. returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
  */
 import type { ReactAggregateDetails } from "./ReactAggregateDetails";
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type ReactAggregateRequest = {
   /**
@@ -22,7 +23,7 @@ export type ReactAggregateRequest = {
   action_features?: string[];
 
   /**
-   * Number, optional, default is 10. applicable only to confusion matrices when computing residuals, the number of predictions
+   * Number, optional, default is 15. applicable only to confusion matrices when computing residuals, the number of predictions
    *   a class should have (value of a cell in the matrix) for it to remain in the confusion matrix. if the count is less than this value, it will
    *   be accumulated into a single value of all insignificant predictions for the class and removed from the confusion matrix.
    * @default 15
@@ -178,7 +179,7 @@ export type ReactAggregateRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
    *   case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Name of feature whose values to use as case weights

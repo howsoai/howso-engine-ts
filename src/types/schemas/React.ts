@@ -6,9 +6,11 @@
  * Run reacts in a batch, output a an assoc of list of outputs from each individual react.
  */
 import type { CaseIndices } from "./CaseIndices";
+import type { DesiredConviction } from "./DesiredConviction";
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
 import type { GenerateNewCases } from "./GenerateNewCases";
 import type { ReactDetails } from "./ReactDetails";
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type ReactRequest = {
   /**
@@ -71,7 +73,7 @@ export type ReactRequest = {
    *   larger values will increase the variance (or creativity) of the generated case from the existing model
    *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
    */
-  desired_conviction?: number;
+  desired_conviction?: DesiredConviction;
 
   /**
    * An assoc of flags for which type of audit data to return, and corresponding values to return (if applicable) in the format of:
@@ -363,7 +365,7 @@ export type ReactRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
    *   if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Flag, if false uses model feature residuals, if true recalculates regional model residuals. only used when desired_conviction is specified

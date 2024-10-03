@@ -5,6 +5,7 @@
  *
  * Computes the conviction for each feature and returns an assoc of feature -> conviction value
  */
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type GetFeatureConvictionRequest = {
   /**
@@ -41,7 +42,7 @@ export type GetFeatureConvictionRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
    *   case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Name of feature whose values to use as case weights

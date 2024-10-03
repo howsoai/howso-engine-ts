@@ -375,9 +375,9 @@ export abstract class AbstractBaseClient {
   public async getCases(
     traineeId: string,
     request: schemas.GetCasesRequest,
-  ): Promise<ClientResponse<shims.GetCasesResponse>> {
+  ): Promise<ClientResponse<schemas.GetCasesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<shims.GetCasesResponse>(trainee.id, "get_cases", request);
+    const response = await this.execute<schemas.GetCasesResponse>(trainee.id, "get_cases", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 

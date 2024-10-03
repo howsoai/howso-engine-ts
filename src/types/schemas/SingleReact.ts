@@ -14,10 +14,12 @@
  *     'influential_cases' : etc... }
  *   see api docs for documentation of all output properties
  */
+import type { DesiredConviction } from "./DesiredConviction";
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
 import type { GenerateNewCases } from "./GenerateNewCases";
 import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { ReactDetails } from "./ReactDetails";
+import type { UseCaseWeights } from "./UseCaseWeights";
 
 export type SingleReactRequest = {
   /**
@@ -79,7 +81,7 @@ export type SingleReactRequest = {
    *   larger values will increase the variance (or creativity) of the generated case from the existing model
    *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
    */
-  desired_conviction?: number;
+  desired_conviction?: DesiredConviction;
 
   /**
    * See the description of the details parameter of #react
@@ -188,7 +190,7 @@ export type SingleReactRequest = {
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
    *   if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
    */
-  use_case_weights?: boolean;
+  use_case_weights?: UseCaseWeights;
 
   /**
    * Flag, if false uses model feature residuals, if true recalculates regional model residuals. only used when desired_conviction is specified

@@ -160,7 +160,6 @@ export type SetFeatureAttributesRequest = {
    *           when true, universally excludes using any data with from the future from all series;
    *           this is applicable when time is globally relevant and there are events that may affect all time series.
    *           if there is any possibility of global relevancy of time, it is generally recommended to set this value to true, which is the default.
-   * @default {}
    */
-  feature_attributes?: FeatureAttributesIndex;
+  feature_attributes: FeatureAttributesIndex;
 };
