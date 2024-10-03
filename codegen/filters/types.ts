@@ -8,24 +8,34 @@ export function isArray(value: any) {
   return Array.isArray(value);
 }
 
-export function convertType(value: SchemaType) {
-  switch (value) {
+export function convertType(schema: SchemaType) {
+  let value: string;
+  switch (schema) {
     case "assoc":
-      return "object";
+      value = "Record<string, any>";
+      break;
     case "list":
-      return "any[]";
+      value = "any[]";
+      break;
     case "string":
-      return "string";
+      value = "string";
+      break;
     case "boolean":
-      return "boolean";
+      value = "boolean";
+      break;
     case "number":
-      return "number";
+      value = "number";
+      break;
     case "null":
-      return "null";
+      value = "null";
+      break;
     case "any":
-      return "any";
+      value = "any";
+      break;
     default:
-      console.warn(`Unexpected type received: ${value}`);
-      return "any";
+      console.warn(`Unexpected type received: ${schema}`);
+      value = "any";
   }
+
+  return this.env.filters.safe(value);
 }

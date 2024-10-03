@@ -10,5 +10,5 @@ export type DeleteSubtraineeRequest = {
   /**
    * Name path of trainee
    */
-  trainee: string | any[];
+  trainee: string | string[];
 };

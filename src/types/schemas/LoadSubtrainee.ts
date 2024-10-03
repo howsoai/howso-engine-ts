@@ -33,5 +33,5 @@ export type LoadSubtraineeRequest = {
    * Name path of trainee to load
    * @default ""
    */
-  trainee?: string | any[];
+  trainee?: string | string[];
 };

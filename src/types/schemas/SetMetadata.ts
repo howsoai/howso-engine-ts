@@ -10,5 +10,5 @@ export type SetMetadataRequest = {
   /**
    * Arbitary map of metadata to store in a trainee
    */
-  metadata: object | null;
+  metadata: Record<string, any> | null;
 };

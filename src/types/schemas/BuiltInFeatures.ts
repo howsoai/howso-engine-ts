@@ -17,7 +17,7 @@ export type BuiltInFeatures = {
   /**
    * The list of features that have been imputed for the case.
    */
-  ".imputed"?: any[] | null;
+  ".imputed"?: string[] | null;
   /**
    * The normalized influence of a case on a prediction.
    */

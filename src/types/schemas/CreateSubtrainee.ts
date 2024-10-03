@@ -16,7 +16,7 @@ export type CreateSubtraineeRequest = {
    * Name of trainee to create
    * @default ""
    */
-  trainee?: string | any[];
+  trainee?: string | string[];
 
   /**
    * Unique id for trainee

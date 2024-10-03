@@ -29,7 +29,7 @@ export type SaveSubtraineeRequest = {
    * Trainee instance name path to store
    * @default ""
    */
-  trainee?: string | any[];
+  trainee?: string | string[];
 
   /**
    * Unique id for trainee. must be provided if trainee does not have one already specified.

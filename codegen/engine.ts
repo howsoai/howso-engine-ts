@@ -106,7 +106,7 @@ export function isSchema(value: SchemaType | Schema | Ref | null | undefined): v
   if (value == null || Array.isArray(value) || typeof value === "string") {
     return false;
   }
-  return !isRef(value) && "type" in value && typeof value.type === "string";
+  return !isRef(value) && "type" in value && (typeof value.type === "string" || Array.isArray(value.type));
 }
 
 export function isSchemaOrRef(value: SchemaType | Schema | Ref | boolean | null | undefined): value is Schema | Ref {
