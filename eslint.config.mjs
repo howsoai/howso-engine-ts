@@ -2,11 +2,11 @@
 
 import eslint from "@eslint/js";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
-import tseslint from "typescript-eslint";
+import tsEslint from "typescript-eslint";
 
-export default tseslint.config(
+export default tsEslint.config(
   eslint.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...tsEslint.configs.recommended,
   eslintPluginPrettierRecommended,
   {
     languageOptions: {
@@ -18,7 +18,21 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/no-empty-object-type": "warn",
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
+      ],
     },
+  },
+  {
+    files: ["**/*.js"],
+    ...tsEslint.configs.disableTypeChecked,
+  },
+  {
+    ignores: ["codegen/build/**/*"],
   },
 );

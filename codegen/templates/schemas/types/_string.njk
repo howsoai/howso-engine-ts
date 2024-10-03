@@ -1,0 +1,7 @@
+{%- if schema.enum -%}
+    {%- for item in schema.enum -%}
+"{{ item }}"{% if not loop.last %} | {% endif %}
+    {%- endfor -%}
+{%- else -%}
+string
+{%- endif -%}

@@ -49,6 +49,7 @@ This process can be CPU intensive, you are encouraged to use a web `Worker` if r
 #### Through a web Worker
 
 ```ts
+// @/workers/AmalgamWorker
 import { AmalgamWasmService, initRuntime } from "@howso/amalgam-lang";
 import wasmDataUri from "@howso/amalgam-lang/lib/amalgam-st.data?url";
 import wasmUri from "@howso/amalgam-lang/lib/amalgam-st.wasm?url";
@@ -77,15 +78,16 @@ import wasmUri from "@howso/amalgam-lang/lib/amalgam-st.wasm?url";
 You can then create the worker client using a url import:
 
 ```ts
-import howsoUrl from "@/data/engine/howso.caml?url";
-import migrationsUrl from "@/data/engine/migrations.caml?url";
-import { type ClientOptions, Trainee, WasmClient } from "@howso/engine";
+import howsoUrl from "@howso/engine/lib/howso.caml?url";
+import migrationsUrl from "@howso/engine/lib/migrations.caml?url";
+import { type ClientOptions, HowsoWorkerClient, BrowserFileSystem } from "@howso/engine";
 
-const getClient = async (): Promise<WasmClient> => {
+const getClient = async (options?: ClientOptions): Promise<HowsoWorkerClient> => {
   const worker = new Worker(new URL("@/workers/AmalgamWorker", import.meta.url), { type: "module" });
-  const client = new WasmClient(worker, {
+  const fs = new BrowserFileSystem(worker);
+  const client = new HowsoWorkerClient(worker, fs, {
     howsoUrl,
-    migrationsUrl,
+    migrationsUrl, // Optional, used for upgrading Trainees saved to disk.
     ...options,
   });
   return client.setup();

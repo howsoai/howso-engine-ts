@@ -1,0 +1,48 @@
+{%- macro field(schema, type=null) %}
+{%- if not type %}
+    {%- if schema | isString or schema | isArray %}
+        {%- set type = schema %}
+    {%- else %}
+        {%- set type = schema.type %}
+    {%- endif %}
+{%- endif %}
+{%- if type | isArray %}
+    {%- for item in type -%}
+{{ field(schema, item) }}{% if not loop.last %} | {% endif %}
+    {%- endfor %}
+{%- else %}
+    {%- if schema | isRef -%}
+{{ schema.ref }}
+    {%- elif schema | isSchema -%}
+        {%- if type == "assoc" -%}
+{% include "schemas/types/_assoc.njk" %}
+        {%- elif type == "list" -%}
+{% include "schemas/types/_list.njk" %}
+        {%- elif type == "string" -%}
+{% include "schemas/types/_string.njk" %}
+        {%- elif type == "number" -%}
+{% include "schemas/types/_number.njk" %}
+        {%- elif type == "boolean" -%}
+boolean
+        {%- elif type == "null" -%}
+null
+        {%- else -%}
+any
+        {%- endif -%}
+    {%- else -%}
+{{ type | convertType }}
+    {%- endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+
+{%- macro comment(schema) %}
+{%- if schema.description %}
+/**
+ * {{ schema.description | capitalize | blockComment | safe }}
+{%- if schema.default != null %}
+ * @default {{ schema.default | toJson | safe }}
+{%- endif %}
+ */
+{%- endif %}
+{%- endmacro %}

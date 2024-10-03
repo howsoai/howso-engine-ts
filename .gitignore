@@ -121,3 +121,6 @@ Desktop.ini
 # Node
 **/node_modules
 *.tgz
+
+# Rollup
+.rollup.cache

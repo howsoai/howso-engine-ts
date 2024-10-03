@@ -1,4 +1,4 @@
-import { ProblemError } from "../client/errors";
+import { HowsoError } from "../client/errors";
 import type { FeatureAttributesIndex } from "../types";
 import {
   AbstractDataType,
@@ -25,7 +25,7 @@ export const getFeatureAttributesInferrer = (
     case "parsed_array":
       return new InferFeatureAttributesFromParsedArray(data as ParsedArrayData);
     default:
-      throw new ProblemError("Unexpected data format.");
+      throw new HowsoError("Unexpected data format.");
   }
 };
 

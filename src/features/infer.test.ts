@@ -31,7 +31,7 @@ const expectFeatureAttributeBounds = (attributes: FeatureAttributes) => {
   expect(typeof attributes.bounds.allow_null).toBe("boolean");
   if (attributes.bounds.min && attributes.bounds.max) {
     if (typeof attributes.bounds.min === "number") {
-      expect(attributes.bounds.min).toBeLessThan(attributes.bounds.max);
+      expect(attributes.bounds.min).toBeLessThan(attributes.bounds.max as number);
     }
     if (attributes.data_type === "formatted_date_time") {
       expect(new Date(attributes.bounds.min).getTime()).toBeLessThan(new Date(attributes.bounds.max).getTime());

@@ -1,5 +1,6 @@
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
+import copy from "rollup-plugin-copy";
 import pkg from "./package.json" with { type: "json" };
 
 /**
@@ -13,9 +14,18 @@ export default {
       noEmitOnError: true,
       tsconfig: "./tsconfig.build.json",
     }),
+    copy({
+      targets: [
+        {
+          src: ["src/assets/howso.caml", "src/assets/migrations.caml"],
+          dest: "lib",
+        },
+      ],
+    }),
     terser(), // minifies generated bundles
   ],
   external: [
+    "node:fs/promises",
     ...Object.keys(pkg.dependencies || {}),
     ...Object.keys(pkg.peerDependencies || {}),
     ...Object.keys(pkg.optionalDependencies || {}),

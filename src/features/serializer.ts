@@ -1,4 +1,4 @@
-import { ProblemError } from "../client/errors";
+import { HowsoError } from "../client/errors";
 import type { FeatureAttributes } from "../types";
 import {
   AbstractDataType,
@@ -38,7 +38,7 @@ export function getFeatureSerializer(format: FeatureSourceFormat): FeatureSerial
       svc = new FeatureSerializerParsedArrayData();
       break;
     default:
-      throw new ProblemError("Unexpected data format.");
+      throw new HowsoError("Unexpected data format.");
   }
   return svc;
 }
