@@ -4,6 +4,9 @@
  * EditHistoryRecord
  */
 
+/**
+ * A record of a single edit that was made to a feature of a case.
+ */
 export type EditHistoryRecord = {
   /**
    * The feature that was modified.

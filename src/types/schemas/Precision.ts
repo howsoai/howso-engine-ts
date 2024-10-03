@@ -4,4 +4,7 @@
  * Precision
  */
 
+/**
+ * Exact matching or fuzzy matching.
+ */
 export type Precision = "exact" | "similar";

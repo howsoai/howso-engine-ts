@@ -1,4 +1,5 @@
 {%- include "schemas/_header.njk" %}
-{%- from "schemas/_macros.njk" import field %}
+{%- from "schemas/_macros.njk" import field, comment %}
 
+{{ comment(schema) }}
 export type {{ name | pascalCase }} = {{ field(schema) }};

@@ -4,6 +4,9 @@
  * FeatureBoundsMap
  */
 
+/**
+ * A map defining any feature bounds, allowed values, and constraints.
+ */
 export type FeatureBoundsMap = {
   /**
    * Explicitly allowed values to be output.

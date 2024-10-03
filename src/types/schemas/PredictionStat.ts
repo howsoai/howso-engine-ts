@@ -4,6 +4,9 @@
  * PredictionStat
  */
 
+/**
+ * Types of prediction statistics.
+ */
 export type PredictionStat =
   | "mae"
   | "confusion_matrix"

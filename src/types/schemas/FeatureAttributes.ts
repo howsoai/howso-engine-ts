@@ -5,6 +5,9 @@
  */
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
 
+/**
+ * The mapping of attributes for a single feature
+ */
 export type FeatureAttributes = {
   /**
    * Derive feature by creating two new continuous features: `.series_progress` and `.series_progress_delta`. series progress values range from 0 to 1.0 for each case in the series. series progress delta values are the delta value of the progress for each case. both of these features are used to determine when to stop series synthesis.
