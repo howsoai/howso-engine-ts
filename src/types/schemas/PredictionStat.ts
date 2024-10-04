@@ -12,6 +12,8 @@ export type PredictionStat =
   | "confusion_matrix"
   | "r2"
   | "rmse"
+  | "adjusted_smape"
+  | "smape"
   | "spearman_coeff"
   | "precision"
   | "recall"

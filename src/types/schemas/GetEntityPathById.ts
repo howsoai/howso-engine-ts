@@ -19,3 +19,5 @@ export type GetEntityPathByIdRequest = {
    */
   path: string[];
 };
+
+export type GetEntityPathByIdResponse = string[] | string | null;

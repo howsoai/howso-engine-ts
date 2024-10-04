@@ -23,3 +23,14 @@ export type CreateSubtraineeRequest = {
    */
   trainee_id?: string;
 };
+
+export type CreateSubtraineeResponse = {
+  /**
+   * The ID of the resulting trainee that was created.
+   */
+  id?: string;
+  /**
+   * The name of the resulting trainee that was created.
+   */
+  name?: string;
+};

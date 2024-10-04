@@ -50,3 +50,5 @@ export type GetFeatureConvictionRequest = {
    */
   weight_feature?: string;
 };
+
+export type GetFeatureConvictionResponse = Record<string, number>;

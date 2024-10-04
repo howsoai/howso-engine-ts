@@ -4,12 +4,6 @@
  * GetDistances
  *
  * Returns an assoc with case distances, containing a list of case session indices and a list of lists (matrix) of the computed distances.
- *  in the following format:
- *  {
- *   'column_case_indices' : [ session-indices ],
- *   'row_case_indices' : [ session-indices ],
- *   'distances': [ [ pairwise distances ] ]
- *  }
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { UseCaseWeights } from "./UseCaseWeights";
@@ -70,4 +64,19 @@ export type GetDistancesRequest = {
    * @default ".case_weight"
    */
   weight_feature?: string;
+};
+
+export type GetDistancesResponse = {
+  /**
+   * The case indices of the cases represented by the columns of the distance matrix.
+   */
+  column_case_indices?: CaseIndices;
+  /**
+   * The case indices of the cases represented by the columns of the distance matrix.
+   */
+  distances?: number[][];
+  /**
+   * The case indices of the cases represented by the columns of the distance matrix.
+   */
+  row_case_indices?: CaseIndices;
 };

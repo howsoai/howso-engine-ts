@@ -12,3 +12,5 @@ export type GetSessionMetadataRequest = {
    */
   session: string;
 };
+
+export type GetSessionMetadataResponse = Record<string, any> | null;

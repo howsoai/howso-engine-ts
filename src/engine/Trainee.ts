@@ -17,6 +17,7 @@ export class Trainee implements BaseTrainee {
   protected _name: BaseTrainee["name"];
   protected _persistence: BaseTrainee["persistence"];
   protected _metadata: BaseTrainee["metadata"];
+  protected _deleted = false;
 
   constructor(client: AbstractBaseClient, obj: BaseTrainee) {
     this.client = client;
@@ -36,6 +37,38 @@ export class Trainee implements BaseTrainee {
 
   public get metadata(): Readonly<{ [key: string]: any }> {
     return this._metadata || {};
+  }
+
+  public get isDeleted(): boolean {
+    return this._deleted;
+  }
+
+  public async update(properties: Partial<BaseTrainee>): Promise<void> {
+    const trainee = await this.client.updateTrainee({ ...properties, id: this.id });
+    this._name = trainee.name;
+    this._metadata = trainee.metadata;
+    this._persistence = trainee.persistence;
+  }
+
+  public async delete(): Promise<void> {
+    await this.client.deleteTrainee(this.id);
+    this._deleted = true;
+  }
+
+  public async copy(name?: string): Promise<Trainee> {
+    return await this.client.copyTrainee(this.id, name);
+  }
+
+  public async acquireResources(): Promise<void> {
+    return await this.client.acquireTraineeResources(this.id);
+  }
+
+  public async releaseResources(): Promise<void> {
+    return await this.client.releaseTraineeResources(this.id);
+  }
+
+  public async persist(): Promise<void> {
+    await this.client.persistTrainee(this.id);
   }
 
   /**
@@ -244,12 +277,6 @@ export class Trainee implements BaseTrainee {
 
   /**
    * Returns an assoc with case distances, containing a list of case session indices and a list of lists (matrix) of the computed distances.
-   *  in the following format:
-   *  {
-   *   'column_case_indices' : [ session-indices ],
-   *   'row_case_indices' : [ session-indices ],
-   *   'distances': [ [ pairwise distances ] ]
-   *  }
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.

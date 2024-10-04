@@ -13,3 +13,5 @@ export type GetSessionIndicesRequest = {
    */
   session: string;
 };
+
+export type GetSessionIndicesResponse = number[];

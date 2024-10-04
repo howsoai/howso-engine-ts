@@ -13,3 +13,10 @@ export type GetSessionsRequest = {
    */
   attributes?: string[];
 };
+
+export type GetSessionsResponse = ({
+  /**
+   * The session ID
+   */
+  id?: string;
+} & Record<string, any>)[];

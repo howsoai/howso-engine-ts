@@ -1,6 +1,6 @@
 {%- include "schemas/_header.njk" %}
 {%- from "schemas/_macros.njk" import field, comment %}
-{% if parameters %}
+{% if parameters | length %}
 export type {{ name }}Request = {
 {%- for key, schema in parameters | dictsort -%}
   {{ comment(schema) | indent(2) }}

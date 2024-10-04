@@ -3,7 +3,7 @@
  * Generated via Howso Engine {{ version }}
  */
 import type { Session, Trainee } from "../engine";
-import type { ClientResponse } from "../types";
+import type { BaseTrainee, ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
@@ -126,7 +126,7 @@ export abstract class AbstractBaseClient {
   public abstract createTrainee(properties: Omit<Trainee, "id">): Promise<Trainee>;
 
   /** Update an existing Trainee. */
-  public abstract updateTrainee(trainee: Trainee): Promise<Trainee>;
+  public abstract updateTrainee(trainee: BaseTrainee): Promise<Trainee>;
 
   /** Copy an existing Trainee. */
   public abstract copyTrainee(traineeId: string, name?: string): Promise<Trainee>;
@@ -169,9 +169,9 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async {{ label | camelCase }}(traineeId: string{% if def.parameters %}, request: {{ requestName }}{% endif %}): Promise<ClientResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
+  public async {{ label | camelCase }}(traineeId: string{% if def.parameters | length %}, request: {{ requestName }}{% endif %}): Promise<ClientResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>(trainee.id, "{{ label }}", {% if def.parameters %}request{% else %}{}{% endif %});
+    const response = await this.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>(trainee.id, "{{ label }}", {% if def.parameters | length %}request{% else %}{}{% endif %});
     {%- if not def.read_only %}
     this.autoPersistTrainee(trainee.id);
     {%- endif %}

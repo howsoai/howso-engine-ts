@@ -3,7 +3,7 @@
  * Generated via Howso Engine 86.1.0+alpha
  */
 import type { Session, Trainee } from "../engine";
-import type { ClientResponse } from "../types";
+import type { BaseTrainee, ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
 import type * as shims from "../types/shims";
 import { DEFAULT_ERROR_MESSAGE, HowsoError, HowsoValidationError } from "./errors";
@@ -126,7 +126,7 @@ export abstract class AbstractBaseClient {
   public abstract createTrainee(properties: Omit<Trainee, "id">): Promise<Trainee>;
 
   /** Update an existing Trainee. */
-  public abstract updateTrainee(trainee: Trainee): Promise<Trainee>;
+  public abstract updateTrainee(trainee: BaseTrainee): Promise<Trainee>;
 
   /** Copy an existing Trainee. */
   public abstract copyTrainee(traineeId: string, name?: string): Promise<Trainee>;
@@ -257,9 +257,9 @@ export abstract class AbstractBaseClient {
   public async createSubtrainee(
     traineeId: string,
     request: schemas.CreateSubtraineeRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.CreateSubtraineeResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "create_subtrainee", request);
+    const response = await this.execute<schemas.CreateSubtraineeResponse>(trainee.id, "create_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -316,9 +316,12 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async evaluate(traineeId: string, request: schemas.EvaluateRequest): Promise<ClientResponse<any>> {
+  public async evaluate(
+    traineeId: string,
+    request: schemas.EvaluateRequest,
+  ): Promise<ClientResponse<schemas.EvaluateResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "evaluate", request);
+    const response = await this.execute<schemas.EvaluateResponse>(trainee.id, "evaluate", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -331,9 +334,13 @@ export abstract class AbstractBaseClient {
   public async executeOnSubtrainee(
     traineeId: string,
     request: schemas.ExecuteOnSubtraineeRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.ExecuteOnSubtraineeResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "execute_on_subtrainee", request);
+    const response = await this.execute<schemas.ExecuteOnSubtraineeResponse>(
+      trainee.id,
+      "execute_on_subtrainee",
+      request,
+    );
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -383,19 +390,16 @@ export abstract class AbstractBaseClient {
 
   /**
    * Returns an assoc with case distances, containing a list of case session indices and a list of lists (matrix) of the computed distances.
-   *  in the following format:
-   *  {
-   *   'column_case_indices' : [ session-indices ],
-   *   'row_case_indices' : [ session-indices ],
-   *   'distances': [ [ pairwise distances ] ]
-   *  }
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getDistances(traineeId: string, request: schemas.GetDistancesRequest): Promise<ClientResponse<any>> {
+  public async getDistances(
+    traineeId: string,
+    request: schemas.GetDistancesRequest,
+  ): Promise<ClientResponse<schemas.GetDistancesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_distances", request);
+    const response = await this.execute<schemas.GetDistancesResponse>(trainee.id, "get_distances", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -410,9 +414,13 @@ export abstract class AbstractBaseClient {
   public async getEntityPathById(
     traineeId: string,
     request: schemas.GetEntityPathByIdRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetEntityPathByIdResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_entity_path_by_id", request);
+    const response = await this.execute<schemas.GetEntityPathByIdResponse>(
+      trainee.id,
+      "get_entity_path_by_id",
+      request,
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -437,9 +445,9 @@ export abstract class AbstractBaseClient {
   public async getExtremeCases(
     traineeId: string,
     request: schemas.GetExtremeCasesRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetExtremeCasesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_extreme_cases", request);
+    const response = await this.execute<schemas.GetExtremeCasesResponse>(trainee.id, "get_extreme_cases", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -465,9 +473,13 @@ export abstract class AbstractBaseClient {
   public async getFeatureConviction(
     traineeId: string,
     request: schemas.GetFeatureConvictionRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetFeatureConvictionResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_feature_conviction", request);
+    const response = await this.execute<schemas.GetFeatureConvictionResponse>(
+      trainee.id,
+      "get_feature_conviction",
+      request,
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -478,9 +490,9 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getHierarchy(traineeId: string): Promise<ClientResponse<any>> {
+  public async getHierarchy(traineeId: string): Promise<ClientResponse<schemas.GetHierarchyResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_hierarchy", {});
+    const response = await this.execute<schemas.GetHierarchyResponse>(trainee.id, "get_hierarchy", {});
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -519,9 +531,9 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getNumTrainingCases(traineeId: string): Promise<ClientResponse<any>> {
+  public async getNumTrainingCases(traineeId: string): Promise<ClientResponse<schemas.GetNumTrainingCasesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_num_training_cases", {});
+    const response = await this.execute<schemas.GetNumTrainingCasesResponse>(trainee.id, "get_num_training_cases", {});
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -535,9 +547,13 @@ export abstract class AbstractBaseClient {
   public async getPairwiseDistances(
     traineeId: string,
     request: schemas.GetPairwiseDistancesRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetPairwiseDistancesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_pairwise_distances", request);
+    const response = await this.execute<schemas.GetPairwiseDistancesResponse>(
+      trainee.id,
+      "get_pairwise_distances",
+      request,
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -575,9 +591,12 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSessions(traineeId: string, request: schemas.GetSessionsRequest): Promise<ClientResponse<any>> {
+  public async getSessions(
+    traineeId: string,
+    request: schemas.GetSessionsRequest,
+  ): Promise<ClientResponse<schemas.GetSessionsResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_sessions", request);
+    const response = await this.execute<schemas.GetSessionsResponse>(trainee.id, "get_sessions", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -591,9 +610,9 @@ export abstract class AbstractBaseClient {
   public async getSessionIndices(
     traineeId: string,
     request: schemas.GetSessionIndicesRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetSessionIndicesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_session_indices", request);
+    const response = await this.execute<schemas.GetSessionIndicesResponse>(trainee.id, "get_session_indices", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -606,9 +625,13 @@ export abstract class AbstractBaseClient {
   public async getSessionMetadata(
     traineeId: string,
     request: schemas.GetSessionMetadataRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetSessionMetadataResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_session_metadata", request);
+    const response = await this.execute<schemas.GetSessionMetadataResponse>(
+      trainee.id,
+      "get_session_metadata",
+      request,
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -622,9 +645,13 @@ export abstract class AbstractBaseClient {
   public async getSessionTrainingIndices(
     traineeId: string,
     request: schemas.GetSessionTrainingIndicesRequest,
-  ): Promise<ClientResponse<any>> {
+  ): Promise<ClientResponse<schemas.GetSessionTrainingIndicesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_session_training_indices", request);
+    const response = await this.execute<schemas.GetSessionTrainingIndicesResponse>(
+      trainee.id,
+      "get_session_training_indices",
+      request,
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
