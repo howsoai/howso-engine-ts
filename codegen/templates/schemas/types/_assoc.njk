@@ -9,11 +9,6 @@
     {%- if schema.additional_indices %}
   & Record<string, {{ field(schema.additional_indices) }}>
     {%- endif %}
-    {%- if schema.dynamic_indices %}
-      {%- for dynamic_key, dynamic_value in schema.dynamic_indices | dictsort %}
-  & Record<`{{ dynamic_key }}`, {{ field(dynamic_value) }}>
-      {%- endfor %}
-    {%- endif %}
 {%- elif schema.additional_indices -%}
 Record<string, {{ field(schema.additional_indices) }}>
 {%- else -%}

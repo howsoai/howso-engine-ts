@@ -46,6 +46,4 @@ export type BuiltInFeatures = {
    * The 0-based index of the case's order in training within its session.
    */
   ".session_training_index"?: number;
-} & Record<`${string}_delta_${number}`, number | null> &
-  Record<`${string}_lag_${number}`, any> &
-  Record<`${string}_rate_${number}`, number | null>;
+};
