@@ -25,6 +25,7 @@ export * from "./FeatureAttributesIndex";
 export * from "./FeatureBoundsMap";
 export * from "./FullHyperparameterMap";
 export * from "./GenerateNewCases";
+export * from "./GetAutoAblationParams";
 export * from "./GetCases";
 export * from "./GetDistances";
 export * from "./GetEntityPathById";

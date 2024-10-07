@@ -73,3 +73,7 @@ export type MoveCasesRequest = {
    */
   target_name_path?: string[];
 };
+
+export type MoveCasesResponse = {
+  count?: number;
+};

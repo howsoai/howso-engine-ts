@@ -67,3 +67,10 @@ export type ReduceDataRequest = {
    */
   skip_auto_analyze?: boolean;
 };
+
+export type ReduceDataResponse = {
+  /**
+   * A map of threshold-type (abs, relative, or delta) to map of metric to map of feature name to boolean. Indicating what thresholds were met to trigger the end of data reduction.
+   */
+  threshold_info?: Record<string, Record<string, Record<string, boolean>>>;
+};

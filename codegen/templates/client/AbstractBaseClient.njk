@@ -161,8 +161,12 @@ export abstract class AbstractBaseClient {
   /** Begin a new Session. */
   public abstract beginSession(name?: string, metadata?: Record<string, any>): Promise<Session>;
 {% for label, def in labels | dictsort %}
-{%- set requestName = "schemas." + label | pascalCase + "Request" %}
-{%- set responseName = "schemas." + label | pascalCase + "Response" %}
+  {%- set requestName = "schemas." + label | pascalCase + "Request" %}
+  {%- if def.returns | isRef %}
+    {%- set responseName = "schemas." + def.returns.ref %}
+  {%- else %}
+    {%- set responseName = "schemas." + label | pascalCase + "Response" %}
+  {%- endif %}
   /**
    * {{ def.description | blockComment | safe | indent(2) }}
    * @param traineeId The Trainee identifier.

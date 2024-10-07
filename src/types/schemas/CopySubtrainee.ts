@@ -34,3 +34,7 @@ export type CopySubtraineeRequest = {
    */
   target_trainee: string | string[];
 };
+
+export type CopySubtraineeResponse = {
+  name?: string;
+};

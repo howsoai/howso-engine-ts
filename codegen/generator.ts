@@ -43,15 +43,10 @@ export class Generator {
     // Temporary shims until return values are defined
     this.responseShims = {
       analyze: "null",
-      get_cases: "shims.GetCasesResponse",
-      get_feature_attributes: "schemas.FeatureAttributesIndex",
-      set_feature_attributes: "schemas.FeatureAttributesIndex",
       get_marginal_stats: "shims.GetMarginalStatsResponse",
-      get_params: "shims.GetParamsResponse",
       react: "shims.ReactResponse",
       react_aggregate: "shims.ReactAggregateResponse",
       react_into_features: "null",
-      train: "shims.TrainResponse",
     };
 
     // Setup template engine
@@ -111,7 +106,8 @@ export class Generator {
     for (const [label, definition] of Object.entries(this.doc.labels)) {
       if (this.ignoredLabels.includes(label) || definition.attribute) continue;
       // Add schemas for label parameters and/or return value if it has any
-      if (definition.parameters != null || definition.returns != null) {
+      // For returns that are just a Ref, ignore them as they can already be referenced directly
+      if (definition.parameters != null || (definition.returns != null && !isRef(definition.returns))) {
         const title = toPascalCase(label);
         allNames.push(title);
         this.renderFile(this.schemaDir, `${title}.ts`, "schemas/label.njk", {

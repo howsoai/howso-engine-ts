@@ -241,9 +241,12 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async copySubtrainee(traineeId: string, request: schemas.CopySubtraineeRequest): Promise<ClientResponse<any>> {
+  public async copySubtrainee(
+    traineeId: string,
+    request: schemas.CopySubtraineeRequest,
+  ): Promise<ClientResponse<schemas.CopySubtraineeResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "copy_subtrainee", request);
+    const response = await this.execute<schemas.CopySubtraineeResponse>(trainee.id, "copy_subtrainee", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -365,9 +368,15 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getAutoAblationParams(traineeId: string): Promise<ClientResponse<any>> {
+  public async getAutoAblationParams(
+    traineeId: string,
+  ): Promise<ClientResponse<schemas.GetAutoAblationParamsResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "get_auto_ablation_params", {});
+    const response = await this.execute<schemas.GetAutoAblationParamsResponse>(
+      trainee.id,
+      "get_auto_ablation_params",
+      {},
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -567,9 +576,9 @@ export abstract class AbstractBaseClient {
   public async getParams(
     traineeId: string,
     request: schemas.GetParamsRequest,
-  ): Promise<ClientResponse<shims.GetParamsResponse>> {
+  ): Promise<ClientResponse<schemas.GetParamsResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<shims.GetParamsResponse>(trainee.id, "get_params", request);
+    const response = await this.execute<schemas.GetParamsResponse>(trainee.id, "get_params", request);
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -727,9 +736,12 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async moveCases(traineeId: string, request: schemas.MoveCasesRequest): Promise<ClientResponse<any>> {
+  public async moveCases(
+    traineeId: string,
+    request: schemas.MoveCasesRequest,
+  ): Promise<ClientResponse<schemas.MoveCasesResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "move_cases", request);
+    const response = await this.execute<schemas.MoveCasesResponse>(trainee.id, "move_cases", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -822,9 +834,12 @@ export abstract class AbstractBaseClient {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reduceData(traineeId: string, request: schemas.ReduceDataRequest): Promise<ClientResponse<any>> {
+  public async reduceData(
+    traineeId: string,
+    request: schemas.ReduceDataRequest,
+  ): Promise<ClientResponse<schemas.ReduceDataResponse>> {
     const trainee = await this.autoResolveTrainee(traineeId);
-    const response = await this.execute<any>(trainee.id, "reduce_data", request);
+    const response = await this.execute<schemas.ReduceDataResponse>(trainee.id, "reduce_data", request);
     this.autoPersistTrainee(trainee.id);
     return { payload: response.payload, warnings: response.warnings };
   }
