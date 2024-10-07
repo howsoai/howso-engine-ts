@@ -9,7 +9,6 @@ import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import { Session, Trainee } from "../../engine";
 import type { BaseTrainee } from "../../types";
-import type * as schemas from "../../types/schemas";
 import {
   AbstractBaseClient,
   type AbstractBaseClientOptions,
@@ -142,35 +141,6 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   }
 
   /**
-   * Automatically resolve a Trainee and ensure it is loaded given an identifier.
-   *
-   * @param traineeId The Trainee identifier.
-   * @returns The Trainee object.
-   */
-  protected async autoResolveTrainee(traineeId: string): Promise<Trainee> {
-    if (traineeId == null) {
-      throw new TypeError("A Trainee identifier is required.");
-    }
-    await this.acquireTraineeResources(traineeId); // does nothing if already cached
-    const cached = this.cache.get(traineeId);
-    if (cached == null) {
-      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
-    }
-    return cached.trainee;
-  }
-
-  /**
-   * Automatically persist Trainee object when appropriate based on persistence level.
-   * @param traineeId The Trainee identifier.
-   */
-  protected async autoPersistTrainee(traineeId: string): Promise<void> {
-    const cached = this.cache.get(traineeId);
-    if (cached?.trainee?.persistence === "always") {
-      await this.persistTrainee(traineeId);
-    }
-  }
-
-  /**
    * Constructs Trainee object from it's Engine metadata.
    *
    * @param traineeId The Trainee identifier.
@@ -190,17 +160,32 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   }
 
   /**
-   * Include the active session in a request if not defined.
-   * @param request The Trainee request object.
-   * @returns The Trainee request object with a session.
+   * Automatically resolve a Trainee and ensure it is loaded given an identifier.
+   *
+   * @param traineeId The Trainee identifier.
+   * @returns The Trainee object.
    */
-  protected async includeSession<T extends Record<string, any>>(request: T): Promise<T> {
-    if (!request.session) {
-      // Include the active session
-      const session = await this.getActiveSession();
-      return { ...request, session: session.id };
+  public async autoResolveTrainee(traineeId: string): Promise<Trainee> {
+    if (traineeId == null) {
+      throw new TypeError("A Trainee identifier is required.");
     }
-    return request;
+    await this.acquireTraineeResources(traineeId); // does nothing if already cached
+    const cached = this.cache.get(traineeId);
+    if (cached == null) {
+      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
+    }
+    return cached.trainee;
+  }
+
+  /**
+   * Automatically persist Trainee object when appropriate based on persistence level.
+   * @param traineeId The Trainee identifier.
+   */
+  public async autoPersistTrainee(traineeId: string): Promise<void> {
+    const cached = this.cache.get(traineeId);
+    if (cached?.trainee?.persistence === "always") {
+      await this.persistTrainee(traineeId);
+    }
   }
 
   /**
@@ -499,40 +484,5 @@ export class HowsoWorkerClient extends AbstractBaseClient {
       }
       return accumulator;
     }, []);
-  }
-
-  public async impute(traineeId: string, request: schemas.ImputeRequest) {
-    request = await this.includeSession(request);
-    return await super.impute(traineeId, request);
-  }
-
-  public async clearImputedData(traineeId: string, request: schemas.ClearImputedDataRequest) {
-    request = await this.includeSession(request);
-    return await super.clearImputedData(traineeId, request);
-  }
-
-  public async moveCases(traineeId: string, request: schemas.MoveCasesRequest) {
-    request = await this.includeSession(request);
-    return await super.moveCases(traineeId, request);
-  }
-
-  public async editCases(traineeId: string, request: schemas.EditCasesRequest) {
-    request = await this.includeSession(request);
-    return await super.editCases(traineeId, request);
-  }
-
-  public async addFeature(traineeId: string, request: schemas.AddFeatureRequest) {
-    request = await this.includeSession(request);
-    return await super.addFeature(traineeId, request);
-  }
-
-  public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest) {
-    request = await this.includeSession(request);
-    return await super.removeFeature(traineeId, request);
-  }
-
-  public async train(traineeId: string, request: schemas.TrainRequest) {
-    request = await this.includeSession(request);
-    return await super.train(traineeId, request);
   }
 }

@@ -4,8 +4,9 @@
  */
 import { AbstractBaseClient } from "../client/AbstractBaseClient";
 import { batcher, BatchOptions } from "../client/utilities";
-import type { BaseTrainee, ClientBatchResponse } from "../types";
+import type { BaseTrainee, ClientBatchResponse, ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
+import type * as shims from "../types/shims";
 
 /**
  * The interface for interacting with a Trainee. Should not be instantiated directly. Instead create or request a
@@ -93,7 +94,7 @@ export class Trainee implements BaseTrainee {
       async function* (this: Trainee, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          const response = await this.client.train(this.id, {
+          const response = await this.train({
             ...rest,
             cases: cases.slice(offset, offset + size),
           });
@@ -116,6 +117,20 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
+   * Include the active session in a request if not defined.
+   * @param request The Trainee request object.
+   * @returns The Trainee request object with a session.
+   */
+  protected async includeSession<T extends Record<string, any>>(request: T): Promise<T> {
+    if (!request.session) {
+      // Include the active session
+      const session = await this.client.getActiveSession();
+      return { ...request, session: session.id };
+    }
+    return request;
+  }
+
+  /**
    * Adds the specified feature on all cases for a trainee that match the specified condition. overwrites features that
    * If condition are not specified, adds feature for all cases and to the model.  If condition is an empty assoc, will not modify feature metadata in the model.
    * If feature attributes are passed in, will also set the model's feature attributes.
@@ -124,8 +139,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async addFeature(request: schemas.AddFeatureRequest) {
-    return this.client.addFeature(this.id, request);
+  public async addFeature(request: schemas.AddFeatureRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<any>(this.id, "add_feature", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -134,8 +153,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async analyze(request: schemas.AnalyzeRequest) {
-    return this.client.analyze(this.id, request);
+  public async analyze(request: schemas.AnalyzeRequest): Promise<ClientResponse<null>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<null>(this.id, "analyze", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -144,8 +166,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async appendToSeriesStore(request: schemas.AppendToSeriesStoreRequest) {
-    return this.client.appendToSeriesStore(this.id, request);
+  public async appendToSeriesStore(request: schemas.AppendToSeriesStoreRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "append_to_series_store", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -154,8 +179,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async autoAnalyze() {
-    return this.client.autoAnalyze(this.id);
+  public async autoAnalyze(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "auto_analyze", {});
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -164,8 +192,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async clearImputedData(request: schemas.ClearImputedDataRequest) {
-    return this.client.clearImputedData(this.id, request);
+  public async clearImputedData(request: schemas.ClearImputedDataRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<any>(this.id, "clear_imputed_data", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -174,8 +206,13 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async copySubtrainee(request: schemas.CopySubtraineeRequest) {
-    return this.client.copySubtrainee(this.id, request);
+  public async copySubtrainee(
+    request: schemas.CopySubtraineeRequest,
+  ): Promise<ClientResponse<schemas.CopySubtraineeResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.CopySubtraineeResponse>(this.id, "copy_subtrainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -184,8 +221,13 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async createSubtrainee(request: schemas.CreateSubtraineeRequest) {
-    return this.client.createSubtrainee(this.id, request);
+  public async createSubtrainee(
+    request: schemas.CreateSubtraineeRequest,
+  ): Promise<ClientResponse<schemas.CreateSubtraineeResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.CreateSubtraineeResponse>(this.id, "create_subtrainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -194,8 +236,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async deleteSession(request: schemas.DeleteSessionRequest) {
-    return this.client.deleteSession(this.id, request);
+  public async deleteSession(request: schemas.DeleteSessionRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "delete_session", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -204,8 +249,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async deleteSubtrainee(request: schemas.DeleteSubtraineeRequest) {
-    return this.client.deleteSubtrainee(this.id, request);
+  public async deleteSubtrainee(request: schemas.DeleteSubtraineeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "delete_subtrainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -217,8 +265,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async editCases(request: schemas.EditCasesRequest) {
-    return this.client.editCases(this.id, request);
+  public async editCases(request: schemas.EditCasesRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<any>(this.id, "edit_cases", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -228,8 +280,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async evaluate(request: schemas.EvaluateRequest) {
-    return this.client.evaluate(this.id, request);
+  public async evaluate(request: schemas.EvaluateRequest): Promise<ClientResponse<schemas.EvaluateResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.EvaluateResponse>(this.id, "evaluate", request);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -238,8 +292,17 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async executeOnSubtrainee(request: schemas.ExecuteOnSubtraineeRequest) {
-    return this.client.executeOnSubtrainee(this.id, request);
+  public async executeOnSubtrainee(
+    request: schemas.ExecuteOnSubtraineeRequest,
+  ): Promise<ClientResponse<schemas.ExecuteOnSubtraineeResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.ExecuteOnSubtraineeResponse>(
+      this.id,
+      "execute_on_subtrainee",
+      request,
+    );
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -249,8 +312,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async exportTrainee(request: schemas.ExportTraineeRequest) {
-    return this.client.exportTrainee(this.id, request);
+  public async exportTrainee(request: schemas.ExportTraineeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "export_trainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -259,8 +325,14 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getAutoAblationParams() {
-    return this.client.getAutoAblationParams(this.id);
+  public async getAutoAblationParams(): Promise<ClientResponse<schemas.GetAutoAblationParamsResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetAutoAblationParamsResponse>(
+      this.id,
+      "get_auto_ablation_params",
+      {},
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -271,8 +343,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getCases(request: schemas.GetCasesRequest) {
-    return this.client.getCases(this.id, request);
+  public async getCases(request: schemas.GetCasesRequest): Promise<ClientResponse<schemas.GetCasesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetCasesResponse>(this.id, "get_cases", request);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -281,8 +355,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getDistances(request: schemas.GetDistancesRequest) {
-    return this.client.getDistances(this.id, request);
+  public async getDistances(
+    request: schemas.GetDistancesRequest,
+  ): Promise<ClientResponse<schemas.GetDistancesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetDistancesResponse>(this.id, "get_distances", request);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -293,8 +371,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getEntityPathById(request: schemas.GetEntityPathByIdRequest) {
-    return this.client.getEntityPathById(this.id, request);
+  public async getEntityPathById(
+    request: schemas.GetEntityPathByIdRequest,
+  ): Promise<ClientResponse<schemas.GetEntityPathByIdResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetEntityPathByIdResponse>(
+      this.id,
+      "get_entity_path_by_id",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -303,8 +389,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getExportAttributes() {
-    return this.client.getExportAttributes(this.id);
+  public async getExportAttributes(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "get_export_attributes", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -313,8 +401,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getExtremeCases(request: schemas.GetExtremeCasesRequest) {
-    return this.client.getExtremeCases(this.id, request);
+  public async getExtremeCases(
+    request: schemas.GetExtremeCasesRequest,
+  ): Promise<ClientResponse<schemas.GetExtremeCasesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetExtremeCasesResponse>(this.id, "get_extreme_cases", request);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -323,8 +415,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getFeatureAttributes() {
-    return this.client.getFeatureAttributes(this.id);
+  public async getFeatureAttributes(): Promise<ClientResponse<schemas.FeatureAttributesIndex>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.FeatureAttributesIndex>(this.id, "get_feature_attributes", {});
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -333,8 +428,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getFeatureConviction(request: schemas.GetFeatureConvictionRequest) {
-    return this.client.getFeatureConviction(this.id, request);
+  public async getFeatureConviction(
+    request: schemas.GetFeatureConvictionRequest,
+  ): Promise<ClientResponse<schemas.GetFeatureConvictionResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetFeatureConvictionResponse>(
+      this.id,
+      "get_feature_conviction",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -344,8 +447,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getHierarchy() {
-    return this.client.getHierarchy(this.id);
+  public async getHierarchy(): Promise<ClientResponse<schemas.GetHierarchyResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetHierarchyResponse>(this.id, "get_hierarchy", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -355,8 +460,13 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getMarginalStats(request: schemas.GetMarginalStatsRequest) {
-    return this.client.getMarginalStats(this.id, request);
+  public async getMarginalStats(
+    request: schemas.GetMarginalStatsRequest,
+  ): Promise<ClientResponse<shims.GetMarginalStatsResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<shims.GetMarginalStatsResponse>(this.id, "get_marginal_stats", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -365,8 +475,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getMetadata() {
-    return this.client.getMetadata(this.id);
+  public async getMetadata(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "get_metadata", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -375,8 +487,14 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getNumTrainingCases() {
-    return this.client.getNumTrainingCases(this.id);
+  public async getNumTrainingCases(): Promise<ClientResponse<schemas.GetNumTrainingCasesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetNumTrainingCasesResponse>(
+      this.id,
+      "get_num_training_cases",
+      {},
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -386,8 +504,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getPairwiseDistances(request: schemas.GetPairwiseDistancesRequest) {
-    return this.client.getPairwiseDistances(this.id, request);
+  public async getPairwiseDistances(
+    request: schemas.GetPairwiseDistancesRequest,
+  ): Promise<ClientResponse<schemas.GetPairwiseDistancesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetPairwiseDistancesResponse>(
+      this.id,
+      "get_pairwise_distances",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -397,8 +523,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getParams(request: schemas.GetParamsRequest) {
-    return this.client.getParams(this.id, request);
+  public async getParams(request: schemas.GetParamsRequest): Promise<ClientResponse<schemas.GetParamsResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetParamsResponse>(this.id, "get_params", request);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -407,8 +535,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getRevision() {
-    return this.client.getRevision(this.id);
+  public async getRevision(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "get_revision", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -417,8 +547,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSessions(request: schemas.GetSessionsRequest) {
-    return this.client.getSessions(this.id, request);
+  public async getSessions(request: schemas.GetSessionsRequest): Promise<ClientResponse<schemas.GetSessionsResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetSessionsResponse>(this.id, "get_sessions", request);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -428,8 +560,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSessionIndices(request: schemas.GetSessionIndicesRequest) {
-    return this.client.getSessionIndices(this.id, request);
+  public async getSessionIndices(
+    request: schemas.GetSessionIndicesRequest,
+  ): Promise<ClientResponse<schemas.GetSessionIndicesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetSessionIndicesResponse>(
+      this.id,
+      "get_session_indices",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -438,8 +578,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSessionMetadata(request: schemas.GetSessionMetadataRequest) {
-    return this.client.getSessionMetadata(this.id, request);
+  public async getSessionMetadata(
+    request: schemas.GetSessionMetadataRequest,
+  ): Promise<ClientResponse<schemas.GetSessionMetadataResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetSessionMetadataResponse>(
+      this.id,
+      "get_session_metadata",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -449,8 +597,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSessionTrainingIndices(request: schemas.GetSessionTrainingIndicesRequest) {
-    return this.client.getSessionTrainingIndices(this.id, request);
+  public async getSessionTrainingIndices(
+    request: schemas.GetSessionTrainingIndicesRequest,
+  ): Promise<ClientResponse<schemas.GetSessionTrainingIndicesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetSessionTrainingIndicesResponse>(
+      this.id,
+      "get_session_training_indices",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -459,8 +615,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getSubstituteFeatureValues() {
-    return this.client.getSubstituteFeatureValues(this.id);
+  public async getSubstituteFeatureValues(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "get_substitute_feature_values", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -469,8 +627,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getTraineeId() {
-    return this.client.getTraineeId(this.id);
+  public async getTraineeId(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "get_trainee_id", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -479,8 +639,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getTraineeVersion() {
-    return this.client.getTraineeVersion(this.id);
+  public async getTraineeVersion(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "get_trainee_version", {});
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -489,8 +651,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async impute(request: schemas.ImputeRequest) {
-    return this.client.impute(this.id, request);
+  public async impute(request: schemas.ImputeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<any>(this.id, "impute", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -503,8 +669,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async loadSubtrainee(request: schemas.LoadSubtraineeRequest) {
-    return this.client.loadSubtrainee(this.id, request);
+  public async loadSubtrainee(request: schemas.LoadSubtraineeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "load_subtrainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -513,8 +682,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async moveCases(request: schemas.MoveCasesRequest) {
-    return this.client.moveCases(this.id, request);
+  public async moveCases(request: schemas.MoveCasesRequest): Promise<ClientResponse<schemas.MoveCasesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<schemas.MoveCasesResponse>(this.id, "move_cases", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -523,8 +696,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async react(request: schemas.ReactRequest) {
-    return this.client.react(this.id, request);
+  public async react(request: schemas.ReactRequest): Promise<ClientResponse<shims.ReactResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<shims.ReactResponse>(this.id, "react", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -534,8 +710,13 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactAggregate(request: schemas.ReactAggregateRequest) {
-    return this.client.reactAggregate(this.id, request);
+  public async reactAggregate(
+    request: schemas.ReactAggregateRequest,
+  ): Promise<ClientResponse<shims.ReactAggregateResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<shims.ReactAggregateResponse>(this.id, "react_aggregate", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -551,8 +732,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactGroup(request: schemas.ReactGroupRequest) {
-    return this.client.reactGroup(this.id, request);
+  public async reactGroup(request: schemas.ReactGroupRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "react_group", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -561,8 +745,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactIntoFeatures(request: schemas.ReactIntoFeaturesRequest) {
-    return this.client.reactIntoFeatures(this.id, request);
+  public async reactIntoFeatures(request: schemas.ReactIntoFeaturesRequest): Promise<ClientResponse<null>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<null>(this.id, "react_into_features", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -573,8 +760,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactSeries(request: schemas.ReactSeriesRequest) {
-    return this.client.reactSeries(this.id, request);
+  public async reactSeries(request: schemas.ReactSeriesRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "react_series", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -584,8 +774,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reduceData(request: schemas.ReduceDataRequest) {
-    return this.client.reduceData(this.id, request);
+  public async reduceData(request: schemas.ReduceDataRequest): Promise<ClientResponse<schemas.ReduceDataResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.ReduceDataResponse>(this.id, "reduce_data", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -594,8 +787,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async removeCases(request: schemas.RemoveCasesRequest) {
-    return this.client.removeCases(this.id, request);
+  public async removeCases(request: schemas.RemoveCasesRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "remove_cases", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -606,8 +802,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async removeFeature(request: schemas.RemoveFeatureRequest) {
-    return this.client.removeFeature(this.id, request);
+  public async removeFeature(request: schemas.RemoveFeatureRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<any>(this.id, "remove_feature", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -616,8 +816,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async removeSeriesStore(request: schemas.RemoveSeriesStoreRequest) {
-    return this.client.removeSeriesStore(this.id, request);
+  public async removeSeriesStore(request: schemas.RemoveSeriesStoreRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "remove_series_store", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -626,8 +829,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async renameSubtrainee(request: schemas.RenameSubtraineeRequest) {
-    return this.client.renameSubtrainee(this.id, request);
+  public async renameSubtrainee(request: schemas.RenameSubtraineeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "rename_subtrainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -636,8 +842,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async resetParams() {
-    return this.client.resetParams(this.id);
+  public async resetParams(): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "reset_params", {});
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -646,8 +855,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async saveSubtrainee(request: schemas.SaveSubtraineeRequest) {
-    return this.client.saveSubtrainee(this.id, request);
+  public async saveSubtrainee(request: schemas.SaveSubtraineeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "save_subtrainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -656,8 +868,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setAutoAblationParams(request: schemas.SetAutoAblationParamsRequest) {
-    return this.client.setAutoAblationParams(this.id, request);
+  public async setAutoAblationParams(request: schemas.SetAutoAblationParamsRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_auto_ablation_params", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -666,8 +881,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setAutoAnalyzeParams(request: schemas.SetAutoAnalyzeParamsRequest) {
-    return this.client.setAutoAnalyzeParams(this.id, request);
+  public async setAutoAnalyzeParams(request: schemas.SetAutoAnalyzeParamsRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_auto_analyze_params", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -676,8 +894,17 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setFeatureAttributes(request: schemas.SetFeatureAttributesRequest) {
-    return this.client.setFeatureAttributes(this.id, request);
+  public async setFeatureAttributes(
+    request: schemas.SetFeatureAttributesRequest,
+  ): Promise<ClientResponse<schemas.FeatureAttributesIndex>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.FeatureAttributesIndex>(
+      this.id,
+      "set_feature_attributes",
+      request,
+    );
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -687,8 +914,13 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setInfluenceWeightThreshold(request: schemas.SetInfluenceWeightThresholdRequest) {
-    return this.client.setInfluenceWeightThreshold(this.id, request);
+  public async setInfluenceWeightThreshold(
+    request: schemas.SetInfluenceWeightThresholdRequest,
+  ): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_influence_weight_threshold", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -697,8 +929,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setMetadata(request: schemas.SetMetadataRequest) {
-    return this.client.setMetadata(this.id, request);
+  public async setMetadata(request: schemas.SetMetadataRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_metadata", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -707,8 +942,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setParams(request: schemas.SetParamsRequest) {
-    return this.client.setParams(this.id, request);
+  public async setParams(request: schemas.SetParamsRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_params", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -717,8 +955,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setParentId(request: schemas.SetParentIdRequest) {
-    return this.client.setParentId(this.id, request);
+  public async setParentId(request: schemas.SetParentIdRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_parent_id", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -727,8 +968,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setRandomSeed(request: schemas.SetRandomSeedRequest) {
-    return this.client.setRandomSeed(this.id, request);
+  public async setRandomSeed(request: schemas.SetRandomSeedRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_random_seed", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -737,8 +981,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setSessionMetadata(request: schemas.SetSessionMetadataRequest) {
-    return this.client.setSessionMetadata(this.id, request);
+  public async setSessionMetadata(request: schemas.SetSessionMetadataRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_session_metadata", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -747,8 +994,13 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setSubstituteFeatureValues(request: schemas.SetSubstituteFeatureValuesRequest) {
-    return this.client.setSubstituteFeatureValues(this.id, request);
+  public async setSubstituteFeatureValues(
+    request: schemas.SetSubstituteFeatureValuesRequest,
+  ): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_substitute_feature_values", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -757,8 +1009,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async setTraineeId(request: schemas.SetTraineeIdRequest) {
-    return this.client.setTraineeId(this.id, request);
+  public async setTraineeId(request: schemas.SetTraineeIdRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "set_trainee_id", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -776,8 +1031,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async singleReact(request: schemas.SingleReactRequest) {
-    return this.client.singleReact(this.id, request);
+  public async singleReact(request: schemas.SingleReactRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "single_react", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -788,8 +1046,11 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async singleReactSeries(request: schemas.SingleReactSeriesRequest) {
-    return this.client.singleReactSeries(this.id, request);
+  public async singleReactSeries(request: schemas.SingleReactSeriesRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "single_react_series", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -798,8 +1059,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async train(request: schemas.TrainRequest) {
-    return this.client.train(this.id, request);
+  public async train(request: schemas.TrainRequest): Promise<ClientResponse<schemas.TrainResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<schemas.TrainResponse>(this.id, "train", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
@@ -808,7 +1073,10 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async upgradeTrainee(request: schemas.UpgradeTraineeRequest) {
-    return this.client.upgradeTrainee(this.id, request);
+  public async upgradeTrainee(request: schemas.UpgradeTraineeRequest): Promise<ClientResponse<any>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<any>(this.id, "upgrade_trainee", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
   }
 }

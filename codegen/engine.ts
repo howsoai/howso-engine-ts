@@ -35,6 +35,7 @@ export interface LabelDefinition {
   parameters: Record<string, Schema | Ref> | null;
   returns?: SchemaType | Schema | Ref | null;
   description?: string | null;
+  use_active_session?: boolean;
   attribute?: boolean;
   long_running?: boolean;
   read_only?: boolean;

@@ -4,8 +4,9 @@
  */
 import { AbstractBaseClient } from "../client/AbstractBaseClient";
 import { batcher, BatchOptions } from "../client/utilities";
-import type { BaseTrainee, ClientBatchResponse } from "../types";
+import type { BaseTrainee, ClientBatchResponse, ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
+import type * as shims from "../types/shims";
 
 /**
  * The interface for interacting with a Trainee. Should not be instantiated directly. Instead create or request a
@@ -93,7 +94,7 @@ export class Trainee implements BaseTrainee {
       async function* (this: Trainee, size: number) {
         let offset = 0;
         while (offset < cases.length) {
-          const response = await this.client.train(this.id, {
+          const response = await this.train({
             ...rest,
             cases: cases.slice(offset, offset + size),
           });
@@ -115,6 +116,20 @@ export class Trainee implements BaseTrainee {
     return { payload: { num_trained, status, ablated_indices }, warnings };
   }
 
+  /**
+   * Include the active session in a request if not defined.
+   * @param request The Trainee request object.
+   * @returns The Trainee request object with a session.
+   */
+  protected async includeSession<T extends Record<string, any>>(request: T): Promise<T> {
+    if (!request.session) {
+      // Include the active session
+      const session = await this.client.getActiveSession();
+      return { ...request, session: session.id };
+    }
+    return request;
+  }
+
 {% for label, def in labels | dictsort %}
   {%- set requestName = "schemas." + label | pascalCase + "Request" %}
   {%- if def.returns | isRef %}
@@ -128,8 +143,16 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async {{ label | camelCase }}({% if def.parameters | length %}request: {{ requestName }}{% endif %}) {
-    return this.client.{{ label | camelCase }}(this.id, {% if def.parameters | length %}request{% endif %});
+  public async {{ label | camelCase }}({% if def.parameters | length %}request: {{ requestName }}{% endif %}): Promise<ClientResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
+    await this.client.autoResolveTrainee(this.id);
+    {%- if def.use_active_session and def.parameters %}
+    request = await this.includeSession(request);
+    {%- endif %}
+    const response = await this.client.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>(this.id, "{{ label }}", {% if def.parameters | length %}request{% else %}{}{% endif %});
+    {%- if not def.read_only %}
+    this.client.autoPersistTrainee(this.id);
+    {%- endif %}
+    return { payload: response.payload, warnings: response.warnings };
   }
 {%- if not loop.last %}
 {% endif %}
