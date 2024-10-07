@@ -7,7 +7,7 @@ export type SchemaTypeOption = "any" | "assoc" | "boolean" | "list" | "number" |
 export type SchemaType = SchemaTypeOption | SchemaTypeOption[];
 
 export interface BaseSchema {
-  description?: string;
+  description?: string | null;
   required?: boolean;
   default?: any;
 }
