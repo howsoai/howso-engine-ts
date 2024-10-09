@@ -65,3 +65,7 @@ export type EditCasesRequest = {
    */
   session?: string;
 };
+
+export type EditCasesResponse = {
+  count?: number;
+};

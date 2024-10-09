@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 
+export const PRIMITIVE_TYPES = ["any", "boolean", "number", "string", "null"];
 export type SchemaTypeOption = "any" | "assoc" | "boolean" | "list" | "number" | "string" | "null";
 export type SchemaType = SchemaTypeOption | SchemaTypeOption[];
 
@@ -36,7 +37,8 @@ export interface LabelDefinition {
   returns?: SchemaType | Schema | Ref | null;
   description?: string | null;
   use_active_session?: boolean;
-  attribute?: boolean;
+  attribute?: SchemaType | null;
+  payload?: boolean;
   long_running?: boolean;
   read_only?: boolean;
   idempotent?: boolean;
@@ -96,6 +98,7 @@ export async function getEngineApi(): Promise<EngineApi> {
   }
 }
 
+/** Check if a type is a Ref object. */
 export function isRef(value: SchemaType | Schema | Ref | null | undefined): value is Ref {
   if (value == null || Array.isArray(value) || typeof value === "string") {
     return false;
@@ -103,6 +106,7 @@ export function isRef(value: SchemaType | Schema | Ref | null | undefined): valu
   return "ref" in value && value.ref != null;
 }
 
+/** Check if a type is a Schema object. */
 export function isSchema(value: SchemaType | Schema | Ref | null | undefined): value is Schema {
   if (value == null || Array.isArray(value) || typeof value === "string") {
     return false;
@@ -110,7 +114,26 @@ export function isSchema(value: SchemaType | Schema | Ref | null | undefined): v
   return !isRef(value) && "type" in value && (typeof value.type === "string" || Array.isArray(value.type));
 }
 
+/** Check if a type is a Schema or Ref object. */
 export function isSchemaOrRef(value: SchemaType | Schema | Ref | boolean | null | undefined): value is Schema | Ref {
   if (typeof value === "boolean") return false;
   return isRef(value) || isSchema(value);
+}
+
+/** Check if a type is a primitive or simple array. */
+export function isSimpleType(value: any) {
+  if (value == null) return false;
+  if (typeof value === "string") {
+    return PRIMITIVE_TYPES.includes(value);
+  } else if (Array.isArray(value)) {
+    return value.map((v) => PRIMITIVE_TYPES.includes(v)).every(Boolean);
+  } else if (isRef(value)) {
+    return true;
+  } else if (isSchema(value)) {
+    if (value.type === "list") {
+      return isSimpleType(value.values);
+    }
+    return isSimpleType(value.type);
+  }
+  return false;
 }

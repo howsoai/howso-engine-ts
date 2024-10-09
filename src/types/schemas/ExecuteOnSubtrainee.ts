@@ -41,5 +41,3 @@ export type ExecuteOnSubtraineeRequest = {
    */
   payload?: Record<string, any>;
 };
-
-export type ExecuteOnSubtraineeResponse = any;

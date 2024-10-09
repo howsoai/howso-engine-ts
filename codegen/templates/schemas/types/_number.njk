@@ -1,6 +1,8 @@
-{%- if schema.enum -%}
+{%- if schema.enum | enumMatchesType("number") -%}
     {%- for item in schema.enum -%}
+        {%- if item is number -%}
 {{ item }}{% if not loop.last %} | {% endif %}
+        {%- endif -%}
     {%- endfor -%}
 {%- else -%}
 number

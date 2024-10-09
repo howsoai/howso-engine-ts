@@ -15,7 +15,7 @@ export type GetAutoAblationParamsResponse = {
   /**
    * The name of the weight feature which is accumulated and used in automatic ablation.
    */
-  auto_ablation_weight_feature?: boolean;
+  auto_ablation_weight_feature?: string;
   /**
    * The conviction threshold above which cases will be ablated.
    */
@@ -39,7 +39,7 @@ export type GetAutoAblationParamsResponse = {
   /**
    * The map of features to relative thresholds that if predicted within on a new case will trigger the ablation of the case.
    */
-  relative_prediction_threshold_map?: string[];
+  relative_prediction_threshold_map?: Record<string, number>;
   /**
    * The list of features that if predicted within their residual on a new case will trigger the ablation of the case.
    */
@@ -47,5 +47,5 @@ export type GetAutoAblationParamsResponse = {
   /**
    * The map of features to absolute thresholds that if predicted within on a new case will trigger the ablation of the case.
    */
-  tolerance_prediction_threshold_map?: string[];
+  tolerance_prediction_threshold_map?: Record<string, number>;
 };

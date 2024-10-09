@@ -1,13 +1,23 @@
 import { SchemaType } from "../engine";
 
-export function isString(value: any) {
-  return typeof value === "string";
-}
-
+/** Check if value is an Array. */
 export function isArray(value: any) {
   return Array.isArray(value);
 }
 
+/**
+ * Check if an enum contains at least one value of the specified type.
+ *
+ * This is required for properties that support both string and number values and defines an enum. When rendering the
+ * enum values we check if the enum contains any values for that type and if not we render just the type itself,
+ * otherwise we enumerate the valid options.
+ */
+export function enumMatchesType(enumeration: Array<string | number> | null, type: "number" | "string") {
+  if (!Array.isArray(enumeration)) return false;
+  return enumeration.some((value) => typeof value === type);
+}
+
+/** Convert Amalgam type to TypeScript type. */
 export function convertType(schema: SchemaType) {
   let value: string;
   switch (schema) {
@@ -33,8 +43,7 @@ export function convertType(schema: SchemaType) {
       value = "any";
       break;
     default:
-      console.warn(`Unexpected type received: ${schema}`);
-      value = "any";
+      throw new Error(`Unexpected Amalgam type received ${JSON.stringify(schema)}`);
   }
 
   return this.env.filters.safe(value);

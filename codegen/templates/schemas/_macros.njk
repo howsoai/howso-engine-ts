@@ -1,6 +1,6 @@
 {%- macro field(schema, type=null) %}
 {%- if not type %}
-    {%- if schema | isString or schema | isArray %}
+    {%- if schema is string or schema | isArray %}
         {%- set type = schema %}
     {%- else %}
         {%- set type = schema.type %}

@@ -33,5 +33,5 @@ export type CreateSubtraineeResponse = {
   /**
    * The name of the resulting trainee that was created.
    */
-  name?: string;
+  name?: string | string[];
 };

@@ -6,7 +6,7 @@
  */
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
-import type { SelectedPredictionStats } from "./SelectedPredictionStats";
+import type { PredictionStat } from "./PredictionStat";
 
 export type ReactAggregateDetails = {
   /**
@@ -78,5 +78,8 @@ export type ReactAggregateDetails = {
    * List of features to use when calculating conditional prediction stats. Should contain all action and context features desired. If 'action_feature' is also provided, that feature will automatically be appended to this list if it is not already in the list
    */
   prediction_stats_features?: string[];
-  selected_prediction_stats?: SelectedPredictionStats;
+  /**
+   * Types of stats to output. When unspecified, returns all except the confusion_matrix. If all, then returns all including the confusion_matrix.
+   */
+  selected_prediction_stats?: PredictionStat[];
 };

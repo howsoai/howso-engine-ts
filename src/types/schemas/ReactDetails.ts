@@ -4,7 +4,7 @@
  *
  * ReactDetails
  */
-import type { SelectedPredictionStats } from "./SelectedPredictionStats";
+import type { PredictionStat } from "./PredictionStat";
 
 export type ReactDetails = {
   /**
@@ -159,7 +159,10 @@ export type ReactDetails = {
    * When true outputs feature prediction stats for all (context and action) features locally around the prediction. The stats returned  are ("r2", "rmse", "spearman_coeff", "precision", "recall", "accuracy", "mcc", "confusion_matrix", "missing_value_accuracy"). Uses only the context features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out context features for computations. 'selected_prediction_stats' controls the returned prediction stats.
    */
   prediction_stats?: boolean;
-  selected_prediction_stats?: SelectedPredictionStats;
+  /**
+   * Types of stats to output. When unspecified, returns all except the confusion_matrix. If all, then returns all including the confusion_matrix.
+   */
+  selected_prediction_stats?: PredictionStat[];
   /**
    * When true, outputs similarity conviction for the reacted case. Uses both context and action feature values as the case values for all computations. This is defined as expected (local) distance contribution divided by reacted case distance contribution.
    */

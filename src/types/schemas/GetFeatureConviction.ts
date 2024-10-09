@@ -52,4 +52,13 @@ export type GetFeatureConvictionRequest = {
   weight_feature?: string;
 };
 
-export type GetFeatureConvictionResponse = Record<string, number>;
+export type GetFeatureConvictionResponse = {
+  /**
+   * A the familiarity conviction of adding the feature to the model.
+   */
+  familiarity_conviction_addition?: Record<string, number>;
+  /**
+   * A the familiarity conviction of removing the feature from the model.
+   */
+  familiarity_conviction_removal?: Record<string, number>;
+};

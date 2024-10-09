@@ -14,10 +14,11 @@ export function registerFilters(env: Environment) {
   env.addFilter(strings.camelCase.name, strings.camelCase);
   env.addFilter(strings.toJson.name, strings.toJson);
   env.addFilter(strings.autoQuote.name, strings.autoQuote);
-  env.addFilter(types.isString.name, types.isString);
   env.addFilter(types.isArray.name, types.isArray);
+  env.addFilter(types.enumMatchesType.name, types.enumMatchesType);
   env.addFilter(types.convertType.name, types.convertType);
   env.addFilter(engine.isRef.name, engine.isRef);
   env.addFilter(engine.isSchema.name, engine.isSchema);
   env.addFilter(engine.isSchemaOrRef.name, engine.isSchemaOrRef);
+  env.addFilter(engine.isSimpleType.name, engine.isSimpleType);
 }

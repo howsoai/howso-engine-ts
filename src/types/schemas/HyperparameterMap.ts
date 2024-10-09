@@ -15,9 +15,9 @@ export type HyperparameterMap = {
    */
   derivedAutoAnalyzed?: boolean;
   /**
-   * The distance transform. Used as an exponent to convert distance to influence before normalization.
+   * The distance transform. Used as an exponent to convert distance to influence before normalization. Also accepts string value "surprisal_to_prob" as experimental option that converts distances to surprisal.
    */
-  dt: number;
+  dt: number | "surprisal_to_prob";
   /**
    * Internal map of features to their deviations. Includes null deviations and sparse deviation matrices.
    */

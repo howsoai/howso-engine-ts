@@ -1,3 +1,4 @@
+{%- from "schemas/_macros.njk" import field %}
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly, instead modify the Trainee.njk template file.
@@ -8,7 +9,6 @@ import { AbstractBaseClient } from "../client/AbstractBaseClient";
 import { batcher, BatchOptions } from "../client/utilities";
 import type { BaseTrainee, ClientBatchResponse, ClientResponse } from "../types";
 import type * as schemas from "../types/schemas";
-import type * as shims from "../types/shims";
 
 /**
  * The interface for interacting with a Trainee. Should not be instantiated directly. Instead create or request a
@@ -136,8 +136,12 @@ export class Trainee implements BaseTrainee {
   {%- set requestName = "schemas." + label | pascalCase + "Request" %}
   {%- if def.returns | isRef %}
     {%- set responseName = "schemas." + def.returns.ref %}
-  {%- else %}
+  {%- elif def.returns | isSimpleType %}
+    {%- set responseName = field(def.returns) %}
+  {%- elif def.returns %}
     {%- set responseName = "schemas." + label | pascalCase + "Response" %}
+  {%- else %}
+    {%- set responseName = "null" %}
   {%- endif %}
   /**
    * {{ def.description | blockComment | safe | indent(2) }}
@@ -145,12 +149,12 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async {{ label | camelCase }}({% if def.parameters | length %}request: {{ requestName }}{% endif %}): Promise<ClientResponse<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>> {
+  public async {{ label | camelCase }}({% if def.parameters | length %}request: {{ requestName }}{% endif %}): Promise<ClientResponse<{{ responseName }}>> {
     await this.client.autoResolveTrainee(this.id);
     {%- if def.use_active_session and def.parameters %}
     request = await this.includeSession(request);
     {%- endif %}
-    const response = await this.client.execute<{% if def.returns %}{{ responseName }}{% elif label in shims %}{{ shims[label] }}{% else %}any{% endif %}>(this.id, "{{ label }}", {% if def.parameters | length %}request{% else %}{}{% endif %});
+    const response = await this.client.execute<{{ responseName }}>(this.id, "{{ label }}", {% if def.parameters | length %}request{% else %}{}{% endif %});
     {%- if not def.read_only %}
     this.client.autoPersistTrainee(this.id);
     {%- endif %}

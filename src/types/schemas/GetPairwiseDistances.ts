@@ -61,5 +61,3 @@ export type GetPairwiseDistancesRequest = {
    */
   weight_feature?: string;
 };
-
-export type GetPairwiseDistancesResponse = number[];

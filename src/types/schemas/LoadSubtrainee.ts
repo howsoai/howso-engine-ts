@@ -36,3 +36,10 @@ export type LoadSubtraineeRequest = {
    */
   trainee?: string | string[];
 };
+
+export type LoadSubtraineeResponse = {
+  /**
+   * The name of the resulting trainee that was loaded.
+   */
+  name: string;
+};

@@ -7,7 +7,6 @@
  * Return the full internal parameters map if no parameters are specified.
  * if any of the parameters are specified, then GetHyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
  */
-import type { FullHyperparameterMap } from "./FullHyperparameterMap";
 import type { HyperparameterMap } from "./HyperparameterMap";
 
 export type GetParamsRequest = {
@@ -52,5 +51,5 @@ export type GetParamsResponse = {
   /**
    * The full map of hyperparameters or a specific map of hyperparameters if any parameters were given
    */
-  hyperparameter_map?: FullHyperparameterMap;
+  hyperparameter_map?: Record<string, any>;
 };

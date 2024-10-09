@@ -82,3 +82,42 @@ export type ReactGroupRequest = {
    */
   weight_feature?: string;
 };
+
+export type ReactGroupResponse = {
+  /**
+   * The average distance contribution of cases in the model.
+   */
+  base_model_average_distance_contribution?: number[];
+  /**
+   * The average distance contribution of cases in the model and the cases of each group.
+   */
+  combined_model_average_distance_contribution?: number[];
+  /**
+   * The average distance contributions of cases in each group.
+   */
+  distance_contribution?: number[];
+  /**
+   * The familiarity conviction of adding each group of cases to the model.
+   */
+  familiarity_conviction_addition?: number[];
+  /**
+   * The familiarity conviction of removing each group of cases to the model.
+   */
+  familiarity_conviction_removal?: number[];
+  /**
+   * The KL divergence of adding each group of cases to the model.
+   */
+  kl_divergence_addition?: number[];
+  /**
+   * The KL divergence of removing each group of cases to the model.
+   */
+  kl_divergence_removal?: number[];
+  /**
+   * The P-value of adding each group of cases to the model.
+   */
+  p_value_of_addition?: number[];
+  /**
+   * The P-value of removing each group of cases to the model.
+   */
+  p_value_of_removal?: number[];
+};

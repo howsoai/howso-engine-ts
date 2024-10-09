@@ -39,3 +39,24 @@ export type GetMarginalStatsRequest = {
    */
   weight_feature?: string;
 };
+
+export type GetMarginalStatsResponse = Record<
+  string,
+  {
+    count?: number | null;
+    entropy?: number | null;
+    kurtosis?: number | null;
+    max?: number | null;
+    mean?: number | null;
+    mean_absdev?: number | null;
+    median?: number | null;
+    min?: number | null;
+    mode?: any | null;
+    percentile_25?: number | null;
+    percentile_75?: number | null;
+    skew?: number | null;
+    stddev?: number | null;
+    uniques?: number | null;
+    variance?: number | null;
+  }
+>;

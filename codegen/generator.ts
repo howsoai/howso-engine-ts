@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
-import { EngineApi, isRef, isSchemaOrRef, LabelDefinition, Ref, Schema } from "./engine";
+import { EngineApi, isRef, isSchemaOrRef, isSimpleType, LabelDefinition, Ref, Schema } from "./engine";
 import { registerFilters } from "./filters";
 import { toPascalCase } from "./utils";
 
@@ -13,7 +13,6 @@ export class Generator {
   clientDir: string;
   engineDir: string;
   ignoredLabels: string[];
-  responseShims: Record<string, string>;
 
   /**
    * Construct a new Generator.
@@ -26,28 +25,20 @@ export class Generator {
     this.engineDir = path.resolve(this.basePath, "engine");
     this.doc = doc;
     this.ignoredLabels = [
-      "root_filepath",
-      "filename",
-      "filepath",
       "debug_label",
       "initialize",
       "initialize_for_deployment",
       "set_contained_trainee_maps",
-      "major_version",
-      "minor_version",
-      "point_version",
       "version",
       "get_api",
+      "single_react",
+      "single_react_series",
+      ...Object.entries(doc.labels).reduce<string[]>((ignored, [label, def]) => {
+        // Ignore all the attribute labels
+        if (def.attribute != null) ignored.push(label);
+        return ignored;
+      }, []),
     ];
-
-    // Temporary shims until return values are defined
-    this.responseShims = {
-      analyze: "null",
-      get_marginal_stats: "shims.GetMarginalStatsResponse",
-      react: "shims.ReactResponse",
-      react_aggregate: "shims.ReactAggregateResponse",
-      react_into_features: "null",
-    };
 
     // TODO - Remove once #21784 is merged
     for (const label of [
@@ -82,13 +73,12 @@ export class Generator {
   private renderClient() {
     const targetLabels: Record<string, LabelDefinition> = {};
     for (const [label, definition] of Object.entries(this.doc.labels)) {
-      if (!this.ignoredLabels.includes(label) || definition.attribute) {
+      if (!this.ignoredLabels.includes(label)) {
         targetLabels[label] = definition;
       }
     }
     this.renderFile(this.engineDir, "Trainee.ts", "engine/Trainee.njk", {
       labels: targetLabels,
-      shims: this.responseShims,
     });
   }
 
@@ -113,10 +103,10 @@ export class Generator {
 
     // Render label schemas
     for (const [label, definition] of Object.entries(this.doc.labels)) {
-      if (this.ignoredLabels.includes(label) || definition.attribute) continue;
+      if (this.ignoredLabels.includes(label)) continue;
       // Add schemas for label parameters and/or return value if it has any
       // For returns that are just a Ref, ignore them as they can already be referenced directly
-      if (definition.parameters != null || (definition.returns != null && !isRef(definition.returns))) {
+      if (definition.parameters != null || (definition.returns && !isSimpleType(definition.returns))) {
         const title = toPascalCase(label);
         allNames.push(title);
         this.renderFile(this.schemaDir, `${title}.ts`, "schemas/label.njk", {
@@ -162,7 +152,7 @@ export class Generator {
         imports.push(...this.detectSchemaImports(schema));
       }
     }
-    if (isSchemaOrRef(label.returns)) {
+    if (isSchemaOrRef(label.returns) && !isSimpleType(label.returns)) {
       imports.push(...this.detectSchemaImports(label.returns));
     }
     return [...new Set(imports)].sort();

@@ -7,6 +7,7 @@
  * Computes, caches, and returns specified details and feature prediction statistics such as Mean Decrease in Accuracy (MDA), residuals (accuracy, Mean Absolute Error),
  *  precision, recall, etc. Returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
  */
+import type { ConfusionMatrixMap } from "./ConfusionMatrixMap";
 import type { ReactAggregateDetails } from "./ReactAggregateDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
@@ -193,3 +194,94 @@ export type ReactAggregateRequest = {
    */
   weight_feature?: string;
 };
+
+export type ReactAggregateResponse = Record<
+  string,
+  {
+    /**
+     * The accuracy of predicting the feature.
+     */
+    accuracy?: number | null;
+    /**
+     * The symmetric mean absolute percentage error with added the min gap / 2 to the actual and predicted values.
+     */
+    adjusted_smape?: number | null;
+    confusion_matrix?: ConfusionMatrixMap;
+    /**
+     * The mean difference of predicting the specified action feature with and without this feature while using the full set of remaining context features.
+     */
+    directional_feature_contributions_full?: number | null;
+    /**
+     * The mean difference of predicting the specified action feature with and without this feature while using samples from the power-set of remaining context features.
+     */
+    directional_feature_contributions_robust?: number | null;
+    /**
+     * The mean absolute difference of predicting the specified action feature with and without this feature while using the full set of remaining context features.
+     */
+    feature_contributions_full?: number | null;
+    /**
+     * The mean absolute difference of predicting the specified action feature with and without this feature while using samples from the power-set of remaining context features.
+     */
+    feature_contributions_robust?: number | null;
+    /**
+     * The mean decrease in accuracy of predicting the specified action feature without this feature versus with this feature while using full set of remaining context features.
+     */
+    feature_mda_full?: number | null;
+    /**
+     * The mean decrease in accuracy of predicting the specified action feature using scrambled values for this feature versus non-scrambled values for this feature while using the full set of remaining context features.
+     */
+    feature_mda_permutation_full?: number | null;
+    /**
+     * The mean decrease in accuracy of predicting the specified action feature using scrambled values for this feature versus non-scrambled values for this feature while using samples from the power-set of remaining context features.
+     */
+    feature_mda_permutation_robust?: number | null;
+    /**
+     * The mean decrease in accuracy of predicting the specified action feature without this feature versus with this feature while using samples from the power-set of remaining context features.
+     */
+    feature_mda_robust?: number | null;
+    /**
+     * The mean absolute error of predicting this feature using the full set of context features.
+     */
+    feature_residuals_full?: number | null;
+    /**
+     * The mean absolute error of predicting this feature using samples from the power-set of context features.
+     */
+    feature_residuals_robust?: number | null;
+    /**
+     * The mean absolute error of predicting the feature.
+     */
+    mae?: number | null;
+    /**
+     * The MCC of predicting the feature.
+     */
+    mcc?: number | null;
+    /**
+     * The proportion of missing values that were correctly predicted as missing for the feature.
+     */
+    missing_value_accuracy?: number | null;
+    /**
+     * The precision of predicting the feature.
+     */
+    precision?: number | null;
+    /**
+     * The R^2 of predicting the feature.
+     */
+    r2?: number | null;
+    /**
+     * The recall of predicting the feature.
+     */
+    recall?: number | null;
+    /**
+     * The RMSE of predicting the feature.
+     */
+    rmse?: number | null;
+    /**
+     * The symmetric mean absolute percentage error of predicting the feature.
+     */
+    smape?: number | null;
+    /**
+     * The Spearman's coefficient of predicting the feature.
+     */
+    spearman_coeff?: number | null;
+  }
+>;

@@ -44,3 +44,7 @@ export type RemoveCasesRequest = {
    */
   precision?: Precision;
 };
+
+export type RemoveCasesResponse = {
+  count?: number;
+};
