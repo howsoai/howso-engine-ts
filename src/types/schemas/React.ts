@@ -8,7 +8,7 @@
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { DesiredConviction } from "./DesiredConviction";
-import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { FeatureBounds } from "./FeatureBounds";
 import type { GenerateNewCases } from "./GenerateNewCases";
 import type { ReactDetails } from "./ReactDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
@@ -281,7 +281,7 @@ export type ReactRequest = {
    *  Only used when desired_conviction is specified
    * @default {}
    */
-  feature_bounds_map?: Record<string, FeatureBoundsMap>;
+  feature_bounds_map?: Record<string, FeatureBounds>;
 
   /**
    * Enum, acceptable values are:

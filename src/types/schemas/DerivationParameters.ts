@@ -4,7 +4,7 @@
  *
  * DerivationParameters
  */
-import type { FeatureValueMap } from "./FeatureValueMap";
+import type { FeatureMetricIndex } from "./FeatureMetricIndex";
 
 /**
  * A map containing the parameters used in the derivation of a reaction.
@@ -21,7 +21,7 @@ export type DerivationParameters = {
   /**
    * A map of feature names to feature weights.
    */
-  feature_weights?: FeatureValueMap;
+  feature_weights?: FeatureMetricIndex;
   /**
    * The number of most similar cases used to make the prediction.
    */
@@ -29,7 +29,7 @@ export type DerivationParameters = {
   /**
    * A map of nominal feature names to the number of unique classes for each feature.
    */
-  nominal_class_counts?: FeatureValueMap;
+  nominal_class_counts?: FeatureMetricIndex;
   /**
    * The parameter of the Lebesgue space used in the Minkowski distance.
    */

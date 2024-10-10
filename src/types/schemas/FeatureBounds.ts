@@ -2,13 +2,13 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
  *
- * FeatureBoundsMap
+ * FeatureBounds
  */
 
 /**
  * A map defining any feature bounds, allowed values, and constraints.
  */
-export type FeatureBoundsMap = {
+export type FeatureBounds = {
   /**
    * Explicitly allowed values to be output.
    */

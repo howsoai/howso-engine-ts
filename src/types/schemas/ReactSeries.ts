@@ -10,7 +10,7 @@
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { DesiredConviction } from "./DesiredConviction";
-import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { FeatureBounds } from "./FeatureBounds";
 import type { GenerateNewCases } from "./GenerateNewCases";
 import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { ReactDetails } from "./ReactDetails";
@@ -113,7 +113,7 @@ export type ReactSeriesRequest = {
    *     allow_null - default is true, if true nulls may be generated per their distribution in the data
    * @default {}
    */
-  feature_bounds_map?: Record<string, FeatureBoundsMap>;
+  feature_bounds_map?: Record<string, FeatureBounds>;
 
   /**
    * Time step values at which to end synthesis for each series, applicable only for time series.

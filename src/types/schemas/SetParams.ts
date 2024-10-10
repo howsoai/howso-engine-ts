@@ -6,8 +6,8 @@
  *
  * Sets internal hyperparameters
  */
-import type { FullHyperparameterMap } from "./FullHyperparameterMap";
 import type { HyperparameterMap } from "./HyperparameterMap";
+import type { HyperparameterMapTree } from "./HyperparameterMapTree";
 
 export type SetParamsRequest = {
   /**
@@ -43,5 +43,5 @@ export type SetParamsRequest = {
    *       ...
    *   }
    */
-  hyperparameter_map?: FullHyperparameterMap;
+  hyperparameter_map?: HyperparameterMapTree;
 };

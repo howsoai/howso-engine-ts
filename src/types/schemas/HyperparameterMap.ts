@@ -21,11 +21,11 @@ export type HyperparameterMap = {
   /**
    * Internal map of features to their deviations. Includes null deviations and sparse deviation matrices.
    */
-  featureDeviations?: Record<string, any>;
+  featureDeviations?: Record<string, any> | null;
   /**
    * Internal map of features to various domain attributes.
    */
-  featureDomainAttributes?: Record<string, any>;
+  featureDomainAttributes?: Record<string, any> | null;
   /**
    * Map of ordinal features to their deviations.
    */
@@ -33,11 +33,11 @@ export type HyperparameterMap = {
   /**
    * Map of features to their computed feature residuals.
    */
-  featureResiduals?: Record<string, any>;
+  featureResiduals?: Record<string, number>;
   /**
    * Map of features to feature weights used in the distance metric.
    */
-  featureWeights?: Record<string, any>;
+  featureWeights?: Record<string, number> | null;
   /**
    * Error computed during the grid search in analysis.
    */
@@ -49,7 +49,7 @@ export type HyperparameterMap = {
   /**
    * Map of features to null uncertainties which describes the distances in the context of missing values.
    */
-  nullUncertainties?: Record<string, any>;
+  nullUncertainties?: Record<string, (number | null)[]>;
   /**
    * The parameter of the Lebesgue space.
    */

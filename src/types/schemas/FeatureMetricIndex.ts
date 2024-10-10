@@ -2,10 +2,10 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
  *
- * FeatureValueMap
+ * FeatureMetricIndex
  */
 
 /**
  * Map of feature names to numeric values.
  */
-export type FeatureValueMap = Record<string, number>;
+export type FeatureMetricIndex = Record<string, number>;

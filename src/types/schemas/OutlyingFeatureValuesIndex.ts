@@ -2,13 +2,13 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
  *
- * OutlyingFeatureValues
+ * OutlyingFeatureValuesIndex
  */
 
 /**
  * Map of feature name to map indicating the case value and the maximum or minimum value of the feature observed in the most similar cases.
  */
-export type OutlyingFeatureValues = Record<
+export type OutlyingFeatureValuesIndex = Record<
   string,
   {
     /**

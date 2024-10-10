@@ -7,7 +7,7 @@
  * Computes, caches, and returns specified details and feature prediction statistics such as Mean Decrease in Accuracy (MDA), residuals (accuracy, Mean Absolute Error),
  *  precision, recall, etc. Returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
  */
-import type { ConfusionMatrixMap } from "./ConfusionMatrixMap";
+import type { ConfusionMatrix } from "./ConfusionMatrix";
 import type { ReactAggregateDetails } from "./ReactAggregateDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
@@ -201,7 +201,7 @@ export type ReactAggregateResponse = Record<
      * The symmetric mean absolute percentage error with added the min gap / 2 to the actual and predicted values.
      */
     adjusted_smape?: number | null;
-    confusion_matrix?: ConfusionMatrixMap;
+    confusion_matrix?: ConfusionMatrix;
     /**
      * The mean difference of predicting the specified action feature with and without this feature while using the full set of remaining context features.
      */

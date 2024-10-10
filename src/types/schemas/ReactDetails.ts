@@ -16,7 +16,7 @@ export type ReactDetails = {
    */
   boundary_cases_familiarity_convictions?: boolean;
   /**
-   * If true outputs each influential case's differences between the
+   * If true outputs each influential case's differences between the predicted action feature value and the predicted action feature value if each individual case were not included. Uses only the context features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
    */
   case_contributions_full?: boolean;
   /**

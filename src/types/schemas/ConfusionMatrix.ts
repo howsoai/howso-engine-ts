@@ -2,13 +2,13 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
  *
- * ConfusionMatrixMap
+ * ConfusionMatrix
  */
 
 /**
  * The confusion matrix in the form of maps from actual classes to maps of predicted classes to frequencies alongside counts for insignficant predictions.
  */
-export type ConfusionMatrixMap = {
+export type ConfusionMatrix = {
   /**
    * Total number of correct predictions for classes that were not statistically significant.
    */

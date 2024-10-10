@@ -6,7 +6,7 @@
  */
 
 /**
- * Specify the data type for features with a type of nominal or continuous. Default is `string` for nominals and `number` for continuous.
+ * The data type of a feature. Default is `string` for nominals and `number` for continuous.
  *
  * Valid values include:
  * - `string`, `number`, `formatted_date_time`, `json`, `amalgam`, `yaml`: Valid for both nominal and continuous.

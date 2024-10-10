@@ -4,16 +4,16 @@
  *
  * SeriesReaction
  */
+import type { Case } from "./Case";
 import type { CaseMDA } from "./CaseMDA";
-import type { CaseMaps } from "./CaseMaps";
 import type { CategoricalActionProbabilities } from "./CategoricalActionProbabilities";
 import type { DistanceRatioParts } from "./DistanceRatioParts";
-import type { FeatureValueMap } from "./FeatureValueMap";
+import type { FeatureMetricIndex } from "./FeatureMetricIndex";
 import type { FullCaseContribution } from "./FullCaseContribution";
-import type { OutlyingFeatureValues } from "./OutlyingFeatureValues";
+import type { OutlyingFeatureValuesIndex } from "./OutlyingFeatureValuesIndex";
 import type { ReactionPredictionStats } from "./ReactionPredictionStats";
 import type { RobustCaseContribution } from "./RobustCaseContribution";
-import type { SimilarCaseMap } from "./SimilarCaseMap";
+import type { SimilarCaseIndex } from "./SimilarCaseIndex";
 
 /**
  * The response payload for #react_series.
@@ -34,7 +34,7 @@ export type SeriesReaction = {
   /**
    * A list of the detail result lists for each case of each series.
    */
-  boundary_cases?: CaseMaps[][];
+  boundary_cases?: Case[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
@@ -46,35 +46,35 @@ export type SeriesReaction = {
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_directional_feature_contributions_full?: FeatureValueMap[][];
+  case_directional_feature_contributions_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_directional_feature_contributions_robust?: FeatureValueMap[][];
+  case_directional_feature_contributions_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_feature_contributions_full?: FeatureValueMap[][];
+  case_feature_contributions_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_feature_contributions_robust?: FeatureValueMap[][];
+  case_feature_contributions_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_feature_residuals_full?: FeatureValueMap[][];
+  case_feature_residuals_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_feature_residuals_robust?: FeatureValueMap[][];
+  case_feature_residuals_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_feature_residual_convictions_full?: FeatureValueMap[][];
+  case_feature_residual_convictions_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  case_feature_residual_convictions_robust?: FeatureValueMap[][];
+  case_feature_residual_convictions_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
@@ -90,11 +90,11 @@ export type SeriesReaction = {
   /**
    * A list of the detail result lists for each case of each series.
    */
-  directional_feature_contributions_full?: FeatureValueMap[][];
+  directional_feature_contributions_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  directional_feature_contributions_robust?: FeatureValueMap[][];
+  directional_feature_contributions_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
@@ -110,35 +110,35 @@ export type SeriesReaction = {
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_contributions_full?: FeatureValueMap[][];
+  feature_contributions_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_contributions_robust?: FeatureValueMap[][];
+  feature_contributions_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_mda_ex_post_full?: FeatureValueMap[][];
+  feature_mda_ex_post_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_mda_ex_post_robust?: FeatureValueMap[][];
+  feature_mda_ex_post_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_mda_full?: FeatureValueMap[][];
+  feature_mda_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_mda_robust?: FeatureValueMap[][];
+  feature_mda_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_residuals_full?: FeatureValueMap[][];
+  feature_residuals_full?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  feature_residuals_robust?: FeatureValueMap[][];
+  feature_residuals_robust?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
@@ -150,23 +150,23 @@ export type SeriesReaction = {
   /**
    * A list of the detail result lists for each case of each series.
    */
-  influential_cases?: CaseMaps[][];
+  influential_cases?: Case[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  most_similar_cases?: CaseMaps[][];
+  most_similar_cases?: Case[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  most_similar_case_indices?: SimilarCaseMap[][][];
+  most_similar_case_indices?: SimilarCaseIndex[][][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  observational_errors?: FeatureValueMap[][];
+  observational_errors?: FeatureMetricIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */
-  outlying_feature_values?: OutlyingFeatureValues[][];
+  outlying_feature_values?: OutlyingFeatureValuesIndex[][];
   /**
    * A list of the detail result lists for each case of each series.
    */

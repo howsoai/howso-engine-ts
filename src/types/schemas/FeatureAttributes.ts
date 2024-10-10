@@ -4,7 +4,7 @@
  *
  * FeatureAttributes
  */
-import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { FeatureBounds } from "./FeatureBounds";
 import type { FeatureDataType } from "./FeatureDataType";
 import type { FeatureType } from "./FeatureType";
 
@@ -33,7 +33,7 @@ export type FeatureAttributes = {
      */
     series_id_features?: string[];
   };
-  bounds?: FeatureBoundsMap;
+  bounds?: FeatureBounds;
   /**
    * Cyclic features are set by specifying a `cycle_length` value in the feature attributes. `cycle_length` requires a single value, which is the upper bound of the difference for the cycle range. For example, if `cycle_length` is 360,  then a value of 1 and 359 will have a difference of 2. Cyclic features have no restrictions in the input dataset, however, cyclic features will be output on a scale from 0 to `cycle_length`. To constrain the output to a different range, modify the `min` and `max` `bounds` feature attribute.
    *
