@@ -5,6 +5,8 @@
  * FeatureAttributes
  */
 import type { FeatureBoundsMap } from "./FeatureBoundsMap";
+import type { FeatureDataType } from "./FeatureDataType";
+import type { FeatureType } from "./FeatureType";
 
 /**
  * The mapping of attributes for a single feature
@@ -41,15 +43,7 @@ export type FeatureAttributes = {
    * - hours: values should be 0-23, cycle_length = 24
    */
   cycle_length?: number;
-  /**
-   * Specify the data type for features with a type of nominal or continuous. Default is `string` for nominals and `number` for continuous.
-   *
-   * Valid values include:
-   * - `string`, `number`, `formatted_date_time`, `json`, `amalgam`, `yaml`: Valid for both nominal and continuous.
-   * - `string_mixable`: Valid only when type is continuous (predicted values may result in interpolated strings   containing a combination of characters from multiple original values).
-   * - `boolean`: Valid only for nominals.
-   */
-  data_type?: "string" | "number" | "boolean" | "formatted_date_time" | "string_mixable" | "json" | "yaml" | "amalgam";
+  data_type?: FeatureDataType;
   /**
    * If specified, feature values should match the date format specified by this string. Only applicable to continuous features.
    */
@@ -200,14 +194,7 @@ export type FeatureAttributes = {
    * The type of value being captured by this time-series feature.
    */
   ts_type?: "lag" | "delta" | "rate";
-  /**
-   * The type of the feature.
-   *
-   * - continuous: A continuous numeric value. (e.g. Temperature or humidity)
-   * - nominal: A numeric or string value with no ordering. (e.g. The name of a fruit)
-   * - ordinal: A nominal numeric value with ordering. (e.g. Rating scale, 1-5 stars)
-   */
-  type: "continuous" | "ordinal" | "nominal";
+  type: FeatureType;
   /**
    * Flag feature as only having unique values. Only applicable to nominals features.
    */

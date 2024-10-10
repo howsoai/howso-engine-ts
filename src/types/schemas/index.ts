@@ -29,6 +29,8 @@ export * from "./ExportTrainee";
 export * from "./FeatureAttributes";
 export * from "./FeatureAttributesIndex";
 export * from "./FeatureBoundsMap";
+export * from "./FeatureDataType";
+export * from "./FeatureType";
 export * from "./FeatureValueMap";
 export * from "./FullCaseContribution";
 export * from "./FullHyperparameterMap";
