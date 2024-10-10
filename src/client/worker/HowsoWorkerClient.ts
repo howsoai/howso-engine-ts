@@ -450,7 +450,10 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     });
     this.cache.discard(traineeId);
     const filename = this.fs.traineeFilename(traineeId);
-    this.fs.unlink(this.fs.join(this.fs.traineeDir, filename));
+    const existingTrainees = await this.fs.readdir(this.fs.traineeDir);
+    if (existingTrainees.includes(filename)) {
+      await this.fs.unlink(this.fs.join(this.fs.traineeDir, filename));
+    }
   }
 
   /**
