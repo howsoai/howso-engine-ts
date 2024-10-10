@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * SaveSubtrainee
  *
@@ -32,7 +33,7 @@ export type SaveSubtraineeRequest = {
   trainee?: string | string[];
 
   /**
-   * Unique id for trainee. must be provided if trainee does not have one already specified.
+   * Unique id for trainee. Must be provided if trainee does not have one already specified.
    */
   trainee_id?: string;
 };

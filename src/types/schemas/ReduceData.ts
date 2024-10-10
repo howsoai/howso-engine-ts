@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * ReduceData
  *
@@ -47,7 +48,7 @@ export type ReduceDataRequest = {
 
   /**
    * Numeric maximum threshold for influence weight entropy of cases to keep, defaults to the value
-   *  influence weight entropy threshold stored within the trainee
+   *  influence weight entropy threshold stored within the Trainee
    * @default 0.15
    */
   influence_weight_entropy_threshold?: number;
@@ -66,4 +67,11 @@ export type ReduceDataRequest = {
    * @default false
    */
   skip_auto_analyze?: boolean;
+};
+
+export type ReduceDataResponse = {
+  /**
+   * A map of threshold-type (abs, relative, or delta) to map of metric to map of feature name to boolean. Indicating what thresholds were met to trigger the end of data reduction.
+   */
+  threshold_info?: Record<string, Record<string, Record<string, boolean>>>;
 };

@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * RenameSubtrainee
  *
@@ -8,7 +9,7 @@
 
 export type RenameSubtraineeRequest = {
   /**
-   * Id of child trainee to rename. ignored if child_name_path is specified
+   * Id of child trainee to rename. Ignored if child_name_path is specified
    */
   child_id?: string;
 

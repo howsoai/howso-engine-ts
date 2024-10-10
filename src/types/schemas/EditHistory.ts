@@ -1,11 +1,12 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * EditHistory
  */
 import type { EditHistoryRecord } from "./EditHistoryRecord";
 
 /**
- * The edit history of a given case. keyed by the session id and in order of occurrence.
+ * The edit history of a given case. Keyed by the session id and in order of occurrence.
  */
 export type EditHistory = Record<string, EditHistoryRecord[]>;

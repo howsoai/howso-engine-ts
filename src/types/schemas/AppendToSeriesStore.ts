@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * AppendToSeriesStore
  *
@@ -13,7 +14,7 @@ export type AppendToSeriesStoreRequest = {
   context_features: string[];
 
   /**
-   * List of lists. case values corresponding to the context features to store into a series.
+   * List of lists. Case values corresponding to the context features to store into a series.
    */
   context_values: any[][];
 

@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * SetAutoAblationParams
  *
@@ -62,8 +63,8 @@ export type SetAutoAblationParamsRequest = {
   minimum_model_size?: number;
 
   /**
-   * Assoc of feature -> percent. for each of the features specified, will
-   *   ablate a case if abs(prediction - case value) / prediction <= percent
+   * Assoc of feature -> PERCENT. for each of the features specified, will
+   *   ablate a case if abs(prediction - case value) / prediction <= PERCENT
    */
   relative_prediction_threshold_map?: Record<string, number>;
 
@@ -74,8 +75,8 @@ export type SetAutoAblationParamsRequest = {
   residual_prediction_features?: string[];
 
   /**
-   * Assoc of feature -> [min, max]. for each of the features specified, will
-   *   ablate a case if the prediction >= (case value - min) and the prediction <= (case value + max)
+   * Assoc of feature -> [MIN, MAX]. for each of the features specified, will
+   *   ablate a case if the prediction >= (case value - MIN) and the prediction <= (case value + MAX)
    */
   tolerance_prediction_threshold_map?: Record<string, any[]>;
 };
