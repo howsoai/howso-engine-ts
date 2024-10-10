@@ -29,6 +29,8 @@ null
         {%- else -%}
 any
         {%- endif -%}
+    {%- elif schema | isAnyOf -%}
+{% include "schemas/composition/_anyOf.njk" %}
     {%- else -%}
 {{ type | convertType }}
     {%- endif -%}

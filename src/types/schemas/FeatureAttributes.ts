@@ -6,6 +6,7 @@
  */
 import type { FeatureBounds } from "./FeatureBounds";
 import type { FeatureDataType } from "./FeatureDataType";
+import type { FeatureOriginalType } from "./FeatureOriginalType";
 import type { FeatureType } from "./FeatureType";
 
 /**
@@ -99,12 +100,7 @@ export type FeatureAttributes = {
   /**
    * Original data type details. Used by clients to determine how to serialize and deserialize feature data.
    */
-  original_type?: {
-    /**
-     * The original type of the data.
-     */
-    data_type: "object" | "string" | "numeric" | "integer" | "boolean" | "datetime" | "time" | "date" | "timedelta";
-  } & Record<string, any>;
+  original_type?: FeatureOriginalType;
   /**
    * The feature whose values this time-series feature's values are derived from.
    */

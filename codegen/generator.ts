@@ -1,7 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
-import { EngineApi, isRef, isSchemaOrRef, isSimpleType, LabelDefinition, Ref, Schema } from "./engine";
+import {
+  AnyOf,
+  EngineApi,
+  isAnyOf,
+  isAnySchema,
+  isRef,
+  isSchema,
+  isSimpleType,
+  LabelDefinition,
+  Ref,
+  Schema,
+} from "./engine";
 import { registerFilters } from "./filters";
 import { toPascalCase } from "./utils";
 
@@ -152,7 +163,7 @@ export class Generator {
         imports.push(...this.detectSchemaImports(schema));
       }
     }
-    if (isSchemaOrRef(label.returns) && !isSimpleType(label.returns)) {
+    if (isAnySchema(label.returns) && !isSimpleType(label.returns)) {
       imports.push(...this.detectSchemaImports(label.returns));
     }
     return [...new Set(imports)].sort();
@@ -163,21 +174,30 @@ export class Generator {
    * @param schema The schema to check.
    * @returns The list of referenced schema names.
    */
-  private detectSchemaImports(schema: Ref | Schema): string[] {
+  private detectSchemaImports(schema: AnyOf | Ref | Schema): string[] {
     const imports: string[] = [];
     if (isRef(schema)) {
-      return [schema.ref];
-    }
-    if (isSchemaOrRef(schema.values)) {
-      imports.push(...this.detectSchemaImports(schema.values));
-    }
-    if (isSchemaOrRef(schema.additional_indices)) {
-      imports.push(...this.detectSchemaImports(schema.additional_indices));
-    }
-    if (schema.indices != null) {
-      for (const value of Object.values(schema.indices)) {
-        if (isSchemaOrRef(value)) {
-          imports.push(...this.detectSchemaImports(value));
+      imports.push(schema.ref);
+    } else if (isAnyOf(schema)) {
+      // Check all parts of the any of list
+      for (const item of schema.anyOf) {
+        if (isAnySchema(item)) {
+          imports.push(...this.detectSchemaImports(item));
+        }
+      }
+    } else if (isSchema(schema)) {
+      // Check nested parts of the schema
+      if (isAnySchema(schema.values)) {
+        imports.push(...this.detectSchemaImports(schema.values));
+      }
+      if (isAnySchema(schema.additional_indices)) {
+        imports.push(...this.detectSchemaImports(schema.additional_indices));
+      }
+      if (schema.indices != null) {
+        for (const value of Object.values(schema.indices)) {
+          if (isAnySchema(value)) {
+            imports.push(...this.detectSchemaImports(value));
+          }
         }
       }
     }

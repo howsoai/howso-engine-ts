@@ -4,16 +4,8 @@
  *
  * SeriesReaction
  */
-import type { Case } from "./Case";
-import type { CaseMDA } from "./CaseMDA";
+import type { Cases } from "./Cases";
 import type { CategoricalActionProbabilities } from "./CategoricalActionProbabilities";
-import type { DistanceRatioParts } from "./DistanceRatioParts";
-import type { FeatureMetricIndex } from "./FeatureMetricIndex";
-import type { FullCaseContribution } from "./FullCaseContribution";
-import type { OutlyingFeatureValuesIndex } from "./OutlyingFeatureValuesIndex";
-import type { ReactionPredictionStats } from "./ReactionPredictionStats";
-import type { RobustCaseContribution } from "./RobustCaseContribution";
-import type { SimilarCaseIndex } from "./SimilarCaseIndex";
 
 /**
  * The response payload for #react_series.
@@ -32,151 +24,151 @@ export type SeriesReaction = {
    */
   aggregated_categorical_action_probabilities?: Record<string, CategoricalActionProbabilities>[];
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  boundary_cases?: Case[][];
+  boundary_cases?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_contributions_full?: FullCaseContribution[][][];
+  case_contributions_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_contributions_robust?: RobustCaseContribution[][][];
+  case_contributions_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_directional_feature_contributions_full?: FeatureMetricIndex[][];
+  case_directional_feature_contributions_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_directional_feature_contributions_robust?: FeatureMetricIndex[][];
+  case_directional_feature_contributions_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_contributions_full?: FeatureMetricIndex[][];
+  case_feature_contributions_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_contributions_robust?: FeatureMetricIndex[][];
+  case_feature_contributions_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_residuals_full?: FeatureMetricIndex[][];
+  case_feature_residuals_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_residuals_robust?: FeatureMetricIndex[][];
+  case_feature_residuals_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_residual_convictions_full?: FeatureMetricIndex[][];
+  case_feature_residual_convictions_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_residual_convictions_robust?: FeatureMetricIndex[][];
+  case_feature_residual_convictions_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_mda_full?: CaseMDA[][][];
+  case_mda_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_mda_robust?: CaseMDA[][][];
+  case_mda_robust?: any;
   /**
    * A list of the detail result lists for each case of each series.
    */
   categorical_action_probabilities?: Record<string, CategoricalActionProbabilities>[][];
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  directional_feature_contributions_full?: FeatureMetricIndex[][];
+  directional_feature_contributions_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  directional_feature_contributions_robust?: FeatureMetricIndex[][];
+  directional_feature_contributions_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  distance_contribution?: number[][];
+  distance_contribution?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  distance_ratio?: number[][];
+  distance_ratio?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  distance_ratio_parts?: DistanceRatioParts[][];
+  distance_ratio_parts?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_contributions_full?: FeatureMetricIndex[][];
+  feature_contributions_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_contributions_robust?: FeatureMetricIndex[][];
+  feature_contributions_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_ex_post_full?: FeatureMetricIndex[][];
+  feature_mda_ex_post_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_ex_post_robust?: FeatureMetricIndex[][];
+  feature_mda_ex_post_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_full?: FeatureMetricIndex[][];
+  feature_mda_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_robust?: FeatureMetricIndex[][];
+  feature_mda_robust?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_residuals_full?: FeatureMetricIndex[][];
+  feature_residuals_full?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_residuals_robust?: FeatureMetricIndex[][];
+  feature_residuals_robust?: any;
   /**
    * A list of the detail result lists for each case of each series.
    */
   generate_attempts?: number[][];
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  hypothetical_values?: Record<string, any>[][];
+  hypothetical_values?: any;
   /**
    * A list of the detail result lists for each case of each series.
    */
-  influential_cases?: Case[][];
+  influential_cases?: Cases[][];
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  most_similar_cases?: Case[][];
+  most_similar_cases?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  most_similar_case_indices?: SimilarCaseIndex[][][];
+  most_similar_case_indices?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  observational_errors?: FeatureMetricIndex[][];
+  observational_errors?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  outlying_feature_values?: OutlyingFeatureValuesIndex[][];
+  outlying_feature_values?: any;
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  prediction_stats?: ReactionPredictionStats[][];
+  prediction_stats?: any;
   /**
    * A list of generation attempts for each series as a whole.
    */
   series_generate_attempts?: number[];
   /**
-   * A list of the detail result lists for each case of each series.
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  similarity_conviction?: number[][];
+  similarity_conviction?: any;
 };

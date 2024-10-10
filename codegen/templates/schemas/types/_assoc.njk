@@ -3,7 +3,7 @@
 {
     {%- for key, value in schema.indices | dictsort -%}
   {{ comment(value) | indent(2) }}
-  {{ key | autoQuote }}{% if not value | isSchemaOrRef or value.required != true %}?{% endif %}: {{ field(value) | indent(2) }};
+  {{ key | autoQuote }}{% if not value | isAnySchema or value.required != true %}?{% endif %}: {{ field(value) | indent(2) }};
     {%- endfor %}
 }
     {%- if schema.additional_indices %}

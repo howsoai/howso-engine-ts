@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 export const PRIMITIVE_TYPES = ["any", "boolean", "number", "string", "null"];
 export type SchemaTypeOption = "any" | "assoc" | "boolean" | "list" | "number" | "string" | "null";
 export type SchemaType = SchemaTypeOption | SchemaTypeOption[];
+export type Spec = SchemaType | Schema | Ref | AnyOf;
 
 export interface BaseSchema {
   description?: string | null;
@@ -17,6 +18,10 @@ export interface Ref extends BaseSchema {
   ref: string;
 }
 
+export interface AnyOf extends BaseSchema {
+  anyOf: Array<SchemaTypeOption | Schema | Ref | AnyOf>;
+}
+
 export interface Schema extends BaseSchema {
   type: SchemaType;
   enum?: (number | string)[];
@@ -26,15 +31,17 @@ export interface Schema extends BaseSchema {
   exclusive_max?: number;
   min_size?: number;
   max_size?: number;
-  values?: SchemaType | Schema | Ref;
-  indices?: Record<string, SchemaType | Schema | Ref>;
-  dynamic_indices?: Record<string, SchemaType | Schema | Ref>;
-  additional_indices?: SchemaType | Schema | Ref | false;
+  values?: Spec;
+  min_indices?: number;
+  max_indices?: number;
+  indices?: Record<string, Spec>;
+  dynamic_indices?: Record<string, Spec>;
+  additional_indices?: Spec | false;
 }
 
 export interface LabelDefinition {
-  parameters: Record<string, Schema | Ref> | null;
-  returns?: SchemaType | Schema | Ref | null;
+  parameters: Record<string, Exclude<Spec, SchemaType>> | null;
+  returns?: Spec | null;
   description?: string | null;
   use_active_session?: boolean;
   attribute?: SchemaType | null;
@@ -47,7 +54,7 @@ export interface LabelDefinition {
 
 export interface EngineApi {
   readonly labels: Record<string, LabelDefinition>;
-  readonly schemas: Record<string, Schema>;
+  readonly schemas: Record<string, Exclude<Spec, SchemaType | Ref>>;
   readonly description: string;
   readonly version: string;
 }
@@ -98,8 +105,16 @@ export async function getEngineApi(): Promise<EngineApi> {
   }
 }
 
+/** Check if a type is a AnyOf object. */
+export function isAnyOf(value: Spec | null | undefined): value is AnyOf {
+  if (value == null || Array.isArray(value) || typeof value === "string") {
+    return false;
+  }
+  return "anyOf" in value && Array.isArray(value.anyOf) && value.anyOf.length > 0;
+}
+
 /** Check if a type is a Ref object. */
-export function isRef(value: SchemaType | Schema | Ref | null | undefined): value is Ref {
+export function isRef(value: Spec | null | undefined): value is Ref {
   if (value == null || Array.isArray(value) || typeof value === "string") {
     return false;
   }
@@ -107,17 +122,17 @@ export function isRef(value: SchemaType | Schema | Ref | null | undefined): valu
 }
 
 /** Check if a type is a Schema object. */
-export function isSchema(value: SchemaType | Schema | Ref | null | undefined): value is Schema {
+export function isSchema(value: Spec | null | undefined): value is Schema {
   if (value == null || Array.isArray(value) || typeof value === "string") {
     return false;
   }
   return !isRef(value) && "type" in value && (typeof value.type === "string" || Array.isArray(value.type));
 }
 
-/** Check if a type is a Schema or Ref object. */
-export function isSchemaOrRef(value: SchemaType | Schema | Ref | boolean | null | undefined): value is Schema | Ref {
-  if (typeof value === "boolean") return false;
-  return isRef(value) || isSchema(value);
+/** Check if a type is a Schema, Ref, or AnyOf object. */
+export function isAnySchema(value: Spec | boolean | null | undefined): value is Schema | Ref {
+  if (value == null || typeof value === "boolean") return false;
+  return isRef(value) || isSchema(value) || isAnyOf(value);
 }
 
 /** Check if a type is a primitive or simple array. */

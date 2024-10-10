@@ -5,7 +5,4 @@
  * Case
  */
 
-/**
- * A list of maps representing the cases that influenced a react.
- */
-export type Case = Record<string, any>[];
+export type Case = Record<string, any>;

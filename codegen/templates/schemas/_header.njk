@@ -9,5 +9,7 @@
 {%- endif %}
  */
 {%- for item in imports %}
+    {%- if item != name %}
 import type { {{ item }} } from "./{{ item }}";
+    {%- endif %}
 {%- endfor %}

@@ -1,0 +1,4 @@
+{%- from "schemas/_macros.njk" import field %}
+{%- for item in schema.anyOf -%}
+{{ field(item) }}{% if not loop.last %} | {% endif %}
+{%- endfor %}

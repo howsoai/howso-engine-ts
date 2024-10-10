@@ -4,8 +4,8 @@
  *
  * Reaction
  */
-import type { Case } from "./Case";
 import type { CaseMDA } from "./CaseMDA";
+import type { Cases } from "./Cases";
 import type { CategoricalActionProbabilities } from "./CategoricalActionProbabilities";
 import type { DistanceRatioParts } from "./DistanceRatioParts";
 import type { FeatureMetricIndex } from "./FeatureMetricIndex";
@@ -30,7 +30,7 @@ export type Reaction = {
   /**
    * A list of lists of boundary cases for each given case.
    */
-  boundary_cases?: Case[];
+  boundary_cases?: Cases[];
   /**
    * A list of lists of maps containing the case index and full contribution to the action feature for each influential case of each given case.
    */
@@ -146,11 +146,11 @@ export type Reaction = {
   /**
    * A list of lists of influential cases for each given case.
    */
-  influential_cases?: Case[];
+  influential_cases?: Cases[];
   /**
    * A list of lists of the most similar cases to each given case.
    */
-  most_similar_cases?: Case[];
+  most_similar_cases?: Cases[];
   /**
    * A list of lists of maps describing the most similar case indices and their distance from each given case.
    */
