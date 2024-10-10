@@ -9,16 +9,16 @@
  * Types of prediction statistics.
  */
 export type PredictionStat =
-  | "mae"
-  | "confusion_matrix"
-  | "r2"
-  | "rmse"
-  | "adjusted_smape"
-  | "smape"
-  | "spearman_coeff"
-  | "precision"
-  | "recall"
   | "accuracy"
-  | "mcc"
+  | "adjusted_smape"
   | "all"
-  | "missing_value_accuracy";
+  | "confusion_matrix"
+  | "mae"
+  | "mcc"
+  | "missing_value_accuracy"
+  | "precision"
+  | "r2"
+  | "recall"
+  | "rmse"
+  | "smape"
+  | "spearman_coeff";

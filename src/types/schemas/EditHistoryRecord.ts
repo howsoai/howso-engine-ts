@@ -20,7 +20,7 @@ export type EditHistoryRecord = {
   /**
    * The type of modification.
    */
-  type?: "set" | "remove" | "impute" | "edit";
+  type?: "edit" | "impute" | "remove" | "set";
   /**
    * The new value.
    */

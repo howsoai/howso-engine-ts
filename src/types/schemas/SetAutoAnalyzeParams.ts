@@ -106,7 +106,7 @@ export type SetAutoAnalyzeParamsRequest = {
    *    "omni_targeted" = analyze hyperparameters for each action feature, using all other features as context_features. if action_features aren't specified, uses all context_features.
    *    "targetless" = analyze hyperparameters for all context features as possible action features, ignores action_features parameter
    */
-  targeted_model?: "single_targeted" | "omni_targeted" | "targetless";
+  targeted_model?: "omni_targeted" | "single_targeted" | "targetless";
 
   /**
    * When true will scale influence weights by each case's weight_feature weight. if use_case_weights isn't specified, it will

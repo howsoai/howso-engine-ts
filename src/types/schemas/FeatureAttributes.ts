@@ -24,7 +24,7 @@ export type FeatureAttributes = {
     /**
      * The train derive operation type.
      */
-    derive_type?: "custom" | "start" | "end" | "progress";
+    derive_type?: "custom" | "end" | "progress" | "start";
     /**
      * Feature name(s) that define the order of the series.
      */
@@ -176,7 +176,7 @@ export type FeatureAttributes = {
     /**
      * When `rate` is specified, uses the difference of the current value from its previous value divided by the change in time since the previous value. When `delta` is specified, uses the difference of the current value from its previous value regardless of the elapsed time. Set to `delta` if feature has `time_feature` set to true.
      */
-    type?: "rate" | "delta";
+    type?: "delta" | "rate";
     /**
      * Controls whether future values of independent time series are considered. Applicable only to the time feature. When false, the time feature is not universal and allows using future data from other series in decisions; this is applicable when the time is not globally relevant and is independent for each time series. When true, universally excludes using any data with from the future from all series; this is applicable when time is globally relevant and there are events that may affect all time series. If there is any possibility of global relevancy of time, it is generally recommended to set this value to true, which is the default.
      */
@@ -189,7 +189,7 @@ export type FeatureAttributes = {
   /**
    * The type of value being captured by this time-series feature.
    */
-  ts_type?: "lag" | "delta" | "rate";
+  ts_type?: "delta" | "lag" | "rate";
   type: FeatureType;
   /**
    * Flag feature as only having unique values. Only applicable to nominals features.

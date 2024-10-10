@@ -19,7 +19,7 @@ export interface Ref extends BaseSchema {
 }
 
 export interface AnyOf extends BaseSchema {
-  anyOf: Array<SchemaTypeOption | Schema | Ref | AnyOf>;
+  any_of: Array<SchemaTypeOption | Schema | Ref | AnyOf>;
 }
 
 export interface Schema extends BaseSchema {
@@ -110,7 +110,7 @@ export function isAnyOf(value: Spec | null | undefined): value is AnyOf {
   if (value == null || Array.isArray(value) || typeof value === "string") {
     return false;
   }
-  return "anyOf" in value && Array.isArray(value.anyOf) && value.anyOf.length > 0;
+  return "any_of" in value && Array.isArray(value.any_of) && value.any_of.length > 0;
 }
 
 /** Check if a type is a Ref object. */

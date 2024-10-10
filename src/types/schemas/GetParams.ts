@@ -23,7 +23,7 @@ export type GetParamsRequest = {
   /**
    * The method of calculation used to find the desired hyperparameters
    */
-  mode?: "robust" | "full";
+  mode?: "full" | "robust";
 
   /**
    * The weight feature used in the calculation of the desired hyperparameters

@@ -13,5 +13,5 @@ export type FeatureOriginalTypeTimedelta = {
   /**
    * The unit of the time delta.
    */
-  unit?: "days" | "seconds" | "nanoseconds";
+  unit?: "days" | "nanoseconds" | "seconds";
 };

@@ -180,7 +180,7 @@ export class Generator {
       imports.push(schema.ref);
     } else if (isAnyOf(schema)) {
       // Check all parts of the any of list
-      for (const item of schema.anyOf) {
+      for (const item of schema.any_of) {
         if (isAnySchema(item)) {
           imports.push(...this.detectSchemaImports(item));
         }

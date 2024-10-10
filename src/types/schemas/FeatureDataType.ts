@@ -14,11 +14,11 @@
  * - `boolean`: Valid only for nominals.
  */
 export type FeatureDataType =
-  | "string"
-  | "number"
+  | "amalgam"
   | "boolean"
   | "formatted_date_time"
-  | "string_mixable"
   | "json"
-  | "yaml"
-  | "amalgam";
+  | "number"
+  | "string"
+  | "string_mixable"
+  | "yaml";

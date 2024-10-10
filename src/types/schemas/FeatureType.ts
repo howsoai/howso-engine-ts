@@ -12,4 +12,4 @@
  * - nominal: A numeric or string value with no ordering. (e.g. The name of a fruit)
  * - ordinal: A nominal numeric value with ordering. (e.g. Rating scale, 1-5 stars)
  */
-export type FeatureType = "continuous" | "ordinal" | "nominal";
+export type FeatureType = "continuous" | "nominal" | "ordinal";

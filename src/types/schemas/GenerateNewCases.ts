@@ -11,4 +11,4 @@
  * b. "always": always generates new cases and if its not possible to generate a new case, it returns nulls.
  * c. "no": generates data based on the `desired_conviction` specified and the generated data is not guaranteed to be a new case (that is, a case not found in original dataset.)
  */
-export type GenerateNewCases = "no" | "attempt" | "always";
+export type GenerateNewCases = "always" | "attempt" | "no";

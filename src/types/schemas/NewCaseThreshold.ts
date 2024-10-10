@@ -8,4 +8,4 @@
 /**
  * The privacy distance criteria for generated new cases.
  */
-export type NewCaseThreshold = "min" | "max" | "most_similar";
+export type NewCaseThreshold = "max" | "min" | "most_similar";

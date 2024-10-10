@@ -220,7 +220,7 @@ export type ReactSeriesRequest = {
    *   relevant series ID, but is allowed to change the series ID that it tracks based on its current context. If "no", does not track any particular series ID.
    * @default "fixed"
    */
-  series_id_tracking?: "fixed" | "dynamic" | "no";
+  series_id_tracking?: "dynamic" | "fixed" | "no";
 
   /**
    * List of assocs of feature -> stop conditions:

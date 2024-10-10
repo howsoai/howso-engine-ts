@@ -10,6 +10,7 @@ import type { CaseIndices } from "./CaseIndices";
 import type { DesiredConviction } from "./DesiredConviction";
 import type { FeatureBounds } from "./FeatureBounds";
 import type { GenerateNewCases } from "./GenerateNewCases";
+import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { ReactDetails } from "./ReactDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
@@ -317,7 +318,7 @@ export type ReactRequest = {
    *      null: the minimum local distance
    * @default "min"
    */
-  new_case_threshold?: "min" | "max" | "most_similar";
+  new_case_threshold?: NewCaseThreshold;
 
   /**
    * Total number of cases to generate for generative reacts.

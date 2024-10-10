@@ -89,7 +89,7 @@ export type AnalyzeRequest = {
    *    "targetless" = analyze hyperparameters for all context features as possible action features, ignores action_features parameter
    * @default "single_targeted"
    */
-  targeted_model?: "single_targeted" | "omni_targeted" | "targetless";
+  targeted_model?: "omni_targeted" | "single_targeted" | "targetless";
 
   /**
    * When true will scale influence weights by each case's weight_feature weight. if use_case_weights isn't specified, it will

@@ -14,7 +14,7 @@ export type TypeSchema =
        * The expected type of values pointed to by any unnamed indices when the structure is an (assoc).
        */
       additional_indices?: TypeSchema | boolean;
-      anyOf?: TypeSchema[];
+      any_of?: TypeSchema[];
       /**
        * A description of the type and the meaning of the value.
        */
@@ -67,53 +67,53 @@ export type TypeSchema =
        * A reference to a named schema to use the type definition there.
        */
       ref?:
-        | "FeatureOriginalTypeNumeric"
-        | "FeatureOriginalTypeString"
-        | "Condition"
-        | "FeatureOriginalTypeDate"
-        | "OutlyingFeatureValuesIndex"
-        | "TypeSchema"
-        | "DerivationParameters"
-        | "FeatureOriginalTypeTime"
-        | "HyperparameterMapTree"
-        | "SimilarCaseIndex"
-        | "SeriesReaction"
-        | "FeatureDataType"
-        | "EditHistory"
-        | "BuiltInFeatures"
-        | "FeatureMetricIndex"
-        | "FullCaseContribution"
-        | "GenerateNewCases"
-        | "PredictionStat"
-        | "Cases"
-        | "Reaction"
-        | "ReactionPredictionStats"
-        | "NewCaseThreshold"
-        | "FeatureOriginalTypeObject"
         | "AblationThresholdMap"
-        | "CaseIndices"
-        | "FeatureOriginalType"
+        | "BuiltInFeatures"
         | "Case"
+        | "CaseIndices"
         | "CaseMDA"
-        | "ReactDetails"
-        | "Precision"
-        | "FeatureOriginalTypeBoolean"
+        | "Cases"
         | "CategoricalActionProbabilities"
-        | "EditHistoryRecord"
-        | "RobustCaseContribution"
-        | "ReactAggregateDetails"
-        | "FeatureAttributes"
-        | "FeatureOriginalTypeInteger"
-        | "DesiredConviction"
-        | "UseCaseWeights"
-        | "FeatureOriginalTypeDatetime"
+        | "Condition"
         | "ConfusionMatrix"
+        | "DerivationParameters"
+        | "DesiredConviction"
+        | "DistanceRatioParts"
+        | "EditHistory"
+        | "EditHistoryRecord"
+        | "FeatureAttributes"
         | "FeatureAttributesIndex"
+        | "FeatureBounds"
+        | "FeatureDataType"
+        | "FeatureMetricIndex"
+        | "FeatureOriginalType"
+        | "FeatureOriginalTypeBoolean"
+        | "FeatureOriginalTypeDate"
+        | "FeatureOriginalTypeDatetime"
+        | "FeatureOriginalTypeInteger"
+        | "FeatureOriginalTypeNumeric"
+        | "FeatureOriginalTypeObject"
+        | "FeatureOriginalTypeString"
+        | "FeatureOriginalTypeTime"
         | "FeatureOriginalTypeTimedelta"
         | "FeatureType"
+        | "FullCaseContribution"
+        | "GenerateNewCases"
         | "HyperparameterMap"
-        | "DistanceRatioParts"
-        | "FeatureBounds";
+        | "HyperparameterMapTree"
+        | "NewCaseThreshold"
+        | "OutlyingFeatureValuesIndex"
+        | "Precision"
+        | "PredictionStat"
+        | "ReactAggregateDetails"
+        | "ReactDetails"
+        | "Reaction"
+        | "ReactionPredictionStats"
+        | "RobustCaseContribution"
+        | "SeriesReaction"
+        | "SimilarCaseIndex"
+        | "TypeSchema"
+        | "UseCaseWeights";
       /**
        * Flag indicating if the value is required to be specified as not (null).
        */
@@ -122,24 +122,24 @@ export type TypeSchema =
        * The type of data. The string name of the type or a list of possible types.
        */
       type?:
-        | "string"
-        | "list"
-        | "assoc"
-        | "number"
-        | "null"
-        | "boolean"
         | "any"
-        | ("string" | "list" | "assoc" | "number" | "null" | "boolean" | "any")[];
+        | "assoc"
+        | "boolean"
+        | "list"
+        | "null"
+        | "number"
+        | "string"
+        | ("any" | "assoc" | "boolean" | "list" | "null" | "number" | "string")[];
       /**
        * The expected type of the structure's values when the structure is a (list).
        */
       values?: TypeSchema;
     }
-  | "string"
-  | "list"
-  | "assoc"
-  | "number"
-  | "null"
-  | "boolean"
   | "any"
-  | ("string" | "list" | "assoc" | "number" | "null" | "boolean" | "any")[];
+  | "assoc"
+  | "boolean"
+  | "list"
+  | "null"
+  | "number"
+  | "string"
+  | ("any" | "assoc" | "boolean" | "list" | "null" | "number" | "string")[];
