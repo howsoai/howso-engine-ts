@@ -8,6 +8,7 @@
  * if any of the parameters are specified, then GetHyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
  */
 import type { HyperparameterMap } from "./HyperparameterMap";
+import type { HyperparameterMapTree } from "./HyperparameterMapTree";
 
 export type GetParamsRequest = {
   /**
@@ -51,5 +52,5 @@ export type GetParamsResponse = {
   /**
    * The full map of hyperparameters or a specific map of hyperparameters if any parameters were given
    */
-  hyperparameter_map?: Record<string, any>;
+  hyperparameter_map?: HyperparameterMap | HyperparameterMapTree;
 };

@@ -102,6 +102,8 @@ export * from "./SetSubstituteFeatureValues";
 export * from "./SetTraineeId";
 export * from "./SimilarCaseIndex";
 export * from "./Train";
+export * from "./TypeDefinition";
 export * from "./TypeSchema";
+export * from "./TypeString";
 export * from "./UpgradeTrainee";
 export * from "./UseCaseWeights";
