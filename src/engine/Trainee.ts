@@ -2,7 +2,7 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly, instead modify the Trainee.njk template file.
  *
- * Generated via Howso Engine 86.1.0+alpha
+ * Generated via Howso Engine 87.1.0+alpha
  */
 import { AbstractBaseClient } from "../client/AbstractBaseClient";
 import { batcher, BatchOptions } from "../client/utilities";
