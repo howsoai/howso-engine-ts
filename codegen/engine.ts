@@ -54,7 +54,7 @@ export interface LabelDefinition {
 
 export interface EngineApi {
   readonly labels: Record<string, LabelDefinition>;
-  readonly schemas: Record<string, Exclude<TypeDefinition, SchemaType | Ref>>;
+  readonly schemas: Record<string, Exclude<TypeDefinition, SchemaType>>;
   readonly description: string;
   readonly version: string;
 }
