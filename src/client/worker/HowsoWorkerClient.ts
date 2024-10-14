@@ -83,7 +83,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
       const result = this.processResponse<R>(response);
       if (throwErrors && Array.isArray(result.errors)) {
         for (const err of result.errors) {
-          throw new HowsoError(err?.message, err?.code);
+          throw err;
         }
       }
       return result;

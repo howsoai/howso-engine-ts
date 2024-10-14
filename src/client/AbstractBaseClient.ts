@@ -73,7 +73,7 @@ export abstract class AbstractBaseClient {
         }
       } else {
         // Collect errors
-        if (value?.errors) {
+        if (value?.errors || value?.code === "invalid") {
           errors.push(new HowsoValidationError(value.detail, value.code, value.errors));
         } else {
           errors.push(new HowsoError(value.detail, value.code));
