@@ -685,9 +685,9 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async react(request: schemas.ReactRequest): Promise<ClientResponse<schemas.Reaction>> {
+  public async react(request: schemas.ReactRequest): Promise<ClientResponse<schemas.ReactResponse>> {
     await this.client.autoResolveTrainee(this.id);
-    const response = await this.client.execute<schemas.Reaction>(this.id, "react", request);
+    const response = await this.client.execute<schemas.ReactResponse>(this.id, "react", request);
     this.client.autoPersistTrainee(this.id);
     return { payload: response.payload, warnings: response.warnings };
   }
@@ -749,9 +749,9 @@ export class Trainee implements BaseTrainee {
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async reactSeries(request: schemas.ReactSeriesRequest): Promise<ClientResponse<schemas.SeriesReaction>> {
+  public async reactSeries(request: schemas.ReactSeriesRequest): Promise<ClientResponse<schemas.ReactSeriesResponse>> {
     await this.client.autoResolveTrainee(this.id);
-    const response = await this.client.execute<schemas.SeriesReaction>(this.id, "react_series", request);
+    const response = await this.client.execute<schemas.ReactSeriesResponse>(this.id, "react_series", request);
     this.client.autoPersistTrainee(this.id);
     return { payload: response.payload, warnings: response.warnings };
   }

@@ -113,11 +113,11 @@ export type ReactGroupResponse = {
    */
   kl_divergence_removal?: number[];
   /**
-   * The P-value of adding each group of cases to the model.
+   * The p-value of adding each group of cases to the model.
    */
   p_value_of_addition?: number[];
   /**
-   * The P-value of removing each group of cases to the model.
+   * The p-value of removing each group of cases to the model.
    */
   p_value_of_removal?: number[];
 };

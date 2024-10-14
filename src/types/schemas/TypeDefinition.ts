@@ -17,6 +17,10 @@ export type TypeDefinition = {
   additional_indices?: TypeSchema | boolean;
   any_of?: TypeSchema[];
   /**
+   * The default value. Only used when describing a parameter.
+   */
+  default?: any;
+  /**
    * A description of the type and the meaning of the value.
    */
   description?: string;
@@ -108,10 +112,8 @@ export type TypeDefinition = {
     | "PredictionStat"
     | "ReactAggregateDetails"
     | "ReactDetails"
-    | "Reaction"
     | "ReactionPredictionStats"
     | "RobustCaseContribution"
-    | "SeriesReaction"
     | "SimilarCaseIndex"
     | "TypeDefinition"
     | "TypeSchema"
