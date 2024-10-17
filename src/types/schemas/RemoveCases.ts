@@ -46,5 +46,5 @@ export type RemoveCasesRequest = {
 };
 
 export type RemoveCasesResponse = {
-  count?: number;
+  count: number;
 };

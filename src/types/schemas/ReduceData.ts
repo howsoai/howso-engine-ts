@@ -13,7 +13,7 @@ export type ReduceDataRequest = {
   /**
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
    *  absolute thresholds will cause data reduction to stop when any of the measure values for any of
-   *  the features for which a threshold is defined go avove the threshold (in the case of rmse and
+   *  the features for which a threshold is defined go above the threshold (in the case of rmse and
    *  mae) or below the threshold (otherwise).
    * @default {}
    */
@@ -28,7 +28,7 @@ export type ReduceDataRequest = {
   /**
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
    *  delta thresholds will cause data reduction to stop when the delta between any of the measure values
-   *  for any of the features for which a threshold is defined and its previous value go avove the threshold
+   *  for any of the features for which a threshold is defined and its previous value go above the threshold
    *  (in the case of rmse and mae) or below the threshold (otherwise).
    * @default {}
    */
@@ -57,7 +57,7 @@ export type ReduceDataRequest = {
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
    *  relative thresholds will cause data reduction to stop when the relative change between any of the
    *  measure values for any of the features for which a threshold is defined and its previous value go
-   *  avove the threshold (in the case of rmse and mae) or below the threshold (otherwise).
+   *  above the threshold (in the case of rmse and mae) or below the threshold (otherwise).
    * @default {}
    */
   rel_threshold_map?: AblationThresholdMap;

@@ -48,7 +48,7 @@ export type AnalyzeRequest = {
   /**
    * List of values for dt (the distance transform) to grid search during analysis
    */
-  dt_values?: number[];
+  dt_values?: (number | string)[];
 
   /**
    * Whether to use inverse residuals as feature weights. If unspecified, inverse residuals will be used as weights for

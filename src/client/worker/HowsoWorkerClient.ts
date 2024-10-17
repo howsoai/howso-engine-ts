@@ -258,11 +258,11 @@ export class HowsoWorkerClient extends AbstractBaseClient {
    * @param traineeId The Trainee identifier.
    */
   public async persistTrainee(traineeId: string): Promise<void> {
-    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.traineeFilename(traineeId));
+    const filePath = this.fs.join(this.fs.traineeDir, this.fs.traineeFilename(traineeId));
     await this.dispatch({
       type: "request",
       command: "storeEntity",
-      parameters: [traineeId, fileUri],
+      parameters: [{ handle: traineeId, filePath }],
     });
   }
 
@@ -296,7 +296,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
       const status = await this.dispatch({
         type: "request",
         command: "loadEntity",
-        parameters: [traineeId, filePath],
+        parameters: [{ handle: traineeId, filePath }],
       });
       if (!status.loaded) {
         throw new HowsoError(`Failed to acquire the Trainee "${traineeId}": ${status.message}`);
@@ -347,11 +347,11 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   public async createTrainee(properties: Omit<BaseTrainee, "id">): Promise<Trainee> {
     const traineeId = properties.name || uuid();
     // Load the Engine entity
-    const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
+    const filePath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
     const status = await this.dispatch({
       type: "request",
       command: "loadEntity",
-      parameters: [traineeId, howsoPath],
+      parameters: [{ handle: traineeId, filePath }],
     });
     if (!status.loaded) {
       throw new HowsoError(`Failed to initialize the Trainee "${traineeId}": ${status.message}`);
@@ -360,7 +360,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     // Create the Trainee entity
     await this.execute<boolean>(traineeId, "initialize", {
       trainee_id: traineeId,
-      filepath: howsoPath,
+      filepath: filePath,
     });
 
     // Set Trainee metadata
@@ -420,7 +420,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     const cloned = await this.dispatch({
       type: "request",
       command: "cloneEntity",
-      parameters: [traineeId, newTraineeId],
+      parameters: [{ handle: traineeId, cloneHandle: newTraineeId }],
     });
     if (!cloned) {
       throw new HowsoError(

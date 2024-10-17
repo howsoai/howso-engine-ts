@@ -76,5 +76,5 @@ export type MoveCasesRequest = {
 };
 
 export type MoveCasesResponse = {
-  count?: number;
+  count: number;
 };

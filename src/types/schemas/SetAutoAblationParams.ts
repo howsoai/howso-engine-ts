@@ -6,6 +6,7 @@
  *
  * Sets the model to auto-ablate by tracking its size and training certain cases as weights
  */
+import type { AblationThresholdMap } from "./AblationThresholdMap";
 
 export type SetAutoAblationParamsRequest = {
   /**
@@ -13,6 +14,15 @@ export type SetAutoAblationParamsRequest = {
    * @default 100
    */
   ablated_cases_distribution_batch_size?: number;
+
+  /**
+   * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
+   *  absolute thresholds will cause ablation to stop when any of the measure values for any of
+   *  the features for which a threshold is defined go above the threshold (in the case of rmse and
+   *  mae) or below the threshold (otherwise).
+   * @default {}
+   */
+  abs_threshold_map?: AblationThresholdMap;
 
   /**
    * Flag, default is false. when true, any enabled ablation techniques will be run at during training.
@@ -43,6 +53,15 @@ export type SetAutoAblationParamsRequest = {
   conviction_upper_threshold?: number;
 
   /**
+   * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
+   *  delta thresholds will cause ablation to stop when the delta between any of the measure values
+   *  for any of the features for which a threshold is defined and its previous value go above the threshold
+   *  (in the case of rmse and mae) or below the threshold (otherwise).
+   * @default {}
+   */
+  delta_threshold_map?: AblationThresholdMap;
+
+  /**
    * List of features. for each of the features specified, will ablate a case if the prediction
    *   matches exactly.
    */
@@ -60,13 +79,22 @@ export type SetAutoAblationParamsRequest = {
    *   default of 1000.
    * @default 1000
    */
-  minimum_model_size?: number;
+  minimum_num_cases?: number;
 
   /**
    * Assoc of feature -> PERCENT. for each of the features specified, will
    *   ablate a case if abs(prediction - case value) / prediction <= PERCENT
    */
   relative_prediction_threshold_map?: Record<string, number>;
+
+  /**
+   * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
+   *  relative thresholds will cause ablation to stop when the relative change between any of the
+   *  measure values for any of the features for which a threshold is defined and its previous value go
+   *  above the threshold (in the case of rmse and mae) or below the threshold (otherwise).
+   * @default {}
+   */
+  rel_threshold_map?: AblationThresholdMap;
 
   /**
    * List of features. for each of the features specified, will ablate a case if

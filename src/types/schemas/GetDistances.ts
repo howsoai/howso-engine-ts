@@ -75,7 +75,7 @@ export type GetDistancesResponse = {
   /**
    * The case indices of the cases represented by the columns of the distance matrix.
    */
-  distances?: number[][];
+  distances: number[][];
   /**
    * The case indices of the cases represented by the columns of the distance matrix.
    */

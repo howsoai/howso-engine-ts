@@ -6,8 +6,13 @@
  *
  * Get auto-ablation parameters set by #set_auto_ablation_params
  */
+import type { AblationThresholdMap } from "./AblationThresholdMap";
 
 export type GetAutoAblationParamsResponse = {
+  /**
+   * The absolute threshold map set by set_auto_ablation_params, if any.
+   */
+  abs_threshold_map?: AblationThresholdMap;
   /**
    * Flag indicating if automatic ablation is enabled.
    */
@@ -25,6 +30,10 @@ export type GetAutoAblationParamsResponse = {
    */
   conviction_upper_threshold?: number;
   /**
+   * The delta threshold map set by set_auto_ablation_params, if any.
+   */
+  delta_threshold_map?: AblationThresholdMap;
+  /**
    * The list of features that if predicted correctly on a new case will trigger the ablation of the case.
    */
   exact_prediction_features?: string[];
@@ -35,11 +44,15 @@ export type GetAutoAblationParamsResponse = {
   /**
    * The minimum number of cases to train before automatic ablation begins.
    */
-  minimum_model_size?: number;
+  minimum_num_cases?: number;
   /**
    * The map of features to relative thresholds that if predicted within on a new case will trigger the ablation of the case.
    */
   relative_prediction_threshold_map?: Record<string, number>;
+  /**
+   * The relative threshold map set by set_auto_ablation_params, if any.
+   */
+  rel_threshold_map?: AblationThresholdMap;
   /**
    * The list of features that if predicted within their residual on a new case will trigger the ablation of the case.
    */

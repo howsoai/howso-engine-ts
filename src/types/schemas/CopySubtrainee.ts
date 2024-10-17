@@ -37,5 +37,5 @@ export type CopySubtraineeRequest = {
 };
 
 export type CopySubtraineeResponse = {
-  name?: string[] | string;
+  name: string[] | string;
 };

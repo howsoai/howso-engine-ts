@@ -67,5 +67,5 @@ export type EditCasesRequest = {
 };
 
 export type EditCasesResponse = {
-  count?: number;
+  count: number;
 };

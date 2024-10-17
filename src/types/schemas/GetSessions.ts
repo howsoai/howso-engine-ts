@@ -19,5 +19,5 @@ export type GetSessionsResponse = ({
   /**
    * The session ID
    */
-  id?: string;
+  id: string;
 } & Record<string, any>)[];

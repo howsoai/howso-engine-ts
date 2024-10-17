@@ -11,5 +11,5 @@ export type GetNumTrainingCasesResponse = {
   /**
    * The number of trained cases.
    */
-  count?: number;
+  count: number;
 };

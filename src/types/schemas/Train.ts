@@ -85,5 +85,5 @@ export type TrainResponse = {
    * - analyzed: If auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed.
    * - analyze: If auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed.
    */
-  status?: "analyze" | "analyzed" | null;
+  status: "analyze" | "analyzed" | null;
 };

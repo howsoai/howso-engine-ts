@@ -70,9 +70,9 @@ export type GetCasesResponse = {
   /**
    * A list of lists of case values in the order specified by 'features'.
    */
-  cases?: any[][];
+  cases: any[][];
   /**
    * The list of features in the order of values of the sublists in 'cases'.
    */
-  features?: string[];
+  features: string[];
 };

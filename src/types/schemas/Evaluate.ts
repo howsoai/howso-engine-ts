@@ -24,9 +24,9 @@ export type EvaluateResponse = {
   /**
    * The resulting value of the aggregation code.
    */
-  aggregated?: any;
+  aggregated: any;
   /**
    * A map of feature names to list of resulting values for the evaluation code for each case.
    */
-  evaluated?: Record<string, any[]>;
+  evaluated: Record<string, any[]>;
 };

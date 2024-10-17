@@ -82,8 +82,9 @@ export async function getEngineApi(): Promise<EngineApi> {
 
   try {
     // Load the Howso Engine into Amalgam
-    amalgam.runtime.FS.writeFile("howso.caml", fs.readFileSync(enginePath));
-    amalgam.loadEntity(handle, "howso.caml");
+    const filePath = "howso.caml";
+    amalgam.runtime.FS.writeFile(filePath, fs.readFileSync(enginePath));
+    amalgam.loadEntity({ handle, filePath });
     console.log(`Amalgam Version: ${amalgam.getVersion()}`);
 
     // Initialize the Engine
