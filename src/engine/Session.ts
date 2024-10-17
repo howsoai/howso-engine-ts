@@ -1,6 +1,10 @@
 import { AbstractBaseClient } from "../client/AbstractBaseClient";
 import type { BaseSession } from "../types";
 
+/**
+ * The interface for interacting with a Session. Should not be instantiated directly. Instead begin or request a
+ * Session using the client.
+ */
 export class Session implements BaseSession {
   public readonly id: string;
   protected readonly client: AbstractBaseClient;

@@ -1,11 +1,5 @@
 import { FeatureAttributes, FeatureAttributesIndex, FeatureOriginalType } from "../../types";
-import {
-  AbstractDataType,
-  FeatureSourceFormat,
-  InferFeatureAttributesOptions,
-  InferFeatureBoundsOptions,
-  InferFeatureTimeSeriesOptions,
-} from "../base";
+import { AbstractDataType, FeatureSourceFormat, InferFeatureAttributesOptions } from "../base";
 import { coerceDate } from "../utils";
 
 export type InferFeatureAttributeFeatureStatistics = {
@@ -37,10 +31,10 @@ export abstract class InferFeatureAttributesBase {
     // Loop the columns into attributes immediately to get order assigned. Probably should be a Map...
     const columns = await this.getFeatureNames();
     const attributes: FeatureAttributesIndex = columns.reduce((attributes, column) => {
-      attributes[column] = (options.defaults?.[column] || {}) as FeatureAttributes;
+      attributes[column] = (options.features?.[column] || {}) as FeatureAttributes;
       return attributes;
     }, {} as FeatureAttributesIndex);
-    const { ordinalFeatureValues = {}, dependentFeatures = {} } = options;
+    const { ordinal_feature_values: ordinalFeatureValues = {}, dependent_features: dependentFeatures = {} } = options;
 
     const getFeatureAttributes = async (featureName: string): Promise<FeatureAttributes | undefined> => {
       const originalFeatureType = await this.getOriginalFeatureType(featureName);
@@ -100,7 +94,7 @@ export abstract class InferFeatureAttributesBase {
         }
 
         // Infer bounds
-        const { inferBounds = true } = options;
+        const { infer_bounds: inferBounds = true } = options;
         if (inferBounds && !attributes[featureName].bounds) {
           const bounds = await this.inferBounds(
             attributes[featureName],
@@ -117,7 +111,7 @@ export abstract class InferFeatureAttributesBase {
         // TODO - infer time series
         // }
 
-        if (options.includeSample) {
+        if (options.include_sample) {
           additions.sample = await this.getSample(featureName);
         }
 
@@ -248,12 +242,12 @@ export abstract class InferFeatureAttributesBase {
   public abstract inferBounds(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
-    options: InferFeatureBoundsOptions,
+    options: InferFeatureAttributesOptions,
   ): Promise<FeatureAttributes["bounds"]>;
   public abstract inferTimeSeries(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
-    options: InferFeatureTimeSeriesOptions,
+    options: InferFeatureAttributesOptions,
   ): Promise<Partial<FeatureAttributes>>;
 
   protected async getSample(featureName: string): Promise<any | undefined> {

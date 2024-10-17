@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetExtremeCases
  *
@@ -21,4 +22,15 @@ export type GetExtremeCasesRequest = {
    * The feature for which to sort the cases by
    */
   sort_feature: string;
+};
+
+export type GetExtremeCasesResponse = {
+  /**
+   * A list of lists of case values in the order specified by 'features'.
+   */
+  cases: any[][];
+  /**
+   * The list of features in the order of values of the sublists in 'cases'.
+   */
+  features: string[];
 };

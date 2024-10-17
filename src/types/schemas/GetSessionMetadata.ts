@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetSessionMetadata
  *
@@ -12,3 +13,5 @@ export type GetSessionMetadataRequest = {
    */
   session: string;
 };
+
+export type GetSessionMetadataResponse = Record<string, any> | null;

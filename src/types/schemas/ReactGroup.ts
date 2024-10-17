@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * ReactGroup
  *
@@ -40,13 +41,13 @@ export type ReactGroupRequest = {
   features?: string[];
 
   /**
-   * Calculate and output the kl divergence of adding the specified new_cases in the output assoc
+   * Calculate and output the KL divergence of adding the specified new_cases in the output assoc
    * @default false
    */
   kl_divergence_addition?: boolean;
 
   /**
-   * Calculate and output the kl divergence of removing the specified new_cases in the output assoc
+   * Calculate and output the KL divergence of removing the specified new_cases in the output assoc
    * @default false
    */
   kl_divergence_removal?: boolean;
@@ -71,7 +72,7 @@ export type ReactGroupRequest = {
 
   /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
-   *    if a weight is missing, uses 1 as the weight. if unspecified, case weights will be used if the trainee has them.
+   *    If a weight is missing, uses 1 as the weight. If unspecified, case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
 
@@ -80,4 +81,43 @@ export type ReactGroupRequest = {
    * @default ".case_weight"
    */
   weight_feature?: string;
+};
+
+export type ReactGroupResponse = {
+  /**
+   * The average distance contribution of cases in the model.
+   */
+  base_model_average_distance_contribution?: number[];
+  /**
+   * The average distance contribution of cases in the model and the cases of each group.
+   */
+  combined_model_average_distance_contribution?: number[];
+  /**
+   * The average distance contributions of cases in each group.
+   */
+  distance_contribution?: number[];
+  /**
+   * The familiarity conviction of adding each group of cases to the model.
+   */
+  familiarity_conviction_addition?: number[];
+  /**
+   * The familiarity conviction of removing each group of cases to the model.
+   */
+  familiarity_conviction_removal?: number[];
+  /**
+   * The KL divergence of adding each group of cases to the model.
+   */
+  kl_divergence_addition?: number[];
+  /**
+   * The KL divergence of removing each group of cases to the model.
+   */
+  kl_divergence_removal?: number[];
+  /**
+   * The p-value of adding each group of cases to the model.
+   */
+  p_value_of_addition?: number[];
+  /**
+   * The p-value of removing each group of cases to the model.
+   */
+  p_value_of_removal?: number[];
 };

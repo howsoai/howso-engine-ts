@@ -2,24 +2,20 @@ import type { FeatureAttributesIndex } from "../types";
 
 export type FeatureSourceFormat = "unknown" | "array" | "parsed_array";
 
-export interface InferFeatureBoundsOptions {
-  tightBounds?: boolean | string[];
-  modeBounds?: boolean | string[];
-}
-
-export interface InferFeatureTimeSeriesOptions {
-  timeFeature: string;
-  idFeatureName?: string;
-}
-
-export interface InferFeatureAttributesOptions {
-  defaults?: FeatureAttributesIndex;
-  inferBounds?: boolean | InferFeatureBoundsOptions;
-  timeSeries?: InferFeatureTimeSeriesOptions;
-  ordinalFeatureValues?: Record<string, string[]>;
-  dependentFeatures?: Record<string, string[]>;
-  includeSample?: boolean;
-}
+/**
+ * A subset of supported options.
+ * Full options are available only when using the Python direct client or Platform installation.
+ * @see https://docs.howso.com/en/release-latest/api_reference/_autosummary/howso.utilities.html#howso.utilities.infer_feature_attributes
+ **/
+export type InferFeatureAttributesOptions = {
+  dependent_features?: Record<string, string[]>;
+  features?: FeatureAttributesIndex;
+  include_sample?: boolean;
+  infer_bounds?: boolean;
+  mode_bound_features?: string[];
+  ordinal_feature_values?: Record<string, string[]>;
+  tight_bounds?: boolean;
+};
 
 export interface ArrayData<T = any, C extends string = string> {
   readonly columns: C[];
