@@ -70,7 +70,7 @@ describe("features/sources/Array", () => {
           number: { type: "continuous", data_type: "number" },
           date: { type: "continuous", data_type: "formatted_date_time", date_time_format: "%Y-%m-%dT%h-%m-%s" },
         };
-        const features = await service.infer({ defaults, includeSample: true });
+        const features = await service.infer({ features: defaults, include_sample: true });
         expectFeatureAttributesIndex(features);
 
         // Id

@@ -1,13 +1,15 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * SetParams
  *
  * Sets internal hyperparameters
  */
-import type { FullHyperparameterMap } from "./FullHyperparameterMap";
 import type { HyperparameterMap } from "./HyperparameterMap";
+import type { HyperparameterMapTree } from "./HyperparameterMapTree";
 
+/** Request parameters of the Trainee method: setParams. */
 export type SetParamsRequest = {
   /**
    * The factor by which to increase the analyze threshold everytime the model grows to the current threshold size
@@ -37,10 +39,10 @@ export type SetParamsRequest = {
    * Must have at least an action feature (e.g., .targetless) -> a contexts key -> robust -> k, p and dt provided.
    *   example:
    *    {
-   *       ".targetless" { "featurea.featureb.": { "robust" : { "k" : number, "p" : number, "dt": number }}},
-   *     "featurea" : { "featureb.featurec.": { "full" : { "k" : number, "p" : number, "dt": number }}},
+   *       ".targetless" { "featureA.featureB.": { "robust" : { "k" : number, "p" : number, "dt": number }}},
+   *     "featureA" : { "featureB.featureC.": { "full" : { "k" : number, "p" : number, "dt": number }}},
    *       ...
    *   }
    */
-  hyperparameter_map?: FullHyperparameterMap;
+  hyperparameter_map?: HyperparameterMapTree;
 };

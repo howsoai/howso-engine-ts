@@ -1,12 +1,5 @@
 import type { FeatureAttributes } from "../../types";
-import {
-  AbstractDataType,
-  ArrayData,
-  FeatureSourceFormat,
-  InferFeatureBoundsOptions,
-  InferFeatureTimeSeriesOptions,
-  isArrayData,
-} from "../base";
+import { AbstractDataType, ArrayData, FeatureSourceFormat, InferFeatureAttributesOptions, isArrayData } from "../base";
 import * as utils from "../utils";
 import { FeatureSerializerBase, InferFeatureAttributeFeatureStatistics, InferFeatureAttributesBase } from "./Base";
 
@@ -124,7 +117,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
   public async inferBounds(
     attributes: Readonly<FeatureAttributes>,
     featureName: string,
-    options: InferFeatureBoundsOptions,
+    options: InferFeatureAttributesOptions,
   ): Promise<FeatureAttributes["bounds"]> {
     const { minimum, maximum, hasNulls, samples, uniqueValues, totalValues } = await this.getStatistics(featureName);
 
@@ -167,15 +160,12 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
       const actualMax = maxValue;
 
       if (minValue !== undefined && maxValue !== undefined) {
-        if (
-          !options.tightBounds ||
-          (Array.isArray(options.tightBounds) && options.tightBounds.indexOf(featureName) === -1)
-        ) {
+        if (!options.tight_bounds) {
           // Use loose bounds
           [minValue, maxValue] = utils.guessLooseBounds(minValue, maxValue);
 
-          const { modeBounds = true } = options;
-          if (modeBounds || (Array.isArray(modeBounds) && modeBounds.indexOf(featureName) >= 0)) {
+          const { mode_bound_features = [] } = options;
+          if (mode_bound_features.includes(featureName)) {
             // Check for mode bounds
             if (uniqueValues !== totalValues) {
               const [modes, modeCount] = utils.allModes(column);
@@ -234,7 +224,7 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
     featureName: string,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars*/
-    options: InferFeatureTimeSeriesOptions,
+    options: InferFeatureAttributesOptions,
   ): Promise<Partial<FeatureAttributes>> {
     // TODO - infer time series
     throw new Error("Method not implemented.");

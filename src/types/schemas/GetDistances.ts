@@ -1,19 +1,15 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetDistances
  *
  * Returns an assoc with case distances, containing a list of case session indices and a list of lists (matrix) of the computed distances.
- *  in the following format:
- *  {
- *   'column_case_indices' : [ session-indices ],
- *   'row_case_indices' : [ session-indices ],
- *   'distances': [ [ pairwise distances ] ]
- *  }
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: getDistances. */
 export type GetDistancesRequest = {
   /**
    * If specified, uses targeted hyperparameters used to predict this action_feature, otherwise uses targetless hyperparameters.
@@ -22,13 +18,13 @@ export type GetDistancesRequest = {
 
   /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the case as it was
-   *   trained. if specified, returns pairwise distances for all of these cases. ignored if feature_values is provided. if neither feature_values nor
+   *   trained. If specified, returns pairwise distances for all of these cases. Ignored if feature_values is provided. If neither feature_values nor
    *   case_indices is specified, runs on the full dataset.
    */
   case_indices?: CaseIndices;
 
   /**
-   * Number of columns to compute in the matrix.  if unspecified, is set to the same number as all the cases.
+   * Number of columns to compute in the matrix.  If unspecified, is set to the same number as all the cases.
    */
   column_count?: number;
 
@@ -39,7 +35,7 @@ export type GetDistancesRequest = {
   column_offset?: number;
 
   /**
-   * Which features to use when computing case distances. if unspecified uses all features.
+   * Which features to use when computing case distances. If unspecified uses all features.
    */
   features?: string[];
 
@@ -49,7 +45,7 @@ export type GetDistancesRequest = {
   feature_values?: any[];
 
   /**
-   * Number of rows to compute in the matrix.  if unspecified, is set to the same number as all the cases.
+   * Number of rows to compute in the matrix.  If unspecified, is set to the same number as all the cases.
    */
   row_count?: number;
 
@@ -60,7 +56,7 @@ export type GetDistancesRequest = {
   row_offset?: number;
 
   /**
-   * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
+   * Flag, if set to true will scale influence weights by each case's weight_feature weight. If unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
@@ -70,4 +66,20 @@ export type GetDistancesRequest = {
    * @default ".case_weight"
    */
   weight_feature?: string;
+};
+
+/** Response of the Trainee method: getDistances. */
+export type GetDistancesResponse = {
+  /**
+   * The case indices of the cases represented by the columns of the distance matrix.
+   */
+  column_case_indices?: CaseIndices;
+  /**
+   * The case indices of the cases represented by the columns of the distance matrix.
+   */
+  distances: number[][];
+  /**
+   * The case indices of the cases represented by the columns of the distance matrix.
+   */
+  row_case_indices?: CaseIndices;
 };

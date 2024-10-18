@@ -1,12 +1,11 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
- *
- * BuiltInFeatures
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  */
 import type { EditHistory } from "./EditHistory";
 
 /**
- * The features and their values created by the howso engine automatically
+ * The features and their values created by the Howso Engine automatically
  */
 export type BuiltInFeatures = {
   ".case_edit_history"?: EditHistory;
@@ -46,6 +45,4 @@ export type BuiltInFeatures = {
    * The 0-based index of the case's order in training within its session.
    */
   ".session_training_index"?: number;
-} & Record<`${string}_delta_${number}`, number | null> &
-  Record<`${string}_lag_${number}`, any> &
-  Record<`${string}_rate_${number}`, number | null>;
+};

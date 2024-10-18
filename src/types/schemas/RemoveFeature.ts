@@ -1,14 +1,16 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * RemoveFeature
  *
  * Removes the specified feature on all cases for a trainee that match the specified condition
  * if conditions are not specified, removes feature for all cases and from the model, if condition is an empty assoc, leaves the feature metadata in the model.
- * updates the accumulated data mass for the model proportional to the number of cases modified.
+ * Updates the accumulated data mass for the model proportional to the number of cases modified.
  */
 import type { Condition } from "./Condition";
 
+/** Request parameters of the Trainee method: removeFeature. */
 export type RemoveFeatureRequest = {
   /**
    * Assoc of feature->value(s).

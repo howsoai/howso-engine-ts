@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * ReduceData
  *
@@ -8,11 +9,12 @@
  */
 import type { AblationThresholdMap } from "./AblationThresholdMap";
 
+/** Request parameters of the Trainee method: reduceData. */
 export type ReduceDataRequest = {
   /**
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
    *  absolute thresholds will cause data reduction to stop when any of the measure values for any of
-   *  the features for which a threshold is defined go avove the threshold (in the case of rmse and
+   *  the features for which a threshold is defined go above the threshold (in the case of rmse and
    *  mae) or below the threshold (otherwise).
    * @default {}
    */
@@ -27,7 +29,7 @@ export type ReduceDataRequest = {
   /**
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
    *  delta thresholds will cause data reduction to stop when the delta between any of the measure values
-   *  for any of the features for which a threshold is defined and its previous value go avove the threshold
+   *  for any of the features for which a threshold is defined and its previous value go above the threshold
    *  (in the case of rmse and mae) or below the threshold (otherwise).
    * @default {}
    */
@@ -47,7 +49,7 @@ export type ReduceDataRequest = {
 
   /**
    * Numeric maximum threshold for influence weight entropy of cases to keep, defaults to the value
-   *  influence weight entropy threshold stored within the trainee
+   *  influence weight entropy threshold stored within the Trainee
    * @default 0.15
    */
   influence_weight_entropy_threshold?: number;
@@ -56,7 +58,7 @@ export type ReduceDataRequest = {
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
    *  relative thresholds will cause data reduction to stop when the relative change between any of the
    *  measure values for any of the features for which a threshold is defined and its previous value go
-   *  avove the threshold (in the case of rmse and mae) or below the threshold (otherwise).
+   *  above the threshold (in the case of rmse and mae) or below the threshold (otherwise).
    * @default {}
    */
   rel_threshold_map?: AblationThresholdMap;
@@ -66,4 +68,12 @@ export type ReduceDataRequest = {
    * @default false
    */
   skip_auto_analyze?: boolean;
+};
+
+/** Response of the Trainee method: reduceData. */
+export type ReduceDataResponse = {
+  /**
+   * A map of threshold-type (abs, relative, or delta) to map of metric to map of feature name to boolean. Indicating what thresholds were met to trigger the end of data reduction.
+   */
+  threshold_info?: Record<string, Record<string, Record<string, boolean>>>;
 };

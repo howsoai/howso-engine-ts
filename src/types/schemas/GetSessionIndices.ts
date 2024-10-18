@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetSessionIndices
  *
@@ -7,6 +8,7 @@
  * session indices are 0-based index of number of the case for the session used for replays; may change if cases are removed
  */
 
+/** Request parameters of the Trainee method: getSessionIndices. */
 export type GetSessionIndicesRequest = {
   /**
    * Id of session

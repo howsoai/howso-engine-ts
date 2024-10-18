@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * ReactIntoFeatures
  *
@@ -7,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: reactIntoFeatures. */
 export type ReactIntoFeaturesRequest = {
   /**
    * The list of case ids for the model to calculate conviction for
@@ -54,7 +56,7 @@ export type ReactIntoFeaturesRequest = {
   similarity_conviction?: boolean | string;
 
   /**
-   * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
+   * Flag, if set to true will scale influence weights by each case's weight_feature weight. If unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;

@@ -60,7 +60,7 @@ describe("features/sources/CSV", () => {
           const service = new InferFeatureAttributesFromCSV(data, serviceOptions);
           expect(service.samples?.length).toBe(serviceOptions.samplesLimit);
 
-          const features = await service.infer({ includeSample: true });
+          const features = await service.infer({ include_sample: true });
           expect(Object.keys(features)).toStrictEqual(columns);
           expectFeatureAttributesIndex(features);
           expectAsteroids(features);

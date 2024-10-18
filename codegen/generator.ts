@@ -1,7 +1,18 @@
 import fs from "node:fs";
 import path from "node:path";
 import nunjucks from "nunjucks";
-import { EngineApi, isRef, isSchemaOrRef, LabelDefinition, Ref, Schema } from "./engine";
+import {
+  AnyOf,
+  EngineApi,
+  isAnyOf,
+  isAnySchema,
+  isRef,
+  isSchema,
+  isSimpleType,
+  LabelDefinition,
+  Ref,
+  Schema,
+} from "./engine";
 import { registerFilters } from "./filters";
 import { toPascalCase } from "./utils";
 
@@ -11,8 +22,8 @@ export class Generator {
   basePath: string;
   schemaDir: string;
   clientDir: string;
+  engineDir: string;
   ignoredLabels: string[];
-  responseShims: Record<string, string>;
 
   /**
    * Construct a new Generator.
@@ -22,35 +33,23 @@ export class Generator {
     this.basePath = path.resolve(__dirname, "../../src");
     this.schemaDir = path.resolve(this.basePath, "types/schemas");
     this.clientDir = path.resolve(this.basePath, "client");
+    this.engineDir = path.resolve(this.basePath, "engine");
     this.doc = doc;
     this.ignoredLabels = [
-      "root_filepath",
-      "filename",
-      "filepath",
       "debug_label",
       "initialize",
       "initialize_for_deployment",
       "set_contained_trainee_maps",
-      "major_version",
-      "minor_version",
-      "point_version",
       "version",
       "get_api",
+      "single_react",
+      "single_react_series",
+      ...Object.entries(doc.labels).reduce<string[]>((ignored, [label, def]) => {
+        // Ignore all the attribute labels
+        if (def.attribute != null) ignored.push(label);
+        return ignored;
+      }, []),
     ];
-
-    // Temporary shims until return values are defined
-    this.responseShims = {
-      analyze: "null",
-      get_cases: "shims.GetCasesResponse",
-      get_feature_attributes: "schemas.FeatureAttributesIndex",
-      set_feature_attributes: "schemas.FeatureAttributesIndex",
-      get_marginal_stats: "shims.GetMarginalStatsResponse",
-      get_params: "shims.GetParamsResponse",
-      react: "shims.ReactResponse",
-      react_aggregate: "shims.ReactAggregateResponse",
-      react_into_features: "null",
-      train: "shims.TrainResponse",
-    };
 
     // Setup template engine
     const loader = new nunjucks.FileSystemLoader(path.join(__dirname, "templates"));
@@ -72,13 +71,12 @@ export class Generator {
   private renderClient() {
     const targetLabels: Record<string, LabelDefinition> = {};
     for (const [label, definition] of Object.entries(this.doc.labels)) {
-      if (!this.ignoredLabels.includes(label) || definition.attribute) {
+      if (!this.ignoredLabels.includes(label)) {
         targetLabels[label] = definition;
       }
     }
-    this.renderFile(this.clientDir, "AbstractBaseClient.ts", "client/AbstractBaseClient.njk", {
+    this.renderFile(this.engineDir, "Trainee.ts", "engine/Trainee.njk", {
       labels: targetLabels,
-      shims: this.responseShims,
     });
   }
 
@@ -103,9 +101,10 @@ export class Generator {
 
     // Render label schemas
     for (const [label, definition] of Object.entries(this.doc.labels)) {
-      if (this.ignoredLabels.includes(label) || definition.attribute) continue;
+      if (this.ignoredLabels.includes(label)) continue;
       // Add schemas for label parameters and/or return value if it has any
-      if (definition.parameters != null || definition.returns != null) {
+      // For returns that are just a Ref, ignore them as they can already be referenced directly
+      if (definition.parameters != null || (definition.returns && !isSimpleType(definition.returns))) {
         const title = toPascalCase(label);
         allNames.push(title);
         this.renderFile(this.schemaDir, `${title}.ts`, "schemas/label.njk", {
@@ -151,7 +150,7 @@ export class Generator {
         imports.push(...this.detectSchemaImports(schema));
       }
     }
-    if (isSchemaOrRef(label.returns)) {
+    if (isAnySchema(label.returns) && !isSimpleType(label.returns)) {
       imports.push(...this.detectSchemaImports(label.returns));
     }
     return [...new Set(imports)].sort();
@@ -162,21 +161,30 @@ export class Generator {
    * @param schema The schema to check.
    * @returns The list of referenced schema names.
    */
-  private detectSchemaImports(schema: Ref | Schema): string[] {
+  private detectSchemaImports(schema: AnyOf | Ref | Schema): string[] {
     const imports: string[] = [];
     if (isRef(schema)) {
-      return [schema.ref];
-    }
-    if (isSchemaOrRef(schema.values)) {
-      imports.push(...this.detectSchemaImports(schema.values));
-    }
-    if (isSchemaOrRef(schema.additional_indices)) {
-      imports.push(...this.detectSchemaImports(schema.additional_indices));
-    }
-    if (schema.indices != null) {
-      for (const value of Object.values(schema.indices)) {
-        if (isSchemaOrRef(value)) {
-          imports.push(...this.detectSchemaImports(value));
+      imports.push(schema.ref);
+    } else if (isAnyOf(schema)) {
+      // Check all parts of the any of list
+      for (const item of schema.any_of) {
+        if (isAnySchema(item)) {
+          imports.push(...this.detectSchemaImports(item));
+        }
+      }
+    } else if (isSchema(schema)) {
+      // Check nested parts of the schema
+      if (isAnySchema(schema.values)) {
+        imports.push(...this.detectSchemaImports(schema.values));
+      }
+      if (isAnySchema(schema.additional_indices)) {
+        imports.push(...this.detectSchemaImports(schema.additional_indices));
+      }
+      if (schema.indices != null) {
+        for (const value of Object.values(schema.indices)) {
+          if (isAnySchema(value)) {
+            imports.push(...this.detectSchemaImports(value));
+          }
         }
       }
     }

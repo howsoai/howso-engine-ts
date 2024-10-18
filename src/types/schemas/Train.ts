@@ -1,24 +1,16 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * Train
  *
- * Train the passed in cases, filtering out cases that match optionally passed in ablation parameters
- *  returns a response object in the following format:
- *   (associate
- *     "num_trained" num_trained_cases
- *     "ablated_indices" (list of session training indices for the ablated cases)
- *     "status" "status output message"
- *   )
- *    list of 'status' values:
- *     (null) - default output, no status output
- *     "analyzed" - if auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed
- *     "analyze" - if auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed
+ * Train the provided cases, filtering out cases that match optionally passed in ablation parameters.
  */
 
+/** Request parameters of the Trainee method: train. */
 export type TrainRequest = {
   /**
-   * Name of feature into which to accumulate neighbors' influences as weight for ablated cases. if unspecified, will not accumulate weights.
+   * Name of feature into which to accumulate neighbors' influences as weight for ablated cases. If unspecified, will not accumulate weights.
    */
   accumulate_weight_feature?: string;
 
@@ -34,9 +26,9 @@ export type TrainRequest = {
   cases: any[][];
 
   /**
-   * List of features to derive in the specified order. if this list is not provided, features with
-   *   the 'auto_derive_on_train' feature attribute set to true will be auto-derived. if provided an empty list, will not derive any features.
-   *   any derived_features that are already in the 'features' list will not be derived since their values are being explicitly provided.
+   * List of features to derive in the specified order. If this list is not provided, features with
+   *   the 'auto_derive_on_train' feature attribute set to True will be auto-derived. If provided an empty list, will not derive any features.
+   *   Any derived_features that are already in the 'features' list will not be derived since their values are being explicitly provided.
    */
   derived_features?: string[];
 
@@ -52,16 +44,16 @@ export type TrainRequest = {
   input_is_substituted?: boolean;
 
   /**
-   * Name of series to pull features and case values from internal series storage.  if specified, trains on all cases that are
-   *   stored in the internal series store for the specified series and session. the trained feature set is the combined features from storage
-   *   and the passed in features.  if input_cases is of length one, the value(s) of this case are appended to all cases in the series.
-   *   if input_cases is the same length as the series, the value of each case in input_cases is applied in order to each of the cases in the
+   * Name of series to pull features and case values from internal series storage.  If specified, trains on all cases that are
+   *   stored in the internal series store for the specified series and session. The trained feature set is the combined features from storage
+   *   and the passed in features.  If input_cases is of length one, the value(s) of this case are appended to all cases in the series.
+   *   If input_cases is the same length as the series, the value of each case in input_cases is applied in order to each of the cases in the
    *   series.
    */
   series?: string;
 
   /**
-   * The session label to record these cases to.  if not specified, refers to this entity's label of same name.
+   * The session label to record these cases to.  If not specified, refers to this entity's label of same name.
    */
   session?: string;
 
@@ -76,4 +68,24 @@ export type TrainRequest = {
    * @default false
    */
   train_weights_only?: boolean;
+};
+
+/** Response of the Trainee method: train. */
+export type TrainResponse = {
+  /**
+   * The session training indices for the ablated cases.
+   */
+  ablated_indices?: number[];
+  /**
+   * The number of trained cases.
+   */
+  num_trained: number;
+  /**
+   * The status output.
+   *
+   * - (null): No status output. This is the default.
+   * - analyzed: If auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed.
+   * - analyze: If auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed.
+   */
+  status: "analyze" | "analyzed" | null;
 };

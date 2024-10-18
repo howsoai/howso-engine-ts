@@ -1,20 +1,22 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetCases
  *
- * Returns assoc with features and cases - a list of lists of all feature values. retrieves all feature values for cases for
- * all (unordered) sessions in the order they were trained within each session. if a session is specified, only that session's
+ * Returns assoc with features and cases - a list of lists of all feature values. Retrieves all feature values for cases for
+ * all (unordered) sessions in the order they were trained within each session. If a session is specified, only that session's
  * cases wil be output.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 
+/** Request parameters of the Trainee method: getCases. */
 export type GetCasesRequest = {
   /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the
-   *   case as it was trained. if specified, ignores session and condition/precision parameters.
+   *   case as it was trained. If specified, ignores session and condition/precision parameters.
    */
   case_indices?: CaseIndices;
 
@@ -36,8 +38,8 @@ export type GetCasesRequest = {
   indicate_imputed?: boolean;
 
   /**
-   * Limit on the number of cases to retrieve; if set to zero there will be no limit.
-   *   if null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
+   * Limit on the number of cases to retrieve; If set to zero there will be no limit.
+   *   If null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
    */
   num_cases?: number;
 
@@ -65,7 +67,14 @@ export type GetCasesRequest = {
   skip_decoding?: number;
 };
 
+/** Response of the Trainee method: getCases. */
 export type GetCasesResponse = {
-  cases?: any[][];
-  features?: string[];
+  /**
+   * A list of lists of case values in the order specified by 'features'.
+   */
+  cases: any[][];
+  /**
+   * The list of features in the order of values of the sublists in 'cases'.
+   */
+  features: string[];
 };
