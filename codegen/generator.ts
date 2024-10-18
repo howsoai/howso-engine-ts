@@ -51,19 +51,6 @@ export class Generator {
       }, []),
     ];
 
-    // TODO - Remove once #21784 is merged
-    for (const label of [
-      "train",
-      "impute",
-      "clear_imputed_data",
-      "edit_cases",
-      "move_cases",
-      "add_feature",
-      "remove_feature",
-    ]) {
-      this.doc.labels[label].use_active_session = true;
-    }
-
     // Setup template engine
     const loader = new nunjucks.FileSystemLoader(path.join(__dirname, "templates"));
     this.env = new nunjucks.Environment(loader, { throwOnUndefined: true });
