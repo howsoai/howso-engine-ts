@@ -108,7 +108,6 @@ export class Generator {
         const title = toPascalCase(label);
         allNames.push(title);
         this.renderFile(this.schemaDir, `${title}.ts`, "schemas/label.njk", {
-          title,
           name: title,
           label: label,
           description: definition.description,
