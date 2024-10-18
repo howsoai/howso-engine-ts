@@ -9,6 +9,7 @@
  * a string error if found but trainee is stored externally as an independent trainee.
  */
 
+/** Request parameters of the Trainee method: getEntityPathById. */
 export type GetEntityPathByIdRequest = {
   /**
    * Unique id of trainee
@@ -21,4 +22,5 @@ export type GetEntityPathByIdRequest = {
   path: string[];
 };
 
+/** Response of the Trainee method: getEntityPathById. */
 export type GetEntityPathByIdResponse = string[] | string | null;

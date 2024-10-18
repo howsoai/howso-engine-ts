@@ -7,6 +7,7 @@
  * Returns all the metadata for a specified session
  */
 
+/** Request parameters of the Trainee method: getSessionMetadata. */
 export type GetSessionMetadataRequest = {
   /**
    * Name of session to return metadata for
@@ -14,4 +15,5 @@ export type GetSessionMetadataRequest = {
   session: string;
 };
 
+/** Response of the Trainee method: getSessionMetadata. */
 export type GetSessionMetadataResponse = Record<string, any> | null;

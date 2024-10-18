@@ -8,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: setAutoAnalyzeParams. */
 export type SetAutoAnalyzeParamsRequest = {
   /**
    * {type "list" values "string"}

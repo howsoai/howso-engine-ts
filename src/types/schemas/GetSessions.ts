@@ -7,6 +7,7 @@
  * Returns a list of all of the training sessions, assoc of id->session, and whatever other attributes specified.
  */
 
+/** Request parameters of the Trainee method: getSessions. */
 export type GetSessionsRequest = {
   /**
    * List of metadata attributes to return from the session
@@ -15,6 +16,7 @@ export type GetSessionsRequest = {
   attributes?: string[];
 };
 
+/** Response of the Trainee method: getSessions. */
 export type GetSessionsResponse = ({
   /**
    * The session ID

@@ -7,6 +7,7 @@
  * Set metadata for model
  */
 
+/** Request parameters of the Trainee method: setMetadata. */
 export type SetMetadataRequest = {
   /**
    * Arbitary map of metadata to store in a trainee

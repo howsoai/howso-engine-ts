@@ -10,6 +10,7 @@
 import type { CaseIndices } from "./CaseIndices";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: getPairwiseDistances. */
 export type GetPairwiseDistancesRequest = {
   /**
    * If specified, uses targeted hyperparameters used to predict this action_feature, otherwise uses targetless hyperparameters.

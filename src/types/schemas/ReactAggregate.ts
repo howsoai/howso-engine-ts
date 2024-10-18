@@ -11,6 +11,7 @@ import type { ConfusionMatrix } from "./ConfusionMatrix";
 import type { ReactAggregateDetails } from "./ReactAggregateDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: reactAggregate. */
 export type ReactAggregateRequest = {
   /**
    * Target feature for which to do computations. If "prediction_stats_action_feature" and "feature_influences_action_feature"
@@ -190,6 +191,7 @@ export type ReactAggregateRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: reactAggregate. */
 export type ReactAggregateResponse = Record<
   string,
   {

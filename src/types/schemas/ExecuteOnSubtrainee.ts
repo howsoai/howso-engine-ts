@@ -7,6 +7,7 @@
  * Execute any method in the API directly on any child trainee of this trainee, used for hierarchy operations.
  */
 
+/** Request parameters of the Trainee method: executeOnSubtrainee. */
 export type ExecuteOnSubtraineeRequest = {
   /**
    * Flag, applicable only to 'load_subtrainee' and 'save_subtrainee' and if specifying child_name_path or child_id.

@@ -8,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: analyze. */
 export type AnalyzeRequest = {
   /**
    * List of action features to analyze for. applicable only to 'single_targeted' mode

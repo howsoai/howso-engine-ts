@@ -8,6 +8,7 @@
  * default value is 0.99
  */
 
+/** Request parameters of the Trainee method: setInfluenceWeightThreshold. */
 export type SetInfluenceWeightThresholdRequest = {
   /**
    * Number, amount of total influence weight to accumulate among nearest

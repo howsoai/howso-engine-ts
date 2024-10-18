@@ -7,6 +7,7 @@
  * Destroys the instance of the trainee specified by the parameter "trainee".
  */
 
+/** Request parameters of the Trainee method: deleteSubtrainee. */
 export type DeleteSubtraineeRequest = {
   /**
    * Name path of trainee

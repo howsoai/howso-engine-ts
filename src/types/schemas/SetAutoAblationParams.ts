@@ -8,6 +8,7 @@
  */
 import type { AblationThresholdMap } from "./AblationThresholdMap";
 
+/** Request parameters of the Trainee method: setAutoAblationParams. */
 export type SetAutoAblationParamsRequest = {
   /**
    * The number of ablated cases to compute influence weights for distribution at a time

@@ -1,10 +1,11 @@
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
- *
- * HyperparameterMap
  */
 
+/**
+ * HyperparameterMap schema.
+ */
 export type HyperparameterMap = {
   /**
    * Flag indicating if all feature's residuals have been cached.

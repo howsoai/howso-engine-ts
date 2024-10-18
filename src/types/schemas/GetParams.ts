@@ -10,6 +10,7 @@
 import type { HyperparameterMap } from "./HyperparameterMap";
 import type { HyperparameterMapTree } from "./HyperparameterMapTree";
 
+/** Request parameters of the Trainee method: getParams. */
 export type GetParamsRequest = {
   /**
    * The target feature of the desired hyperparameters
@@ -32,6 +33,7 @@ export type GetParamsRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: getParams. */
 export type GetParamsResponse = {
   /**
    * The scalar rate at which the number of cases to trigger an auto-analysis grows with each iteration

@@ -10,6 +10,7 @@
  */
 import type { Condition } from "./Condition";
 
+/** Request parameters of the Trainee method: removeFeature. */
 export type RemoveFeatureRequest = {
   /**
    * Assoc of feature->value(s).

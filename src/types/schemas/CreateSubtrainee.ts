@@ -7,6 +7,7 @@
  * Creates a new instance of a contained trainee as specified by the entity label "trainee".
  */
 
+/** Request parameters of the Trainee method: createSubtrainee. */
 export type CreateSubtraineeRequest = {
   /**
    * Path to the file (optional)
@@ -25,6 +26,7 @@ export type CreateSubtraineeRequest = {
   trainee_id?: string;
 };
 
+/** Response of the Trainee method: createSubtrainee. */
 export type CreateSubtraineeResponse = {
   /**
    * The ID of the resulting trainee that was created.

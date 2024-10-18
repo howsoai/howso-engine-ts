@@ -9,6 +9,7 @@
  */
 import type { AblationThresholdMap } from "./AblationThresholdMap";
 
+/** Request parameters of the Trainee method: reduceData. */
 export type ReduceDataRequest = {
   /**
    * A map of measure names (any of the prediction stats) to a map of feature names to threshold value.
@@ -69,6 +70,7 @@ export type ReduceDataRequest = {
   skip_auto_analyze?: boolean;
 };
 
+/** Response of the Trainee method: reduceData. */
 export type ReduceDataResponse = {
   /**
    * A map of threshold-type (abs, relative, or delta) to map of metric to map of feature name to boolean. Indicating what thresholds were met to trigger the end of data reduction.

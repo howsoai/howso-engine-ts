@@ -8,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: reactIntoFeatures. */
 export type ReactIntoFeaturesRequest = {
   /**
    * The list of case ids for the model to calculate conviction for

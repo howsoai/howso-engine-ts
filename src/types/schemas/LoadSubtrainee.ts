@@ -11,6 +11,7 @@
  * returns the trainee name if successful, null if not
  */
 
+/** Request parameters of the Trainee method: loadSubtrainee. */
 export type LoadSubtraineeRequest = {
   /**
    * Name to load (without extension)
@@ -37,6 +38,7 @@ export type LoadSubtraineeRequest = {
   trainee?: string | string[];
 };
 
+/** Response of the Trainee method: loadSubtrainee. */
 export type LoadSubtraineeResponse = {
   /**
    * The name of the resulting trainee that was loaded.

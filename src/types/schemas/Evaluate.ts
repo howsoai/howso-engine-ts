@@ -8,6 +8,7 @@
  * a list of the custom code's return values for each feature specified.
  */
 
+/** Request parameters of the Trainee method: evaluate. */
 export type EvaluateRequest = {
   /**
    * Custom code to aggregrate the results from using features_to_code
@@ -20,6 +21,7 @@ export type EvaluateRequest = {
   features_to_code_map: Record<string, string>;
 };
 
+/** Response of the Trainee method: evaluate. */
 export type EvaluateResponse = {
   /**
    * The resulting value of the aggregation code.

@@ -8,4 +8,5 @@
  * the currently contained hierarchy as a nested assoc with (false) for trainees that are stored independently.
  */
 
+/** Response of the Trainee method: getHierarchy. */
 export type GetHierarchyResponse = Record<string, any>;

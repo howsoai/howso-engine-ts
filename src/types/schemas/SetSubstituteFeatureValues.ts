@@ -7,6 +7,7 @@
  * Sets substitution feature values used in case generation
  */
 
+/** Request parameters of the Trainee method: setSubstituteFeatureValues. */
 export type SetSubstituteFeatureValuesRequest = {
   /**
    * Assoc of feature -> assoc of value -> substitution.

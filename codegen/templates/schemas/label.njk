@@ -1,6 +1,7 @@
 {%- include "schemas/_header.njk" %}
 {%- from "schemas/_macros.njk" import field, comment %}
 {% if parameters | length %}
+/** Request parameters of the Trainee method: {{ label | camelCase }}. */
 export type {{ name }}Request = {
 {%- for key, schema in parameters | dictsort -%}
   {{ comment(schema) | indent(2) }}
@@ -12,6 +13,7 @@ export type {{ name }}Request = {
 {% endif -%}
 
 {%- if returns and not returns | isSimpleType %}
+/** Response of the Trainee method: {{ label | camelCase }}. */
 export type {{ name }}Response = {{ field(returns) }};
 
 {%- endif %}

@@ -7,6 +7,7 @@
  * Train the provided cases, filtering out cases that match optionally passed in ablation parameters.
  */
 
+/** Request parameters of the Trainee method: train. */
 export type TrainRequest = {
   /**
    * Name of feature into which to accumulate neighbors' influences as weight for ablated cases. If unspecified, will not accumulate weights.
@@ -69,6 +70,7 @@ export type TrainRequest = {
   train_weights_only?: boolean;
 };
 
+/** Response of the Trainee method: train. */
 export type TrainResponse = {
   /**
    * The session training indices for the ablated cases.

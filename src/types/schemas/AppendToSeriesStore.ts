@@ -7,6 +7,7 @@
  * Append cases to a series
  */
 
+/** Request parameters of the Trainee method: appendToSeriesStore. */
 export type AppendToSeriesStoreRequest = {
   /**
    * List of context features for the corresponding context_values

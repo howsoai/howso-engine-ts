@@ -1,10 +1,11 @@
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
- *
- * FeatureOriginalTypeString
  */
 
+/**
+ * FeatureOriginalTypeString schema.
+ */
 export type FeatureOriginalTypeString = {
   /**
    * The data type kind.

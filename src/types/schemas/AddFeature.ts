@@ -12,6 +12,7 @@
 import type { Condition } from "./Condition";
 import type { FeatureAttributes } from "./FeatureAttributes";
 
+/** Request parameters of the Trainee method: addFeature. */
 export type AddFeatureRequest = {
   /**
    * Assoc of feature->value(s).

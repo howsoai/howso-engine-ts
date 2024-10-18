@@ -7,6 +7,7 @@
  * Set session metadata for a specified session.
  */
 
+/** Request parameters of the Trainee method: setSessionMetadata. */
 export type SetSessionMetadataRequest = {
   /**
    * Any arbitrary metadata.

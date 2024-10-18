@@ -7,6 +7,7 @@
  * Retrieve the top or bottom number of cases for a specified feature, sorted top to bottom for top, and bottom to top for bottom
  */
 
+/** Request parameters of the Trainee method: getExtremeCases. */
 export type GetExtremeCasesRequest = {
   /**
    * The features for which values should be returned
@@ -24,6 +25,7 @@ export type GetExtremeCasesRequest = {
   sort_feature: string;
 };
 
+/** Response of the Trainee method: getExtremeCases. */
 export type GetExtremeCasesResponse = {
   /**
    * A list of lists of case values in the order specified by 'features'.

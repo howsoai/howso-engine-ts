@@ -8,6 +8,7 @@
  */
 import type { FeatureAttributesIndex } from "./FeatureAttributesIndex";
 
+/** Request parameters of the Trainee method: setFeatureAttributes. */
 export type SetFeatureAttributesRequest = {
   /**
    * Flag, default to true. create time series feature attributes if necessary

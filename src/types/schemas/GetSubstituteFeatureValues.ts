@@ -7,4 +7,5 @@
  * Returns the substitution map
  */
 
+/** Response of the Trainee method: getSubstituteFeatureValues. */
 export type GetSubstituteFeatureValuesResponse = Record<string, any>;

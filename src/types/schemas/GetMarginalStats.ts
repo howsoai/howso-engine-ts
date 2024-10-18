@@ -10,6 +10,7 @@
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 
+/** Request parameters of the Trainee method: getMarginalStats. */
 export type GetMarginalStatsRequest = {
   /**
    * Assoc of feature->value(s)
@@ -40,6 +41,7 @@ export type GetMarginalStatsRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: getMarginalStats. */
 export type GetMarginalStatsResponse = Record<
   string,
   {

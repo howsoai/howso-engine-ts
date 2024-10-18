@@ -7,6 +7,7 @@
  * Returns the total number of training cases for trainee
  */
 
+/** Response of the Trainee method: getNumTrainingCases. */
 export type GetNumTrainingCasesResponse = {
   /**
    * The number of trained cases.

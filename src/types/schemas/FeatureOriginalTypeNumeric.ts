@@ -1,10 +1,11 @@
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
- *
- * FeatureOriginalTypeNumeric
  */
 
+/**
+ * FeatureOriginalTypeNumeric schema.
+ */
 export type FeatureOriginalTypeNumeric = {
   /**
    * The data type kind.

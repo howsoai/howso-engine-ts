@@ -9,6 +9,7 @@
 import type { HyperparameterMap } from "./HyperparameterMap";
 import type { HyperparameterMapTree } from "./HyperparameterMapTree";
 
+/** Request parameters of the Trainee method: setParams. */
 export type SetParamsRequest = {
   /**
    * The factor by which to increase the analyze threshold everytime the model grows to the current threshold size

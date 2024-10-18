@@ -9,6 +9,7 @@
 import type { CaseIndices } from "./CaseIndices";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: getDistances. */
 export type GetDistancesRequest = {
   /**
    * If specified, uses targeted hyperparameters used to predict this action_feature, otherwise uses targetless hyperparameters.
@@ -67,6 +68,7 @@ export type GetDistancesRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: getDistances. */
 export type GetDistancesResponse = {
   /**
    * The case indices of the cases represented by the columns of the distance matrix.

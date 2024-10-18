@@ -7,6 +7,7 @@
  * Clear values that were imputed during a specified session, but won't clear values that were manually set by user after the impute
  */
 
+/** Request parameters of the Trainee method: clearImputedData. */
 export type ClearImputedDataRequest = {
   /**
    * Session id of the impute for which to clear the data. if null, will clear all imputed

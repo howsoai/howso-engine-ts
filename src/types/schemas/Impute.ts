@@ -7,6 +7,7 @@
  * Imputes the model, filling in all the (null) feature values
  */
 
+/** Request parameters of the Trainee method: impute. */
 export type ImputeRequest = {
   /**
    * A positive integer, specifying how many rows to fill before recomputing entropy. default is 1 which should return the

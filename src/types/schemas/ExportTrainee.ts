@@ -8,6 +8,7 @@
  * this method should be run by a script from the ./migrations folder
  */
 
+/** Request parameters of the Trainee method: exportTrainee. */
 export type ExportTraineeRequest = {
   /**
    * Flag, default false. if true will decode (e.g., convert from epoch to datetime) any encoded feature values

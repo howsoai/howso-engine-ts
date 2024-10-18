@@ -18,6 +18,7 @@ import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { ReactDetails } from "./ReactDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: reactSeries. */
 export type ReactSeriesRequest = {
   /**
    * List of feature names corresponding to values in each row of action_values
@@ -259,6 +260,7 @@ export type ReactSeriesRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: reactSeries. */
 export type ReactSeriesResponse = {
   /**
    * The list of feature names that correspond to the values in each list of values in 'action_values'.

@@ -24,6 +24,7 @@ import type { RobustCaseContribution } from "./RobustCaseContribution";
 import type { SimilarCaseIndex } from "./SimilarCaseIndex";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: react. */
 export type ReactRequest = {
   /**
    * Full list of features to output values for the case
@@ -396,6 +397,7 @@ export type ReactRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: react. */
 export type ReactResponse = {
   /**
    * The list of action features in the order the action values are returned.

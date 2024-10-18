@@ -8,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: getFeatureConviction. */
 export type GetFeatureConvictionRequest = {
   /**
    * List of action features to use as the baseline for conviction instead of the full model
@@ -52,6 +53,7 @@ export type GetFeatureConvictionRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: getFeatureConviction. */
 export type GetFeatureConvictionResponse = {
   /**
    * A the familiarity conviction of adding the feature to the model.

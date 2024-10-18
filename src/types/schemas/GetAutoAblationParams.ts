@@ -8,6 +8,7 @@
  */
 import type { AblationThresholdMap } from "./AblationThresholdMap";
 
+/** Response of the Trainee method: getAutoAblationParams. */
 export type GetAutoAblationParamsResponse = {
   /**
    * The absolute threshold map set by set_auto_ablation_params, if any.

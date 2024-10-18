@@ -1,8 +1,6 @@
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
- *
- * TypeDefinition
  */
 import type { TypeSchema } from "./TypeSchema";
 import type { TypeString } from "./TypeString";

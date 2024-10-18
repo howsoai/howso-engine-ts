@@ -10,6 +10,7 @@ import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 
+/** Request parameters of the Trainee method: moveCases. */
 export type MoveCasesRequest = {
   /**
    * A list of session id and training index tuples that specify which cases are to be moved
@@ -75,6 +76,7 @@ export type MoveCasesRequest = {
   target_name_path?: string[];
 };
 
+/** Response of the Trainee method: moveCases. */
 export type MoveCasesResponse = {
   count: number;
 };

@@ -7,4 +7,5 @@
  * Get metadata for model
  */
 
+/** Response of the Trainee method: getMetadata. */
 export type GetMetadataResponse = Record<string, any> | null;

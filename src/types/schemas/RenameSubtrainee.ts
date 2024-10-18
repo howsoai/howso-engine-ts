@@ -7,6 +7,7 @@
  * Rename a contained trainee
  */
 
+/** Request parameters of the Trainee method: renameSubtrainee. */
 export type RenameSubtraineeRequest = {
   /**
    * Id of child trainee to rename. Ignored if child_name_path is specified

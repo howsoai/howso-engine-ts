@@ -7,6 +7,7 @@
  * Removes replay specified by session and any references within cases
  */
 
+/** Request parameters of the Trainee method: deleteSession. */
 export type DeleteSessionRequest = {
   /**
    * Session to remove

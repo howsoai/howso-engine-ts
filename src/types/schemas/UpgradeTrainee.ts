@@ -7,6 +7,7 @@
  * Update version to latest, auto importing any exported data.
  */
 
+/** Request parameters of the Trainee method: upgradeTrainee. */
 export type UpgradeTraineeRequest = {
   /**
    * Base path to Howso Engine Core installation

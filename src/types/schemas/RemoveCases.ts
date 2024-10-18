@@ -10,6 +10,7 @@ import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 
+/** Request parameters of the Trainee method: removeCases. */
 export type RemoveCasesRequest = {
   /**
    * A list of session id and training index tuples that specify which cases are to be removed
@@ -45,6 +46,7 @@ export type RemoveCasesRequest = {
   precision?: Precision;
 };
 
+/** Response of the Trainee method: removeCases. */
 export type RemoveCasesResponse = {
   count: number;
 };

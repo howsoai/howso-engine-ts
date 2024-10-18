@@ -12,6 +12,7 @@
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 
+/** Request parameters of the Trainee method: editCases. */
 export type EditCasesRequest = {
   /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the case as
@@ -66,6 +67,7 @@ export type EditCasesRequest = {
   session?: string;
 };
 
+/** Response of the Trainee method: editCases. */
 export type EditCasesResponse = {
   count: number;
 };

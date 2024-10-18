@@ -7,6 +7,7 @@
  * Saves a subtrainee with the following optional parameters, escapes trainee filenames on save
  */
 
+/** Request parameters of the Trainee method: saveSubtrainee. */
 export type SaveSubtraineeRequest = {
   /**
    * Name to store (without extension)

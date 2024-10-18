@@ -7,6 +7,7 @@
  * Set trainee's unique id
  */
 
+/** Request parameters of the Trainee method: setTraineeId. */
 export type SetTraineeIdRequest = {
   /**
    * A unique string identifier for the trainee

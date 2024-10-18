@@ -1,13 +1,14 @@
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
- *
- * ReactAggregateDetails
  */
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 import type { PredictionStat } from "./PredictionStat";
 
+/**
+ * ReactAggregateDetails schema.
+ */
 export type ReactAggregateDetails = {
   /**
    * If specified, will condition the action set, which is the dataset for which the prediction stats are for. If both 'action_condition' and 'context_condition' are provided, then all of the action cases selected by the 'action_condition' will be excluded from the context set, which is the set being queried to make to make predictions on the action set, effectively holding them out. If only 'action_condition' is specified, then only the single predicted case will be left out.

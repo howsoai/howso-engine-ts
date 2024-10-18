@@ -15,6 +15,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: reactGroup. */
 export type ReactGroupRequest = {
   /**
    * Calculate and output distance contribution ratios in the output assoc
@@ -83,6 +84,7 @@ export type ReactGroupRequest = {
   weight_feature?: string;
 };
 
+/** Response of the Trainee method: reactGroup. */
 export type ReactGroupResponse = {
   /**
    * The average distance contribution of cases in the model.

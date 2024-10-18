@@ -7,6 +7,7 @@
  * Creates a copy of a trainee and stores it a subtrainee, returns the name of the copied trainee on success
  */
 
+/** Request parameters of the Trainee method: copySubtrainee. */
 export type CopySubtraineeRequest = {
   /**
    * Id of source trainee to copy. Ignored if source_name_path is specified.
@@ -36,6 +37,7 @@ export type CopySubtraineeRequest = {
   target_trainee: string | string[];
 };
 
+/** Response of the Trainee method: copySubtrainee. */
 export type CopySubtraineeResponse = {
   name: string[] | string;
 };

@@ -12,6 +12,7 @@ import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
 
+/** Request parameters of the Trainee method: getCases. */
 export type GetCasesRequest = {
   /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the
@@ -66,6 +67,7 @@ export type GetCasesRequest = {
   skip_decoding?: number;
 };
 
+/** Response of the Trainee method: getCases. */
 export type GetCasesResponse = {
   /**
    * A list of lists of case values in the order specified by 'features'.

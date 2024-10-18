@@ -7,6 +7,7 @@
  * Returns the trainee's !revision
  */
 
+/** Response of the Trainee method: getRevision. */
 export type GetRevisionResponse = {
   count: number;
 };

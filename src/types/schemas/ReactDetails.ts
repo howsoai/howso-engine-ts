@@ -1,11 +1,12 @@
 /**
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
- *
- * ReactDetails
  */
 import type { PredictionStat } from "./PredictionStat";
 
+/**
+ * ReactDetails schema.
+ */
 export type ReactDetails = {
   /**
    * When true, outputs an automatically determined (when 'num_boundary_cases' is not specified) relevant number of boundary cases. Uses both context and action features of the reacted case to determine the counterfactual boundary based on action features, which maximize the dissimilarity of action features while maximizing the similarity of context features. If action features aren't specified, uses familiarity conviction to determine the boundary instead.
