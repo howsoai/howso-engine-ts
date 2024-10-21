@@ -25,7 +25,7 @@ export type ClientOptions = AbstractBaseClientOptions & {
   /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
   migrationsUrl?: string | URL;
   /** Enable tracing all Trainee operations for debugging. */
-  trace?: boolean;
+  trace?: AmalgamOptions["trace"];
 };
 
 export class HowsoWorkerClient extends AbstractBaseClient {
