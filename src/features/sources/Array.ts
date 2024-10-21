@@ -164,8 +164,8 @@ export class InferFeatureAttributesFromArray extends InferFeatureAttributesBase 
           // Use loose bounds
           [minValue, maxValue] = utils.guessLooseBounds(minValue, maxValue);
 
-          const { mode_bound_features = [] } = options;
-          if (mode_bound_features.includes(featureName)) {
+          const { mode_bound_features } = options;
+          if (!mode_bound_features || mode_bound_features.includes(featureName)) {
             // Check for mode bounds
             if (uniqueValues !== totalValues) {
               const [modes, modeCount] = utils.allModes(column);
