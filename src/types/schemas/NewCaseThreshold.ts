@@ -1,10 +1,9 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
- *
- * NewCaseThreshold
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  */
 
 /**
  * The privacy distance criteria for generated new cases.
  */
-export type NewCaseThreshold = "min" | "max" | "most_similar";
+export type NewCaseThreshold = "max" | "min" | "most_similar";

@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * SetAutoAnalyzeParams
  *
@@ -7,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: setAutoAnalyzeParams. */
 export type SetAutoAnalyzeParamsRequest = {
   /**
    * {type "list" values "string"}
@@ -65,10 +67,10 @@ export type SetAutoAnalyzeParamsRequest = {
   /**
    * List of values for dt (the distance transform) to grid search during analysis
    */
-  dt_values?: number[];
+  dt_values?: (number | string)[];
 
   /**
-   * Whether to use inverse residuals as feature weights. if unspecified, inverse residuals will be used as weights for
+   * Whether to use inverse residuals as feature weights. If unspecified, inverse residuals will be used as weights for
    *  targetless params, otherwise this method will not be used.
    */
   inverse_residuals_as_weights?: boolean | null;
@@ -95,7 +97,7 @@ export type SetAutoAnalyzeParamsRequest = {
   num_samples?: number;
 
   /**
-   * List of values for p (the parameter of the lebesgue space) to grid search during analysis
+   * List of values for p (the parameter of the Lebesgue space) to grid search during analysis
    */
   p_values?: number[];
 
@@ -105,7 +107,7 @@ export type SetAutoAnalyzeParamsRequest = {
    *    "omni_targeted" = analyze hyperparameters for each action feature, using all other features as context_features. if action_features aren't specified, uses all context_features.
    *    "targetless" = analyze hyperparameters for all context features as possible action features, ignores action_features parameter
    */
-  targeted_model?: "single_targeted" | "omni_targeted" | "targetless";
+  targeted_model?: "omni_targeted" | "single_targeted" | "targetless";
 
   /**
    * When true will scale influence weights by each case's weight_feature weight. if use_case_weights isn't specified, it will
@@ -114,8 +116,8 @@ export type SetAutoAnalyzeParamsRequest = {
   use_case_weights?: UseCaseWeights;
 
   /**
-   * Whether to use deviations for lk metric in queries. when true forces the use
-   *   of deviations, when false will not use deviations. if unspecified, the better performing option will be selected.
+   * Whether to use deviations for LK metric in queries. When true forces the use
+   *   of deviations, when false will not use deviations. If unspecified, the better performing option will be selected.
    */
   use_deviations?: boolean | null;
 

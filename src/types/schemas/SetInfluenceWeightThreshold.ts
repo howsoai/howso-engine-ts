@@ -1,12 +1,14 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * SetInfluenceWeightThreshold
  *
- * Set the influence weight threshold for outputting only the k neighbors whose influence weight is <= to this threshold
+ * Set the influence weight threshold for outputting only the K neighbors whose influence weight is <= to this threshold
  * default value is 0.99
  */
 
+/** Request parameters of the Trainee method: setInfluenceWeightThreshold. */
 export type SetInfluenceWeightThresholdRequest = {
   /**
    * Number, amount of total influence weight to accumulate among nearest

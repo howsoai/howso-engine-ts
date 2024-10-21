@@ -1,11 +1,13 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * SaveSubtrainee
  *
  * Saves a subtrainee with the following optional parameters, escapes trainee filenames on save
  */
 
+/** Request parameters of the Trainee method: saveSubtrainee. */
 export type SaveSubtraineeRequest = {
   /**
    * Name to store (without extension)
@@ -32,7 +34,7 @@ export type SaveSubtraineeRequest = {
   trainee?: string | string[];
 
   /**
-   * Unique id for trainee. must be provided if trainee does not have one already specified.
+   * Unique id for trainee. Must be provided if trainee does not have one already specified.
    */
   trainee_id?: string;
 };

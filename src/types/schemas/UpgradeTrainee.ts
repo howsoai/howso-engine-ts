@@ -1,14 +1,16 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * UpgradeTrainee
  *
  * Update version to latest, auto importing any exported data.
  */
 
+/** Request parameters of the Trainee method: upgradeTrainee. */
 export type UpgradeTraineeRequest = {
   /**
-   * Base path to howso engine core installation
+   * Base path to Howso Engine Core installation
    */
   root_filepath?: string;
 
@@ -25,7 +27,7 @@ export type UpgradeTraineeRequest = {
 
   /**
    * Path from which to load previously exported meta.json and exp.json files.
-   *   if unspecified, expects them to be located in the base installation /migrations/ directory.
+   *   If unspecified, expects them to be located in the base installation /migrations/ directory.
    */
   trainee_json_filepath?: string;
 };

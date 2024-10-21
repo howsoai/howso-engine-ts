@@ -1,10 +1,9 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
- *
- * UseCaseWeights
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  */
 
 /**
- * If set to true will scale influence weights by each case's weight_feature weight. if null, case weights will be used if the trainee has them.
+ * If set to true will scale influence weights by each case's weight_feature weight. If null, case weights will be used if the trainee has them.
  */
 export type UseCaseWeights = boolean | null;

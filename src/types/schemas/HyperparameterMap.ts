@@ -1,9 +1,11 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
- *
- * HyperparameterMap
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  */
 
+/**
+ * HyperparameterMap schema.
+ */
 export type HyperparameterMap = {
   /**
    * Flag indicating if all feature's residuals have been cached.
@@ -14,17 +16,17 @@ export type HyperparameterMap = {
    */
   derivedAutoAnalyzed?: boolean;
   /**
-   * The distance transform. used as an exponent to convert distance to influence before normalization.
+   * The distance transform. Used as an exponent to convert distance to influence before normalization. Also accepts string value "surprisal_to_prob" as experimental option that converts distances to surprisal.
    */
-  dt: number;
+  dt: number | "surprisal_to_prob";
   /**
-   * Internal map of features to their deviations. includes null deviations and sparse deviation matrices.
+   * Internal map of features to their deviations. Includes null deviations and sparse deviation matrices.
    */
-  featureDeviations?: Record<string, any>;
+  featureDeviations?: Record<string, any> | null;
   /**
    * Internal map of features to various domain attributes.
    */
-  featureDomainAttributes?: Record<string, any>;
+  featureDomainAttributes?: Record<string, any> | null;
   /**
    * Map of ordinal features to their deviations.
    */
@@ -32,11 +34,11 @@ export type HyperparameterMap = {
   /**
    * Map of features to their computed feature residuals.
    */
-  featureResiduals?: Record<string, any>;
+  featureResiduals?: Record<string, number>;
   /**
    * Map of features to feature weights used in the distance metric.
    */
-  featureWeights?: Record<string, any>;
+  featureWeights?: Record<string, number> | null;
   /**
    * Error computed during the grid search in analysis.
    */
@@ -48,9 +50,9 @@ export type HyperparameterMap = {
   /**
    * Map of features to null uncertainties which describes the distances in the context of missing values.
    */
-  nullUncertainties?: Record<string, any>;
+  nullUncertainties?: Record<string, (number | null)[]>;
   /**
-   * The parameter of the lebesgue space.
+   * The parameter of the Lebesgue space.
    */
   p: number;
   /**

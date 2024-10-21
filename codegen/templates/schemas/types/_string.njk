@@ -1,6 +1,8 @@
-{%- if schema.enum -%}
-    {%- for item in schema.enum -%}
+{%- if schema.enum | enumMatchesType("string") -%}
+    {%- for item in schema.enum | sort -%}
+        {%- if item is string -%}
 "{{ item }}"{% if not loop.last %} | {% endif %}
+        {%- endif -%}
     {%- endfor -%}
 {%- else -%}
 string

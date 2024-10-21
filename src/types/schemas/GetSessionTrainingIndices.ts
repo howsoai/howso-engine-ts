@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetSessionTrainingIndices
  *
@@ -7,6 +8,7 @@
  * session training indices are 0-based index of the case, ordered by training during the session; is not changed
  */
 
+/** Request parameters of the Trainee method: getSessionTrainingIndices. */
 export type GetSessionTrainingIndicesRequest = {
   /**
    * Id of session

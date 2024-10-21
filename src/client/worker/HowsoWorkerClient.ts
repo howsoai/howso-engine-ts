@@ -8,8 +8,7 @@ import {
 import type { Worker as NodeWorker } from "node:worker_threads";
 import { v4 as uuid } from "uuid";
 import { Session, Trainee } from "../../engine";
-import type { BaseTrainee, ClientBatchResponse, TrainResponse } from "../../types";
-import type * as schemas from "../../types/schemas";
+import type { BaseTrainee } from "../../types";
 import {
   AbstractBaseClient,
   type AbstractBaseClientOptions,
@@ -17,7 +16,7 @@ import {
   type ExecuteResponse,
 } from "../AbstractBaseClient";
 import { HowsoError, RequiredError } from "../errors";
-import { batcher, BatchOptions, CacheMap } from "../utilities";
+import { CacheMap } from "../utilities";
 import { AbstractFileSystem } from "./filesystem";
 
 export type ClientOptions = AbstractBaseClientOptions & {
@@ -26,7 +25,7 @@ export type ClientOptions = AbstractBaseClientOptions & {
   /** Trainee migrations caml file. This will not be loaded unless a function request it, such as `upgradeTrainee` */
   migrationsUrl?: string | URL;
   /** Enable tracing all Trainee operations for debugging. */
-  trace?: boolean;
+  trace?: AmalgamOptions["trace"];
 };
 
 export class HowsoWorkerClient extends AbstractBaseClient {
@@ -84,7 +83,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
       const result = this.processResponse<R>(response);
       if (throwErrors && Array.isArray(result.errors)) {
         for (const err of result.errors) {
-          throw new HowsoError(err?.message, err?.code);
+          throw err;
         }
       }
       return result;
@@ -142,35 +141,6 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   }
 
   /**
-   * Automatically resolve a Trainee and ensure it is loaded given an identifier.
-   *
-   * @param traineeId The Trainee identifier.
-   * @returns The Trainee object.
-   */
-  protected async autoResolveTrainee(traineeId: string): Promise<Trainee> {
-    if (traineeId == null) {
-      throw new TypeError("A Trainee identifier is required.");
-    }
-    await this.acquireTraineeResources(traineeId); // does nothing if already cached
-    const cached = this.cache.get(traineeId);
-    if (cached == null) {
-      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
-    }
-    return cached.trainee;
-  }
-
-  /**
-   * Automatically persist Trainee object when appropriate based on persistence level.
-   * @param traineeId The Trainee identifier.
-   */
-  protected async autoPersistTrainee(traineeId: string): Promise<void> {
-    const cached = this.cache.get(traineeId);
-    if (cached?.trainee?.persistence === "always") {
-      await this.persistTrainee(traineeId);
-    }
-  }
-
-  /**
    * Constructs Trainee object from it's Engine metadata.
    *
    * @param traineeId The Trainee identifier.
@@ -190,17 +160,32 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   }
 
   /**
-   * Include the active session in a request if not defined.
-   * @param request The Trainee request object.
-   * @returns The Trainee request object with a session.
+   * Automatically resolve a Trainee and ensure it is loaded given an identifier.
+   *
+   * @param traineeId The Trainee identifier.
+   * @returns The Trainee object.
    */
-  protected async includeSession<T extends Record<string, any>>(request: T): Promise<T> {
-    if (!request.session) {
-      // Include the active session
-      const session = await this.getActiveSession();
-      return { ...request, session: session.id };
+  public async autoResolveTrainee(traineeId: string): Promise<Trainee> {
+    if (traineeId == null) {
+      throw new TypeError("A Trainee identifier is required.");
     }
-    return request;
+    await this.acquireTraineeResources(traineeId); // does nothing if already cached
+    const cached = this.cache.get(traineeId);
+    if (cached == null) {
+      throw new HowsoError(`Trainee "${traineeId}" not found.`, "not_found");
+    }
+    return cached.trainee;
+  }
+
+  /**
+   * Automatically persist Trainee object when appropriate based on persistence level.
+   * @param traineeId The Trainee identifier.
+   */
+  public async autoPersistTrainee(traineeId: string): Promise<void> {
+    const cached = this.cache.get(traineeId);
+    if (cached?.trainee?.persistence === "always") {
+      await this.persistTrainee(traineeId);
+    }
   }
 
   /**
@@ -273,11 +258,11 @@ export class HowsoWorkerClient extends AbstractBaseClient {
    * @param traineeId The Trainee identifier.
    */
   public async persistTrainee(traineeId: string): Promise<void> {
-    const fileUri = this.fs.join(this.fs.traineeDir, this.fs.traineeFilename(traineeId));
+    const filePath = this.fs.join(this.fs.traineeDir, this.fs.traineeFilename(traineeId));
     await this.dispatch({
       type: "request",
       command: "storeEntity",
-      parameters: [traineeId, fileUri],
+      parameters: [{ handle: traineeId, filePath }],
     });
   }
 
@@ -311,7 +296,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
       const status = await this.dispatch({
         type: "request",
         command: "loadEntity",
-        parameters: [traineeId, filePath],
+        parameters: [{ handle: traineeId, filePath }],
       });
       if (!status.loaded) {
         throw new HowsoError(`Failed to acquire the Trainee "${traineeId}": ${status.message}`);
@@ -362,11 +347,11 @@ export class HowsoWorkerClient extends AbstractBaseClient {
   public async createTrainee(properties: Omit<BaseTrainee, "id">): Promise<Trainee> {
     const traineeId = properties.name || uuid();
     // Load the Engine entity
-    const howsoPath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
+    const filePath = this.fs.join(this.fs.libDir, `howso.${this.fs.entityExt}`);
     const status = await this.dispatch({
       type: "request",
       command: "loadEntity",
-      parameters: [traineeId, howsoPath],
+      parameters: [{ handle: traineeId, filePath }],
     });
     if (!status.loaded) {
       throw new HowsoError(`Failed to initialize the Trainee "${traineeId}": ${status.message}`);
@@ -375,7 +360,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     // Create the Trainee entity
     await this.execute<boolean>(traineeId, "initialize", {
       trainee_id: traineeId,
-      filepath: howsoPath,
+      filepath: filePath,
     });
 
     // Set Trainee metadata
@@ -435,7 +420,7 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     const cloned = await this.dispatch({
       type: "request",
       command: "cloneEntity",
-      parameters: [traineeId, newTraineeId],
+      parameters: [{ handle: traineeId, cloneHandle: newTraineeId }],
     });
     if (!cloned) {
       throw new HowsoError(
@@ -465,7 +450,10 @@ export class HowsoWorkerClient extends AbstractBaseClient {
     });
     this.cache.discard(traineeId);
     const filename = this.fs.traineeFilename(traineeId);
-    this.fs.unlink(this.fs.join(this.fs.traineeDir, filename));
+    const existingTrainees = await this.fs.readdir(this.fs.traineeDir);
+    if (existingTrainees.includes(filename)) {
+      await this.fs.unlink(this.fs.join(this.fs.traineeDir, filename));
+    }
   }
 
   /**
@@ -499,89 +487,5 @@ export class HowsoWorkerClient extends AbstractBaseClient {
       }
       return accumulator;
     }, []);
-  }
-
-  public async impute(traineeId: string, request: schemas.ImputeRequest) {
-    request = await this.includeSession(request);
-    return await super.impute(traineeId, request);
-  }
-
-  public async clearImputedData(traineeId: string, request: schemas.ClearImputedDataRequest) {
-    request = await this.includeSession(request);
-    return await super.clearImputedData(traineeId, request);
-  }
-
-  public async moveCases(traineeId: string, request: schemas.MoveCasesRequest) {
-    request = await this.includeSession(request);
-    return await super.moveCases(traineeId, request);
-  }
-
-  public async editCases(traineeId: string, request: schemas.EditCasesRequest) {
-    request = await this.includeSession(request);
-    return await super.editCases(traineeId, request);
-  }
-
-  public async addFeature(traineeId: string, request: schemas.AddFeatureRequest) {
-    request = await this.includeSession(request);
-    return await super.addFeature(traineeId, request);
-  }
-
-  public async removeFeature(traineeId: string, request: schemas.RemoveFeatureRequest) {
-    request = await this.includeSession(request);
-    return await super.removeFeature(traineeId, request);
-  }
-
-  public async train(traineeId: string, request: schemas.TrainRequest) {
-    request = await this.includeSession(request);
-    return await super.train(traineeId, request);
-  }
-
-  /**
-   * Train data into the Trainee using batched requests to the Engine.
-   * @param traineeId The Trainee identifier.
-   * @param request The train parameters.
-   * @returns The train result.
-   */
-  public async batchTrain(
-    traineeId: string,
-    request: schemas.TrainRequest,
-  ): Promise<ClientBatchResponse<TrainResponse>> {
-    const trainee = await this.autoResolveTrainee(traineeId);
-    const { cases = [], ...rest } = request;
-
-    // Limit to 10,000 cases at once maximum
-    const batchOptions: BatchOptions = { startSize: 100, limits: [1, 10000] };
-
-    let num_trained = 0;
-    let status = null;
-    const ablated_indices: number[] = [];
-    const warnings: string[][] = [];
-
-    // Batch scale the requests
-    await batcher(
-      async function* (this: HowsoWorkerClient, size: number) {
-        let offset = 0;
-        while (offset < cases.length) {
-          const response = await this.train(trainee.id, {
-            ...rest,
-            cases: cases.slice(offset, offset + size),
-          });
-          offset += size;
-          if (response.payload.status) status = response.payload.status;
-          if (response.payload.num_trained) num_trained += response.payload.num_trained;
-          if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
-
-          // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
-          if (response.warnings.length > 0) {
-            warnings.push(response.warnings);
-          }
-          size = yield;
-        }
-      }.bind(this),
-      batchOptions,
-    );
-
-    await this.autoPersistTrainee(trainee.id);
-    return { payload: { num_trained, status, ablated_indices }, warnings };
   }
 }

@@ -6,9 +6,9 @@
  */
 export function blockComment(content: any) {
   // Ensure the content is a string
-  const str = typeof content === "string" ? content : String(content);
+  let str = typeof content === "string" ? content : String(content);
 
-  return str
+  str = str
     .split("\n")
     .reduceRight<string[]>((accumulator, value) => {
       // Removing tailing empty lines
@@ -34,4 +34,7 @@ export function blockComment(content: any) {
     })
     .join("\n")
     .trimEnd();
+
+  // Capitalize first sentence.
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }

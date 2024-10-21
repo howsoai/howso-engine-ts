@@ -1,21 +1,23 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * ExecuteOnSubtrainee
  *
- * Execute any method in the api directly on any child trainee of this trainee, used for hierarchy operations.
+ * Execute any method in the API directly on any child trainee of this trainee, used for hierarchy operations.
  */
 
+/** Request parameters of the Trainee method: executeOnSubtrainee. */
 export type ExecuteOnSubtraineeRequest = {
   /**
    * Flag, applicable only to 'load_subtrainee' and 'save_subtrainee' and if specifying child_name_path or child_id.
-   *   for 'save_subtrainee', stores the child out as an independent trainee and removes it as a contained entity.
-   *   for 'load_subtrainee' updates hierarchy by adding the child as an independently stored trainee to the hierarchy without loading the trainee as a subtrainee.
+   *   For 'save_subtrainee', stores the child out as an independent trainee and removes it as a contained entity.
+   *   For 'load_subtrainee' updates hierarchy by adding the child as an independently stored trainee to the hierarchy without loading the trainee as a subtrainee.
    */
   as_external?: boolean;
 
   /**
-   * Id of child trainee to execute method. ignored if child_name_path is specified
+   * Id of child trainee to execute method. Ignored if child_name_path is specified
    */
   child_id?: string;
 

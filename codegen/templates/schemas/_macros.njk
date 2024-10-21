@@ -1,6 +1,6 @@
 {%- macro field(schema, type=null) %}
 {%- if not type %}
-    {%- if schema | isString or schema | isArray %}
+    {%- if schema is string or schema | isArray %}
         {%- set type = schema %}
     {%- else %}
         {%- set type = schema.type %}
@@ -29,6 +29,8 @@ null
         {%- else -%}
 any
         {%- endif -%}
+    {%- elif schema | isAnyOf -%}
+{% include "schemas/composition/_anyOf.njk" %}
     {%- else -%}
 {{ type | convertType }}
     {%- endif -%}
@@ -36,13 +38,17 @@ any
 {%- endmacro %}
 
 
-{%- macro comment(schema) %}
+{%- macro comment(schema, default=null) %}
 {%- if schema.description %}
 /**
- * {{ schema.description | capitalize | blockComment | safe }}
+ * {{ schema.description | blockComment | safe }}
 {%- if schema.default != null %}
  * @default {{ schema.default | toJson | safe }}
 {%- endif %}
+ */
+{%- elif default %}
+/**
+ * {{ default }}
  */
 {%- endif %}
 {%- endmacro %}

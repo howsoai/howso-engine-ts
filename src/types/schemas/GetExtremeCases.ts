@@ -1,11 +1,13 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetExtremeCases
  *
  * Retrieve the top or bottom number of cases for a specified feature, sorted top to bottom for top, and bottom to top for bottom
  */
 
+/** Request parameters of the Trainee method: getExtremeCases. */
 export type GetExtremeCasesRequest = {
   /**
    * The features for which values should be returned
@@ -21,4 +23,16 @@ export type GetExtremeCasesRequest = {
    * The feature for which to sort the cases by
    */
   sort_feature: string;
+};
+
+/** Response of the Trainee method: getExtremeCases. */
+export type GetExtremeCasesResponse = {
+  /**
+   * A list of lists of case values in the order specified by 'features'.
+   */
+  cases: any[][];
+  /**
+   * The list of features in the order of values of the sublists in 'cases'.
+   */
+  features: string[];
 };

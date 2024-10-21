@@ -1,11 +1,13 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * AppendToSeriesStore
  *
  * Append cases to a series
  */
 
+/** Request parameters of the Trainee method: appendToSeriesStore. */
 export type AppendToSeriesStoreRequest = {
   /**
    * List of context features for the corresponding context_values
@@ -13,7 +15,7 @@ export type AppendToSeriesStoreRequest = {
   context_features: string[];
 
   /**
-   * List of lists. case values corresponding to the context features to store into a series.
+   * List of lists. Case values corresponding to the context features to store into a series.
    */
   context_values: any[][];
 

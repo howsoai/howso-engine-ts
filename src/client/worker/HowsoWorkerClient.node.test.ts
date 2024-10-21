@@ -27,7 +27,8 @@ describe("Node HowsoWorkerClient", () => {
     const data = JSON.parse(readFileSync(dataPath, { encoding: "utf8" }));
     const feature_attributes = await inferFeatureAttributes(data, "array", {});
     const trainee = await client.createTrainee({ name: "My Trainee" });
-    await client.setFeatureAttributes(trainee.id, { feature_attributes });
+    const { payload: set_feature_attributes } = await trainee.setFeatureAttributes({ feature_attributes });
+    expect(set_feature_attributes).toEqual(feature_attributes);
   });
 
   afterAll(() => {

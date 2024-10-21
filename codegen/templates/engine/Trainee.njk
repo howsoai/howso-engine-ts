@@ -1,0 +1,166 @@
+{%- from "schemas/_macros.njk" import field %}
+/**
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly, instead modify the Trainee.njk template file.
+ *
+ * Generated via Howso Engine {{ version }}
+ */
+import { AbstractBaseClient } from "../client/AbstractBaseClient";
+import { batcher, BatchOptions } from "../client/utilities";
+import type { BaseTrainee, ClientBatchResponse, ClientResponse } from "../types";
+import type * as schemas from "../types/schemas";
+
+/**
+ * The interface for interacting with a Trainee. Should not be instantiated directly. Instead create or request a
+ * Trainee using the client.
+ */
+export class Trainee implements BaseTrainee {
+  public readonly id: string;
+  protected readonly client: AbstractBaseClient;
+  protected _name: BaseTrainee["name"];
+  protected _persistence: BaseTrainee["persistence"];
+  protected _metadata: BaseTrainee["metadata"];
+  protected _deleted = false;
+
+  constructor(client: AbstractBaseClient, obj: BaseTrainee) {
+    this.client = client;
+    this.id = obj.id;
+    this._name = obj.name;
+    this._metadata = obj.metadata;
+    this._persistence = obj.persistence;
+  }
+
+  public get name() {
+    return this._name ?? null;
+  }
+
+  public get persistence() {
+    return this._persistence || "allow";
+  }
+
+  public get metadata(): Readonly<{ [key: string]: any }> {
+    return this._metadata || {};
+  }
+
+  public get isDeleted(): boolean {
+    return this._deleted;
+  }
+
+  public async update(properties: Partial<BaseTrainee>): Promise<void> {
+    const trainee = await this.client.updateTrainee({ ...properties, id: this.id });
+    this._name = trainee.name;
+    this._metadata = trainee.metadata;
+    this._persistence = trainee.persistence;
+  }
+
+  public async delete(): Promise<void> {
+    await this.client.deleteTrainee(this.id);
+    this._deleted = true;
+  }
+
+  public async copy(name?: string): Promise<Trainee> {
+    return await this.client.copyTrainee(this.id, name);
+  }
+
+  public async acquireResources(): Promise<void> {
+    return await this.client.acquireTraineeResources(this.id);
+  }
+
+  public async releaseResources(): Promise<void> {
+    return await this.client.releaseTraineeResources(this.id);
+  }
+
+  public async persist(): Promise<void> {
+    await this.client.persistTrainee(this.id);
+  }
+
+  /**
+   * Train data into the Trainee using batched requests to the Engine.
+   * @param traineeId The Trainee identifier.
+   * @param request The train parameters.
+   * @returns The train result.
+   */
+  public async batchTrain(request: schemas.TrainRequest): Promise<ClientBatchResponse<schemas.TrainResponse>> {
+    const { cases = [], ...rest } = request;
+
+    // Limit to 10,000 cases at once maximum
+    const batchOptions: BatchOptions = { startSize: 100, limits: [1, 10000] };
+
+    let num_trained = 0;
+    let status = null;
+    const ablated_indices: number[] = [];
+    const warnings: string[][] = [];
+
+    // Batch scale the requests
+    await batcher(
+      async function* (this: Trainee, size: number) {
+        let offset = 0;
+        while (offset < cases.length) {
+          const response = await this.train({
+            ...rest,
+            cases: cases.slice(offset, offset + size),
+          });
+          offset += size;
+          if (response.payload.status) status = response.payload.status;
+          if (response.payload.num_trained) num_trained += response.payload.num_trained;
+          if (response.payload.ablated_indices) ablated_indices.push(...response.payload.ablated_indices);
+
+          // Warnings will be already output to the provided Logger in prepareResponse. Just aggregate.
+          if (response.warnings.length > 0) {
+            warnings.push(response.warnings);
+          }
+          size = yield;
+        }
+      }.bind(this),
+      batchOptions,
+    );
+
+    return { payload: { num_trained, status, ablated_indices }, warnings };
+  }
+
+  /**
+   * Include the active session in a request if not defined.
+   * @param request The Trainee request object.
+   * @returns The Trainee request object with a session.
+   */
+  protected async includeSession<T extends Record<string, any>>(request: T): Promise<T> {
+    if (!request.session) {
+      // Include the active session
+      const session = await this.client.getActiveSession();
+      return { ...request, session: session.id };
+    }
+    return request;
+  }
+
+{% for label, def in labels | dictsort %}
+  {%- set requestName = "schemas." + label | pascalCase + "Request" %}
+  {%- if def.returns | isRef %}
+    {%- set responseName = "schemas." + def.returns.ref %}
+  {%- elif def.returns | isSimpleType %}
+    {%- set responseName = field(def.returns) %}
+  {%- elif def.returns %}
+    {%- set responseName = "schemas." + label | pascalCase + "Response" %}
+  {%- else %}
+    {%- set responseName = "null" %}
+  {%- endif %}
+  /**
+   * {{ def.description | blockComment | safe | indent(2) }}
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async {{ label | camelCase }}({% if def.parameters | length %}request: {{ requestName }}{% endif %}): Promise<ClientResponse<{{ responseName }}>> {
+    await this.client.autoResolveTrainee(this.id);
+    {%- if def.use_active_session and def.parameters %}
+    request = await this.includeSession(request);
+    {%- endif %}
+    const response = await this.client.execute<{{ responseName }}>(this.id, "{{ label }}", {% if def.parameters | length %}request{% else %}{}{% endif %});
+    {%- if not def.read_only %}
+    this.client.autoPersistTrainee(this.id);
+    {%- endif %}
+    return { payload: response.payload, warnings: response.warnings };
+  }
+{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+}

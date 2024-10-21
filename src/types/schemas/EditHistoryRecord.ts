@@ -1,7 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
- *
- * EditHistoryRecord
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  */
 
 /**
@@ -19,7 +18,7 @@ export type EditHistoryRecord = {
   /**
    * The type of modification.
    */
-  type?: "set" | "remove" | "impute" | "edit";
+  type?: "edit" | "impute" | "remove" | "set";
   /**
    * The new value.
    */

@@ -1,5 +1,6 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * GetFeatureConviction
  *
@@ -7,6 +8,7 @@
  */
 import type { UseCaseWeights } from "./UseCaseWeights";
 
+/** Request parameters of the Trainee method: getFeatureConviction. */
 export type GetFeatureConvictionRequest = {
   /**
    * List of action features to use as the baseline for conviction instead of the full model
@@ -39,7 +41,7 @@ export type GetFeatureConvictionRequest = {
   features?: string[];
 
   /**
-   * Flag, if set to true will scale influence weights by each case's weight_feature weight. if unspecified,
+   * Flag, if set to true will scale influence weights by each case's weight_feature weight. If unspecified,
    *   case weights will be used if the trainee has them.
    */
   use_case_weights?: UseCaseWeights;
@@ -49,4 +51,16 @@ export type GetFeatureConvictionRequest = {
    * @default ".case_weight"
    */
   weight_feature?: string;
+};
+
+/** Response of the Trainee method: getFeatureConviction. */
+export type GetFeatureConvictionResponse = {
+  /**
+   * A the familiarity conviction of adding the feature to the model.
+   */
+  familiarity_conviction_addition?: Record<string, number>;
+  /**
+   * A the familiarity conviction of removing the feature from the model.
+   */
+  familiarity_conviction_removal?: Record<string, number>;
 };

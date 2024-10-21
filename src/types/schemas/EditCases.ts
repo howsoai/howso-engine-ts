@@ -1,20 +1,22 @@
 /**
- * WARNING: This file is auto generated, do not modify manually.
+ * 🛑 WARNING: DO NOT EDIT! 🛑
+ * This file is auto generated and should not be modified directly.
  *
  * EditCases
  *
  * Edit feature values for the specified cases.
- * cases are specified by either case_indices or by the condition. if neither is provided, edits all cases.
- * updates the accumulated data mass for the model proportional to the number of cases and features modified.
+ * Cases are specified by either case_indices or by the condition. If neither is provided, edits all cases.
+ * Updates the accumulated data mass for the model proportional to the number of cases and features modified.
  * returns null if invalid features specified or an assoc with "count"
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 
+/** Request parameters of the Trainee method: editCases. */
 export type EditCasesRequest = {
   /**
    * List of pair (list) of session id and index, where index is the original 0-based session_training_index of the case as
-   *   it was trained. if specified, ignores condition and condition_session
+   *   it was trained. If specified, ignores condition and condition_session
    * @default []
    */
   case_indices?: CaseIndices;
@@ -47,8 +49,8 @@ export type EditCasesRequest = {
   feature_values: any[];
 
   /**
-   * Limit on the number of cases to edit; if set to zero there will be no limit.
-   *   if null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
+   * Limit on the number of cases to edit; If set to zero there will be no limit.
+   *   If null, will be set to k if precision is "similar" or no limit if precision is "exact". default is null
    */
   num_cases?: number;
 
@@ -63,4 +65,9 @@ export type EditCasesRequest = {
    * @default "none"
    */
   session?: string;
+};
+
+/** Response of the Trainee method: editCases. */
+export type EditCasesResponse = {
+  count: number;
 };
