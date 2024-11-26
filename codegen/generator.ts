@@ -39,14 +39,13 @@ export class Generator {
       "debug_label",
       "initialize",
       "initialize_for_deployment",
-      "set_contained_trainee_maps",
       "version",
       "get_api",
       "single_react",
       "single_react_series",
       ...Object.entries(doc.labels).reduce<string[]>((ignored, [label, def]) => {
-        // Ignore all the attribute labels
-        if (def.attribute != null) ignored.push(label);
+        // Ignore all the attribute and protected labels
+        if (def.attribute != null || def.protected) ignored.push(label);
         return ignored;
       }, []),
     ];
