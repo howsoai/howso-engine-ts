@@ -45,6 +45,7 @@ export interface LabelDefinition {
   description?: string | null;
   use_active_session?: boolean;
   attribute?: SchemaType | null;
+  protected?: boolean;
   payload?: boolean;
   long_running?: boolean;
   read_only?: boolean;
