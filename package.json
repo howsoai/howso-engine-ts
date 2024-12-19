@@ -33,7 +33,7 @@
     "lib"
   ],
   "dependencies": {
-    "@howso/amalgam-lang": "^57.0.3",
+    "@howso/amalgam-lang": "^57.0.4",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
