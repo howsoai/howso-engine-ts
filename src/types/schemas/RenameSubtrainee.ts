@@ -6,21 +6,23 @@
  *
  * Rename a contained trainee
  */
+import type { TraineePath } from "./TraineePath";
+import type { TraineePathLabel } from "./TraineePathLabel";
 
 /** Request parameters of the Trainee method: renameSubtrainee. */
 export type RenameSubtraineeRequest = {
   /**
-   * Id of child trainee to rename. Ignored if child_name_path is specified
+   * Id of child trainee to rename. Ignored if path is specified
    */
   child_id?: string;
 
   /**
-   * List of strings specifying the user-friendly path of the child subtrainee to rename
+   * New path label of child trainee
    */
-  child_name_path?: string[];
+  label: TraineePathLabel;
 
   /**
-   * New name of child trainee
+   * List of strings specifying the user-friendly path of the child subtrainee to rename
    */
-  new_name: string;
+  path?: TraineePath;
 };

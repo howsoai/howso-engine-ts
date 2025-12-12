@@ -5,8 +5,8 @@
  * RemoveFeature
  *
  * Removes the specified feature on all cases for a trainee that match the specified condition
- * if conditions are not specified, removes feature for all cases and from the model, if condition is an empty assoc, leaves the feature metadata in the model.
- * Updates the accumulated data mass for the model proportional to the number of cases modified.
+ * if conditions are not specified, removes feature for all cases and from the trainee, if condition is an empty assoc, leaves the feature metadata in the trainee.
+ * Updates the accumulated data mass for the dataset proportional to the number of cases modified.
  */
 import type { Condition } from "./Condition";
 
@@ -14,10 +14,11 @@ import type { Condition } from "./Condition";
 export type RemoveFeatureRequest = {
   /**
    * Assoc of feature->value(s).
-   *     no value = must have feature
+   *     no value or (null) = select cases where that feature is (null)/missing
    *   - for continuous or numeric ordinal features:
    *     one value = must equal exactly the value or be close to it for fuzzy match
-   *     values = inclusive between
+   *     two values = inclusive between, supports (null) on either side for less than/greater than conditions
+   *     [(null) (null)] = select all non-null cases
    *   - for nominal or string ordinal features:
    *     n values = must match any of these values exactly
    */

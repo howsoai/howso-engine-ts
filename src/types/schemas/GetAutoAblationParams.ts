@@ -19,6 +19,10 @@ export type GetAutoAblationParamsResponse = {
    */
   auto_ablation_enabled?: boolean;
   /**
+   * The minimum threshold of influence weight entropy for a case to be ablated in the process of automatic ablation.
+   */
+  auto_ablation_influence_weight_entropy_threshold?: number;
+  /**
    * The name of the weight feature which is accumulated and used in automatic ablation.
    */
   auto_ablation_weight_feature?: string;
@@ -39,13 +43,25 @@ export type GetAutoAblationParamsResponse = {
    */
   exact_prediction_features?: string[];
   /**
-   * The minimum threshold of influence weight entropy for a case to be ablated in the process of automatic ablation.
+   * The maximum number of cases to sample without replacement for computing the influence weight entropy threshold.
    */
-  influence_weight_entropy_threshold?: number;
+  influence_weight_entropy_sample_size?: number;
+  /**
+   * The number of cases to train before automatic data reduction begins.
+   */
+  max_num_cases?: number;
   /**
    * The minimum number of cases to train before automatic ablation begins.
    */
-  minimum_num_cases?: number;
+  min_num_cases?: number;
+  /**
+   * The minimum threshold of influence weight entropy for a case to be ablated in the process of data reduction.
+   */
+  reduce_data_influence_weight_entropy_threshold?: number;
+  /**
+   * The maximum number of cases that may remain after a call to reduce_cases.
+   */
+  reduce_max_cases?: number;
   /**
    * The map of features to relative thresholds that if predicted within on a new case will trigger the ablation of the case.
    */

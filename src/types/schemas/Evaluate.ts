@@ -4,7 +4,7 @@
  *
  * Evaluate
  *
- * Evaluate custom Amalgam code for feature values of every case in the model and returns
+ * Evaluate custom Amalgam code for feature values of every case in the dataset and returns
  * a list of the custom code's return values for each feature specified.
  */
 

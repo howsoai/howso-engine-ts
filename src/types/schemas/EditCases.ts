@@ -6,7 +6,7 @@
  *
  * Edit feature values for the specified cases.
  * Cases are specified by either case_indices or by the condition. If neither is provided, edits all cases.
- * Updates the accumulated data mass for the model proportional to the number of cases and features modified.
+ * Updates the accumulated data mass for the dataset proportional to the number of cases and features modified.
  * returns null if invalid features specified or an assoc with "count"
  */
 import type { CaseIndices } from "./CaseIndices";
@@ -23,10 +23,11 @@ export type EditCasesRequest = {
 
   /**
    * Assoc of feature->value(s)
-   *     no value = must have feature
+   *     no value or (null) = select cases where that feature is (null)/missing
    *      - for continuous or numeric ordinal features:
    *       one value = must equal exactly the value or be close to it for fuzzy match
-   *       two values = inclusive between
+   *       two values = inclusive between, supports (null) on either side for less than/greater than conditions
+   *       [(null) (null)] = select all non-null cases
    *      - for nominal or string ordinal features:
    *       n values = must match any of these values exactly
    * @default {}

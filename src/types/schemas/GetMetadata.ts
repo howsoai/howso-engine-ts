@@ -4,7 +4,7 @@
  *
  * GetMetadata
  *
- * Get metadata for model
+ * Get metadata for dataset
  */
 
 /** Response of the Trainee method: getMetadata. */

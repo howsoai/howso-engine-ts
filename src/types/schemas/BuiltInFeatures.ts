@@ -26,17 +26,13 @@ export type BuiltInFeatures = {
    */
   ".raw_influence_weight"?: number;
   /**
+   * The zero-based index of the case within its series sorted by time in reverse.
+   */
+  ".reverse_series_index"?: number;
+  /**
    * The zero-based index of the case within its series sorted by time.
    */
   ".series_index"?: number;
-  /**
-   * A 0-1 float describing the progress though the case's series at the point in time described by the case.
-   */
-  ".series_progress"?: number;
-  /**
-   * The delta between the series progress of the previous case of the series and the case being described.
-   */
-  ".series_progress_delta"?: number;
   /**
    * The name of the session the case was trained in.
    */
@@ -45,4 +41,12 @@ export type BuiltInFeatures = {
    * The 0-based index of the case's order in training within its session.
    */
   ".session_training_index"?: number;
+  /**
+   * The number of time steps that follow in the series that take place at the same time value.
+   */
+  ".synchronous_counter"?: number;
+  /**
+   * The difference between the last time value observed in the series and the maximum time value observed in the trained data. This is only defined and used when using a universal time feature.
+   */
+  ".time_to_horizon"?: number;
 };

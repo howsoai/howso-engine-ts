@@ -51,6 +51,10 @@ export type TypeDefinition = {
    */
   max_indices?: number;
   /**
+   * The inclusive upper limit for the length of a given string.
+   */
+  max_length?: number;
+  /**
    * The exclusive maximum value when the type is a (list).
    */
   max_size?: number;
@@ -63,9 +67,17 @@ export type TypeDefinition = {
    */
   min_indices?: number;
   /**
+   * The inclusive lower limit for the length of a given string.
+   */
+  min_length?: number;
+  /**
    * The inclusive minimum size when the type is a (list).
    */
   min_size?: number;
+  /**
+   * A regex pattern that the given value must match on.
+   */
+  pattern?: string;
   /**
    * A reference to a named schema to use the type definition there.
    */
@@ -73,8 +85,8 @@ export type TypeDefinition = {
     | "AblationThresholdMap"
     | "BuiltInFeatures"
     | "Case"
+    | "CaseAccuracyContributions"
     | "CaseIndices"
-    | "CaseMDA"
     | "Cases"
     | "CategoricalActionProbabilities"
     | "Condition"
@@ -100,19 +112,27 @@ export type TypeDefinition = {
     | "FeatureOriginalTypeTime"
     | "FeatureOriginalTypeTimedelta"
     | "FeatureType"
-    | "FullCaseContribution"
+    | "FullCasePredictionContribution"
     | "GenerateNewCases"
+    | "GoalFeatures"
     | "HyperparameterMap"
+    | "HyperparameterMapFull"
     | "HyperparameterMapTree"
+    | "NewCaseMinDistanceRatio"
     | "NewCaseThreshold"
+    | "NumericalPrecision"
     | "OutlyingFeatureValuesIndex"
     | "Precision"
     | "PredictionStat"
     | "ReactAggregateDetails"
     | "ReactDetails"
+    | "ReactGroupDetails"
     | "ReactionPredictionStats"
-    | "RobustCaseContribution"
+    | "RobustCasePredictionContribution"
     | "SimilarCaseIndex"
+    | "SortByCriteria"
+    | "TraineePath"
+    | "TraineePathLabel"
     | "TypeDefinition"
     | "TypeSchema"
     | "TypeString"

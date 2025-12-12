@@ -9,6 +9,7 @@
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
+import type { TraineePath } from "./TraineePath";
 
 /** Request parameters of the Trainee method: moveCases. */
 export type MoveCasesRequest = {
@@ -18,10 +19,15 @@ export type MoveCasesRequest = {
   case_indices?: CaseIndices;
 
   /**
-   * Assoc of feature->value(s) (no value = must have feature, one value = must equal exactly the value, two values = inclusive between). Ignored if case_indices is specified.
+   * Assoc of feature->value(s) (no value or (null) = select cases where that feature is (null)/missing, one value = must equal exactly the value, two values = inclusive between with support for (null) on either side for less than/greater than conditions, [(null) (null)] = select all non-null cases). Ignored if case_indices is specified.
    * @default {}
    */
   condition?: Condition;
+
+  /**
+   * Session from which to move cases (even if by condition).
+   */
+  condition_session?: string;
 
   /**
    * Name of feature into which to distribute the removed cases' weights to their neighbors.
@@ -54,26 +60,26 @@ export type MoveCasesRequest = {
   session?: string;
 
   /**
-   * Id of source trainee from which to move cases. Ignored if source_name_path is specified.
-   *   If neither source_name_path nor source_id are specified, moves cases from the trainee itself.
+   * Id of source trainee from which to move cases. Ignored if source_path is specified.
+   *   If neither source_path nor source_id are specified, moves cases from the trainee itself.
    */
   source_id?: string;
 
   /**
    * List of strings specifying the user-friendly path of the child subtrainee from which to move cases.
    */
-  source_name_path?: string[];
+  source_path?: TraineePath;
 
   /**
-   * Id of target trainee to move cases to. Ignored if target_name_path is specified.
-   *   If neither target_name_path nor target_id are specified, moves cases to the trainee itself.
+   * Id of target trainee to move cases to. Ignored if target_path is specified.
+   *   If neither target_path nor target_id are specified, moves cases to the trainee itself.
    */
   target_id?: string;
 
   /**
    * List of strings specifying the user-friendly path of the child subtrainee to move cases to.
    */
-  target_name_path?: string[];
+  target_path?: TraineePath;
 };
 
 /** Response of the Trainee method: moveCases. */

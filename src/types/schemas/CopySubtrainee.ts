@@ -4,40 +4,39 @@
  *
  * CopySubtrainee
  *
- * Creates a copy of a trainee and stores it a subtrainee, returns the name of the copied trainee on success
+ * Creates a copy of a trainee and stores it a subtrainee, returns the path of the copied trainee on success
  */
+import type { TraineePath } from "./TraineePath";
 
 /** Request parameters of the Trainee method: copySubtrainee. */
 export type CopySubtraineeRequest = {
   /**
-   * Id of source trainee to copy. Ignored if source_name_path is specified.
-   *   If neither source_name_path nor source_id are specified, copies the trainee itself.
+   * Id of source trainee to copy. Ignored if source_path is specified.
+   *   If neither source_path nor source_id are specified, copies the trainee itself.
    */
   source_id?: string;
 
   /**
    * List of strings specifying the user-friendly path of the child subtrainee to copy.
    */
-  source_name_path?: string[];
+  source_path?: TraineePath;
 
   /**
-   * Id of target trainee to copy trainee into.  Ignored if target_name_path is specified.
-   *   If neither target_name_path nor target_id are specified, copies as a direct child of trainee
+   * New unique id of copied target trainee
    */
-  target_id?: string;
+  target_id: string;
 
   /**
-   * List of strings specifying the user-friendly path of the child subtrainee to copy trainee into.
+   * List of strings specifying the resulting destination user-friendly path of the child subtrainee.
+   * including the label of the child as the last value in the path
    */
-  target_name_path?: string[];
-
-  /**
-   * Name of new copied trainee
-   */
-  target_trainee: string | string[];
+  target_path: TraineePath;
 };
 
 /** Response of the Trainee method: copySubtrainee. */
 export type CopySubtraineeResponse = {
-  name: string[] | string;
+  /**
+   * The path of the resulting trainee that was copied.
+   */
+  path?: string | string[];
 };

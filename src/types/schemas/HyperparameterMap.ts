@@ -4,7 +4,7 @@
  */
 
 /**
- * HyperparameterMap schema.
+ * The base hyperparameter map containing all the individual parameter values.
  */
 export type HyperparameterMap = {
   /**
@@ -28,6 +28,10 @@ export type HyperparameterMap = {
    */
   featureDomainAttributes?: Record<string, any> | null;
   /**
+   * Map of each feature's map of feature weights.
+   */
+  featureMdaMap?: Record<string, any>;
+  /**
    * Map of ordinal features to their deviations.
    */
   featureOrdinalDeviations?: Record<string, any>;
@@ -46,7 +50,7 @@ export type HyperparameterMap = {
   /**
    * The number of most similar cases used for interpolation.
    */
-  k: number;
+  k: number | any[];
   /**
    * Map of features to null uncertainties which describes the distances in the context of missing values.
    */

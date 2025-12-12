@@ -23,7 +23,7 @@ export type DerivationParameters = {
   /**
    * The number of most similar cases used to make the prediction.
    */
-  k?: number;
+  k?: number | any[];
   /**
    * A map of nominal feature names to the number of unique classes for each feature.
    */
@@ -33,7 +33,7 @@ export type DerivationParameters = {
    */
   p?: number;
   /**
-   * Flag indicating if feature weights are derived using inverse-residual weighting.
+   * Flag indicating if parameters were derived using a targetless approach.
    */
-  use_irw?: boolean;
+  targetless?: boolean;
 };

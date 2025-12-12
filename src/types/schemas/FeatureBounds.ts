@@ -29,4 +29,12 @@ export type FeatureBounds = {
    * The minimum value to be output. May be a number or date string.
    */
   min?: number | string;
+  /**
+   * The observed maximum value in the data. May be a number, string, or date string.
+   */
+  observed_max?: number | string;
+  /**
+   * The observed minimum value in the data. May be a number, string, or date string.
+   */
+  observed_min?: number | string;
 };

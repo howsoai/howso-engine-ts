@@ -12,7 +12,7 @@ import type { FeatureType } from "./FeatureType";
  */
 export type FeatureAttributes = {
   /**
-   * Derive feature by creating two new continuous features: `.series_progress` and `.series_progress_delta`. Series progress values range from 0 to 1.0 for each case in the series. Series progress delta values are the delta value of the progress for each case. Both of these features are used to determine when to stop series synthesis.
+   * Configuration for auto deriving the values of a feature based on the otehr feature values of the case or series.
    */
   auto_derive_on_train?: {
     /**
@@ -20,9 +20,13 @@ export type FeatureAttributes = {
      */
     code?: string;
     /**
+     * A list of features needed to derive code
+     */
+    code_features?: string[];
+    /**
      * The train derive operation type.
      */
-    derive_type?: "custom" | "end" | "progress" | "start";
+    derive_type?: "custom" | "end" | "start";
     /**
      * Feature name(s) that define the order of the series.
      */
@@ -33,6 +37,10 @@ export type FeatureAttributes = {
     series_id_features?: string[];
   };
   bounds?: FeatureBounds;
+  /**
+   * A list of features needed to derive code
+   */
+  code_features?: string[];
   /**
    * Cyclic features are set by specifying a `cycle_length` value in the feature attributes. `cycle_length` requires a single value, which is the upper bound of the difference for the cycle range. For example, if `cycle_length` is 360,  then a value of 1 and 359 will have a difference of 2. Cyclic features have no restrictions in the input dataset, however, cyclic features will be output on a scale from 0 to `cycle_length`. To constrain the output to a different range, modify the `min` and `max` `bounds` feature attribute.
    *
@@ -52,6 +60,10 @@ export type FeatureAttributes = {
    */
   decimal_places?: number;
   /**
+   * The default time zone for datetimes. If unspecified, uses 'UTC'.
+   */
+  default_time_zone?: string;
+  /**
    * A list of other feature names that this feature either depends on or features that depend on this feature. Should be used when there are multi-type value features that tightly depend on values based on other multi-type value features.
    */
   dependent_features?: string[];
@@ -59,8 +71,8 @@ export type FeatureAttributes = {
    * Code defining how the value for this feature could be derived if this feature is specified as a `derived_context_feature` or a `derived_action_feature` during react flows. For `react_series`, the data referenced is the accumulated series data (as a list of rows), and for non-series reacts, the data is the one single row. Each row is comprised of all the combined context and action features. Referencing data in these rows uses 0-based indexing, where the current row index is 0, the previous row's is 1, etc. The specified code may do simple logic and numeric operations on feature values referenced via feature name and row offset
    *
    * Examples:
-   * - ``"#x 1"``: Use the value for feature 'x' from the previously processed row (offset of 1, one lag value).
-   * - ``"(- #y 0 #x 1)"``: Feature 'y' value from current (offset 0) row  minus feature 'x' value from previous (offset 1) row.
+   * - ``"(call value {feature "x" lag 1})``: Use the value for feature 'x' from the previously processed row (offset of 1, one lag value).
+   * - ``"(- (call value {feature "y" lag 0}) (call value {feature "x" lag 1}))"``: Feature 'y' value from current (offset 0) row  minus feature 'x' value from previous (offset 1) row.
    */
   derived_feature_code?: string;
   /**
@@ -106,7 +118,7 @@ export type FeatureAttributes = {
   /**
    * The type of time-series processing used by the parent feature.
    */
-  parent_type?: "delta" | "rate";
+  parent_type?: "covariate" | "delta" | "rate";
   /**
    * Custom Amalgam code that is called on resulting values of this feature during react operations.
    */
@@ -115,6 +127,10 @@ export type FeatureAttributes = {
    * A sample of a value for the feature.
    */
   sample?: any;
+  /**
+   * A list of feature names that will share deviations with this feature. In analysis, the predictions computed for this feature and the features specified are combined to create deviations that are used for all of the involved features. If a time series feature, then child lag features will automatically share deviations. If 'shared_deviations' is specified as false, then automatically created lag features will not automatically share deviations.
+   */
+  shared_deviations?: string[] | boolean;
   /**
    * Round to the specified significant digits, default is no rounding.
    */
@@ -160,21 +176,13 @@ export type FeatureAttributes = {
      */
     rate_min?: number[];
     /**
-     * When true, requires that the model identify and learn values that explicitly denote the end of a series. Only applicable to id features for a series.
-     */
-    series_has_terminators?: boolean;
-    /**
-     * When true, requires that a series ends on a terminator value. Only applicable to id features for a series.
-     */
-    stop_on_terminator?: boolean;
-    /**
      * When true, the feature will be treated as the time feature for time series modeling. Additionally, time features must use type `delta`.
      */
     time_feature?: boolean;
     /**
-     * When `rate` is specified, uses the difference of the current value from its previous value divided by the change in time since the previous value. When `delta` is specified, uses the difference of the current value from its previous value regardless of the elapsed time. Set to `delta` if feature has `time_feature` set to true.
+     * When `rate` is specified, uses the difference of the current value from its previous value divided by the change in time since the previous value. When `delta` is specified, uses the difference of the current value from its previous value regardless of the elapsed time. Set to `delta` if feature has `time_feature` set to true. When `covariate` is specified, temporal changes are not modeled and feature values are directly predicted with interpolation in series generation rather than derived using a rate or delta.
      */
-    type?: "delta" | "rate";
+    type?: "covariate" | "delta" | "rate";
     /**
      * Controls whether future values of independent time series are considered. Applicable only to the time feature. When false, the time feature is not universal and allows using future data from other series in decisions; this is applicable when the time is not globally relevant and is independent for each time series. When true, universally excludes using any data with from the future from all series; this is applicable when time is globally relevant and there are events that may affect all time series. If there is any possibility of global relevancy of time, it is generally recommended to set this value to true, which is the default.
      */

@@ -40,43 +40,71 @@ export type ReactAggregateDetails = {
    */
   context_condition_precision?: Precision;
   /**
-   * If true will for each context_feature, use the full set of all other context_features to compute the mean absolute delta between prediction of action_feature with and without the context_feature in the model. Uses full computation.
+   * Compute and output estimated lower bound of residuals for specified action features.
    */
-  feature_contributions_full?: boolean;
+  estimated_residual_lower_bound?: boolean;
   /**
-   * For each context_feature, use the robust (power set/permutation) set of all other context_features to compute the mean absolute delta between prediction of action_feature with and without the context_feature in the model. Uses robust computation. Uses robust computation.
+   * If true, will compute feature deviations for each feature in action_features. The feature deviation is the mean absolute error of predicting the feature using all the context features as well as value of the feature being predicted as the context for each prediction.
    */
-  feature_contributions_robust?: boolean;
+  feature_deviations?: boolean;
   /**
-   * If true will compute Mean Decrease in Accuracy (feature_mda) for each context feature at predicting mda_action_features. Drop each feature and use the full set of remaining context features for each prediction. false removes cached values. Uses full computation.
+   * If true will compute the Accuracy Contribution for each context feature in predicting action_feature. Drop each feature and use the full set of remaining context features for each prediction.Uses full computation.
    */
-  feature_mda_full?: boolean;
+  feature_full_accuracy_contributions?: boolean;
   /**
-   * If true will compute feature_mda_full by scrambling each feature and using the full set of remaining context features for each prediction.  false removes cached values. Uses full computation.
+   * If true will compute the Accuracy Contribution in predicting the action feature by scrambling each feature and using the full set of remaining context features for each prediction. Uses full computation.
    */
-  feature_mda_permutation_full?: boolean;
+  feature_full_accuracy_contributions_permutation?: boolean;
   /**
-   * If true will compute feature_mda by scrambling each feature and using the robust (power set/permutations) set of remaining context features for each prediction.  false removes cached values. Uses robust computation.
+   * If true will for each context_feature, use the full set of all other context_features to compute the mean absolute delta between prediction of action_feature with and without the context_feature in the dataset. Uses full computation.
    */
-  feature_mda_permutation_robust?: boolean;
-  /**
-   * If true will compute feature_mda by dropping each feature and using the robust (power set/permutations) set of remaining context features for each prediction. false removes cached values. Uses robust computation.
-   */
-  feature_mda_robust?: boolean;
+  feature_full_prediction_contributions?: boolean;
   /**
    * If true, will for each context_feature, use the full set of all other context_features to predict the feature.  When true, computes, caches, and returns the residuals for all features. Uses full computation. When "prediction_stats" in the "details" parameter is true, it will also compute and cache the feature residuals.
    */
-  feature_residuals_full?: boolean;
+  feature_full_residuals?: boolean;
+  /**
+   * If true will compute the Accuracy Contribution in predicting the action feature by dropping each feature and using the robust (power set/permutations) set of remaining context features for each prediction. Uses robust computation.
+   */
+  feature_robust_accuracy_contributions?: boolean;
+  /**
+   * If true will compute the Accuracy Contribution in predicting the action feature by scrambling each feature and using the robust (power set/permutations) set of remaining context features for each prediction. Uses robust computation.
+   */
+  feature_robust_accuracy_contributions_permutation?: boolean;
+  /**
+   * For each context_feature, use the robust (power set/permutation) set of all other context_features to compute the mean absolute delta between prediction of action_feature with and without the context_feature in the dataset. Uses robust computation. Uses robust computation.
+   */
+  feature_robust_prediction_contributions?: boolean;
   /**
    * If true, will for each context_feature, computes, caches, and returns the same stats as residuals but using the robust (power set/permutations) set of all other context_features to predict the feature. Uses robust computation.
    */
-  feature_residuals_robust?: boolean;
+  feature_robust_residuals?: boolean;
+  /**
+   * If true, outputs the mean surprisal of the difference in predictions for each feature when the feature itself is used in the query versus when it is held out.
+   */
+  missing_information?: boolean;
   /**
    * If true outputs full feature prediction stats for all (context and action) features. The prediction stats returned are set by the `"selected_prediction_stats`" parameter. Uses full calculations, which uses leave-one-out for features for computations. Uses full computation.
    */
   prediction_stats?: boolean;
   /**
+   * When true, outputs a collection of typical values around the given contexts for each context feature. If a list of feature names, outputs a collection of typical values around the given contexts for each specified feature.
+   */
+  relevant_values?: boolean | string[];
+  /**
    * Types of stats to output. When unspecified, returns all except the confusion_matrix. If all, then returns all including the confusion_matrix.
    */
   selected_prediction_stats?: PredictionStat[];
+  /**
+   * Perform a focused computation to determine how all the individual values of specified 'value_robust_contributions_features' affect the accuracy of 'value_robust_contributions_action_feature'.
+   */
+  value_robust_accuracy_contributions?: boolean;
+  /**
+   * Perform a focused computation to determine how all the individual values of specified 'value_robust_contributions_features' affect the predictions of 'value_robust_contributions_action_feature'.
+   */
+  value_robust_prediction_contributions?: boolean;
+  /**
+   * Perform a focused computation to determine how all the individual values of specified 'value_robust_ac_features' affect the accuracy of 'value_robust_ac_action_feature'.
+   */
+  value_robust_surprisal_asymmetry?: boolean;
 };

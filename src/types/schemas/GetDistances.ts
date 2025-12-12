@@ -40,7 +40,7 @@ export type GetDistancesRequest = {
   features?: string[];
 
   /**
-   * If specified, returns case distances of the local model relative to these values, ignores case_indices parameter.
+   * If specified, returns case distances of the local data relative to these values, ignores case_indices parameter.
    */
   feature_values?: any[];
 

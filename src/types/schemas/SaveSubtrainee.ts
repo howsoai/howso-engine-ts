@@ -6,14 +6,25 @@
  *
  * Saves a subtrainee with the following optional parameters, escapes trainee filenames on save
  */
+import type { TraineePath } from "./TraineePath";
 
 /** Request parameters of the Trainee method: saveSubtrainee. */
 export type SaveSubtraineeRequest = {
   /**
-   * Name to store (without extension)
-   * @default ""
+   * When true, stores the child out as an independent trainee and removes it as a contained entity.
+   * @default false
    */
-  filename?: string;
+  as_external?: boolean;
+
+  /**
+   * Unique id of child trainee to save. Ignored if path is specified
+   */
+  child_id?: string;
+
+  /**
+   * Name to store (without extension)
+   */
+  filename: string;
 
   /**
    * Base path to store to
@@ -22,19 +33,14 @@ export type SaveSubtraineeRequest = {
   filepath?: string;
 
   /**
+   * List of strings specifying the user-friendly path of the child subtrainee to save
+   * including the label of the child as the last value in the path
+   */
+  path?: TraineePath;
+
+  /**
    * Flag, default to false. if set to true will save each case as an individual file
    * @default false
    */
   separate_files?: boolean;
-
-  /**
-   * Trainee instance name path to store
-   * @default ""
-   */
-  trainee?: string | string[];
-
-  /**
-   * Unique id for trainee. Must be provided if trainee does not have one already specified.
-   */
-  trainee_id?: string;
 };

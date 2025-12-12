@@ -2,7 +2,7 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly, instead modify the Trainee.njk template file.
  *
- * Generated via Howso Engine 88.0.1
+ * Generated via Howso Engine 108.1.2
  */
 import { AbstractBaseClient } from "../client/AbstractBaseClient";
 import { batcher, BatchOptions } from "../client/utilities";
@@ -133,9 +133,9 @@ export class Trainee implements BaseTrainee {
 
   /**
    * Adds the specified feature on all cases for a trainee that match the specified condition. overwrites features that
-   * If condition are not specified, adds feature for all cases and to the model.  If condition is an empty assoc, will not modify feature metadata in the model.
-   * If feature attributes are passed in, will also set the model's feature attributes.
-   * Updates the accumulated data mass for the model proportional to the number of cases modified.
+   * If condition are not specified, adds feature for all cases and to the trainee.  If condition is an empty assoc, will not modify feature metadata in the trainee.
+   * If feature attributes are passed in, will also set the trainee's feature attributes.
+   * Updates the accumulated data mass for the dataset proportional to the number of cases modified.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -175,7 +175,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Automatically analyze the model using stored parameters from previous analyze calls
+   * Automatically analyze the dataset using stored parameters from previous analyze calls
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -202,7 +202,26 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Creates a copy of a trainee and stores it a subtrainee, returns the name of the copied trainee on success
+   * Alternate read-only train call that given cases, returns the case data that should be trained and the case-id -> weight accumulating maps to be used on a
+   * write-permissioned follow up call to the Trainee
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async computeTrainPayload(
+    request: schemas.ComputeTrainPayloadRequest,
+  ): Promise<ClientResponse<schemas.ComputeTrainPayloadResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.ComputeTrainPayloadResponse>(
+      this.id,
+      "compute_train_payload",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
+  }
+
+  /**
+   * Creates a copy of a trainee and stores it a subtrainee, returns the path of the copied trainee on success
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -217,7 +236,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Creates a new instance of a contained trainee as specified by the entity label "trainee".
+   * Creates a new instance of a contained trainee
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -260,7 +279,7 @@ export class Trainee implements BaseTrainee {
   /**
    * Edit feature values for the specified cases.
    * Cases are specified by either case_indices or by the condition. If neither is provided, edits all cases.
-   * Updates the accumulated data mass for the model proportional to the number of cases and features modified.
+   * Updates the accumulated data mass for the dataset proportional to the number of cases and features modified.
    * returns null if invalid features specified or an assoc with "count"
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -275,7 +294,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Evaluate custom Amalgam code for feature values of every case in the model and returns
+   * Evaluate custom Amalgam code for feature values of every case in the dataset and returns
    * a list of the custom code's return values for each feature specified.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -331,9 +350,10 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Returns assoc with features and cases - a list of lists of all feature values. Retrieves all feature values for cases for
-   * all (unordered) sessions in the order they were trained within each session. If a session is specified, only that session's
-   * cases wil be output.
+   * Returns assoc with features and cases - a list of lists of all feature values. Retrieves all feature values for cases in
+   * all sessions. If a session is specified, only that session's cases will be output. Session and case order is not guaranteed,
+   * however, the features ".session" and ".session_training_index" may be requested to get the session id and session train order
+   * for each case respectively.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -359,27 +379,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Returns the full entity path to a child trainee provided its unique trainee id if it is contained in the hierarchy.
-   * Iterates down the hierarchy searching for a trainee that matches the specified id, returns null if not found or
-   * a string error if found but trainee is stored externally as an independent trainee.
-   * @param traineeId The Trainee identifier.
-   * @param request The operation parameters.
-   * @returns The response of the operation, including any warnings.
-   */
-  public async getEntityPathById(
-    request: schemas.GetEntityPathByIdRequest,
-  ): Promise<ClientResponse<schemas.GetEntityPathByIdResponse>> {
-    await this.client.autoResolveTrainee(this.id);
-    const response = await this.client.execute<schemas.GetEntityPathByIdResponse>(
-      this.id,
-      "get_entity_path_by_id",
-      request,
-    );
-    return { payload: response.payload, warnings: response.warnings };
-  }
-
-  /**
-   * Method to return the list of all model attributes that can be exported/imported
+   * Method to return the list of all dataset attributes that can be exported/imported
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -437,14 +437,32 @@ export class Trainee implements BaseTrainee {
 
   /**
    * Pull the hierarchy for a trainee, returns an assoc of:
-   * the currently contained hierarchy as a nested assoc with (false) for trainees that are stored independently.
+   * the currently contained hierarchy as a nested assoc with .false for trainees that are stored independently.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
    */
-  public async getHierarchy(): Promise<ClientResponse<schemas.GetHierarchyResponse>> {
+  public async getHierarchy(
+    request: schemas.GetHierarchyRequest,
+  ): Promise<ClientResponse<schemas.GetHierarchyResponse>> {
     await this.client.autoResolveTrainee(this.id);
-    const response = await this.client.execute<schemas.GetHierarchyResponse>(this.id, "get_hierarchy", {});
+    const response = await this.client.execute<schemas.GetHierarchyResponse>(this.id, "get_hierarchy", request);
+    return { payload: response.payload, warnings: response.warnings };
+  }
+
+  /**
+   * Method to output references for contained trainees
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async getHierarchyRelationships(): Promise<ClientResponse<schemas.GetHierarchyRelationshipsResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetHierarchyRelationshipsResponse>(
+      this.id,
+      "get_hierarchy_relationships",
+      {},
+    );
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -469,7 +487,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Get metadata for model
+   * Get metadata for dataset
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -519,6 +537,18 @@ export class Trainee implements BaseTrainee {
   public async getParams(request: schemas.GetParamsRequest): Promise<ClientResponse<schemas.GetParamsResponse>> {
     await this.client.autoResolveTrainee(this.id);
     const response = await this.client.execute<schemas.GetParamsResponse>(this.id, "get_params", request);
+    return { payload: response.payload, warnings: response.warnings };
+  }
+
+  /**
+   * Get trainee's unique parent id
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async getParentId(): Promise<ClientResponse<string | null>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<string | null>(this.id, "get_parent_id", {});
     return { payload: response.payload, warnings: response.warnings };
   }
 
@@ -633,7 +663,24 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Imputes the model, filling in all the (null) feature values
+   * Outputs all unique values and the mass of each value given the trained data and possible conditions
+   * if a weight feature is specified or auto-ablation is enabled, then the probability masses are returned rather
+   * than frequency of cases with each value.
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async getValueMasses(
+    request: schemas.GetValueMassesRequest,
+  ): Promise<ClientResponse<schemas.GetValueMassesResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.GetValueMassesResponse>(this.id, "get_value_masses", request);
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
+  }
+
+  /**
+   * Imputes the dataset, filling in all the (null) feature values
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -648,10 +695,9 @@ export class Trainee implements BaseTrainee {
 
   /**
    * Attempts to load a subtrainee with the following optional parameters.
-   * If a parameter is not specified, it will look to this entity's own label of the same name.
    * If the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
    * assumes loaded trainee filenames need to be escaped
-   * returns the trainee name if successful, null if not
+   * returns the trainee path if successful, null if not
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -680,6 +726,28 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
+   * Sibling method of #compute_train_payload that takes that endpoints return data as input.
+   * this method simply trains the given case data, accumulates to the weight feature, and makes
+   * any case edits that are given
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async processTrainPayload(
+    request: schemas.ProcessTrainPayloadRequest,
+  ): Promise<ClientResponse<schemas.ProcessTrainPayloadResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    request = await this.includeSession(request);
+    const response = await this.client.execute<schemas.ProcessTrainPayloadResponse>(
+      this.id,
+      "process_train_payload",
+      request,
+    );
+    this.client.autoPersistTrainee(this.id);
+    return { payload: response.payload, warnings: response.warnings };
+  }
+
+  /**
    * Run reacts in a batch, output a an assoc of list of outputs from each individual react.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -688,12 +756,11 @@ export class Trainee implements BaseTrainee {
   public async react(request: schemas.ReactRequest): Promise<ClientResponse<schemas.ReactResponse>> {
     await this.client.autoResolveTrainee(this.id);
     const response = await this.client.execute<schemas.ReactResponse>(this.id, "react", request);
-    this.client.autoPersistTrainee(this.id);
     return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
-   * Computes, caches, and returns specified details and feature prediction statistics such as Mean Decrease in Accuracy (MDA), residuals (accuracy, Mean Absolute Error),
+   * Computes, caches, and returns specified details and feature prediction statistics such as Accuracy Contributions, residuals (accuracy, Mean Absolute Error),
    *  precision, recall, etc. Returns details and feature prediction stats for all features in the format of feature -> assoc stat -> value
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
@@ -709,7 +776,8 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Computes the convictions of an average case for each given hypothetical set of cases specified
+   * Computes the convictions of an average case for each given set of cases specified by either a list of
+   * case indices, a condition, or given data.
    *  output an assoc react key -> list of corresponding values from each individual group.
    *  example output for 2 groups:
    *  (assoc
@@ -729,7 +797,9 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Computes various data, such as familiarity convictions and distance contribution for each case in the model and stores them into specified features.
+   * Computes various data, such as familiarity convictions and distance contribution for each case in the dataset and stores them into specified features.
+   *  After this method is called, if "similarity_conviction" or "distance_contribution" are selected, then they may be used as `derived_context_features`
+   *  in `react` under the same feature name specified in this method.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -752,13 +822,34 @@ export class Trainee implements BaseTrainee {
   public async reactSeries(request: schemas.ReactSeriesRequest): Promise<ClientResponse<schemas.ReactSeriesResponse>> {
     await this.client.autoResolveTrainee(this.id);
     const response = await this.client.execute<schemas.ReactSeriesResponse>(this.id, "react_series", request);
-    this.client.autoPersistTrainee(this.id);
     return { payload: response.payload, warnings: response.warnings };
   }
 
   /**
-   * Reduce the trained data by removing cases which have an influence weight entropy that falls above
-   *  a threshold.
+   * React to series data predicting stationary feature values, values that do not change
+   * over the timesteps of the series.
+   * @param traineeId The Trainee identifier.
+   * @param request The operation parameters.
+   * @returns The response of the operation, including any warnings.
+   */
+  public async reactSeriesStationary(
+    request: schemas.ReactSeriesStationaryRequest,
+  ): Promise<ClientResponse<schemas.ReactSeriesStationaryResponse>> {
+    await this.client.autoResolveTrainee(this.id);
+    const response = await this.client.execute<schemas.ReactSeriesStationaryResponse>(
+      this.id,
+      "react_series_stationary",
+      request,
+    );
+    return { payload: response.payload, warnings: response.warnings };
+  }
+
+  /**
+   * Reduce the trained data by removing cases that match the following criteria:
+   * a) it's an exact duplicate
+   * b) a near-duplicate (very similar to exactly one other case)
+   * c) it's not "too far" away (keep outliers and dissimilar cases)
+   * d) its influence weight entropy is relatively high (above a threshold, case can be evenly distributed among its neighbors)
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -785,8 +876,8 @@ export class Trainee implements BaseTrainee {
 
   /**
    * Removes the specified feature on all cases for a trainee that match the specified condition
-   * if conditions are not specified, removes feature for all cases and from the model, if condition is an empty assoc, leaves the feature metadata in the model.
-   * Updates the accumulated data mass for the model proportional to the number of cases modified.
+   * if conditions are not specified, removes feature for all cases and from the trainee, if condition is an empty assoc, leaves the feature metadata in the trainee.
+   * Updates the accumulated data mass for the dataset proportional to the number of cases modified.
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -852,7 +943,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Sets the model to auto-ablate by tracking its size and training certain cases as weights
+   * Sets the dataset to auto-ablate by tracking its size and training certain cases as weights
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -865,7 +956,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Sets the model to auto-analyze by tracking its size and notifying the clients in train responses when it should be analyzed
+   * Sets the dataset to auto-analyze by tracking its size and notifying the clients in train responses when it should be analyzed
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -913,7 +1004,7 @@ export class Trainee implements BaseTrainee {
   }
 
   /**
-   * Set metadata for model
+   * Set metadata for dataset
    * @param traineeId The Trainee identifier.
    * @param request The operation parameters.
    * @returns The response of the operation, including any warnings.
@@ -934,19 +1025,6 @@ export class Trainee implements BaseTrainee {
   public async setParams(request: schemas.SetParamsRequest): Promise<ClientResponse<null>> {
     await this.client.autoResolveTrainee(this.id);
     const response = await this.client.execute<null>(this.id, "set_params", request);
-    this.client.autoPersistTrainee(this.id);
-    return { payload: response.payload, warnings: response.warnings };
-  }
-
-  /**
-   * Set trainee's unique parent id
-   * @param traineeId The Trainee identifier.
-   * @param request The operation parameters.
-   * @returns The response of the operation, including any warnings.
-   */
-  public async setParentId(request: schemas.SetParentIdRequest): Promise<ClientResponse<null>> {
-    await this.client.autoResolveTrainee(this.id);
-    const response = await this.client.execute<null>(this.id, "set_parent_id", request);
     this.client.autoPersistTrainee(this.id);
     return { payload: response.payload, warnings: response.warnings };
   }
