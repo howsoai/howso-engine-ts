@@ -5,6 +5,6 @@
 import type { HyperparameterMap } from "./HyperparameterMap";
 
 /**
- * HyperparameterMapTree schema.
+ * The subtree of a the full hyperparameter map starting with the nodes containing analyzed context_features.
  */
-export type HyperparameterMapTree = Record<string, Record<string, Record<string, Record<string, HyperparameterMap>>>>;
+export type HyperparameterMapTree = Record<string, Record<string, HyperparameterMap>>;

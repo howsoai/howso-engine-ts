@@ -6,8 +6,8 @@
 /**
  * A map for an influential case that describes its training index, session, and the full contribution to the action feature.
  */
-export type FullCaseContribution = {
+export type FullCasePredictionContribution = {
   ".session"?: string;
   ".session_training_index"?: number;
-  case_contributions_full?: number;
+  full_prediction_contribution?: number;
 };

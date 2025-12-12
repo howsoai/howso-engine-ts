@@ -11,13 +11,13 @@ import type { UseCaseWeights } from "./UseCaseWeights";
 /** Request parameters of the Trainee method: getFeatureConviction. */
 export type GetFeatureConvictionRequest = {
   /**
-   * List of action features to use as the baseline for conviction instead of the full model
+   * List of action features to use as the baseline for conviction instead of the full dataset
    * @default []
    */
   action_features?: string[];
 
   /**
-   * List of cases for which to use as the model to compute feature conviction
+   * List of cases for which to use as the dataset to compute feature conviction
    * @default []
    */
   case_ids?: string[];
@@ -56,11 +56,11 @@ export type GetFeatureConvictionRequest = {
 /** Response of the Trainee method: getFeatureConviction. */
 export type GetFeatureConvictionResponse = {
   /**
-   * A the familiarity conviction of adding the feature to the model.
+   * The familiarity conviction of adding the feature to the dataset.
    */
   familiarity_conviction_addition?: Record<string, number>;
   /**
-   * A the familiarity conviction of removing the feature from the model.
+   * The familiarity conviction of removing the feature from the dataset.
    */
   familiarity_conviction_removal?: Record<string, number>;
 };

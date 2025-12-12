@@ -6,8 +6,8 @@
 /**
  * A map for an influential case of a reaction that describes its training index, session, and MDA for the action feature.
  */
-export type CaseMDA = {
+export type CaseAccuracyContributions = {
   ".session"?: string;
   ".session_training_index"?: number;
-  mda?: number;
+  accuracy_contribution?: number;
 };

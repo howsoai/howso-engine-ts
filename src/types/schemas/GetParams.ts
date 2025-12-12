@@ -8,12 +8,15 @@
  * if any of the parameters are specified, then GetHyperparameters is called, which uses the specified parameters to find the most suitable set of hyperparameters to return
  */
 import type { HyperparameterMap } from "./HyperparameterMap";
-import type { HyperparameterMapTree } from "./HyperparameterMapTree";
+import type { HyperparameterMapFull } from "./HyperparameterMapFull";
+import type { NumericalPrecision } from "./NumericalPrecision";
 
 /** Request parameters of the Trainee method: getParams. */
 export type GetParamsRequest = {
   /**
-   * The target feature of the desired hyperparameters
+   * The target feature of the desired hyperparameters, when specified as a feature name, outputs the matching "targeted" hyperparameters.
+   *   When empty string "" will output "targetless" hyperparameters. When unspecified defaults to whatever hyperparameters were analyzed,
+   *   prioritizing "targetless" hyperparameters if multiple parameters exist.
    */
   action_feature?: string;
 
@@ -21,11 +24,6 @@ export type GetParamsRequest = {
    * The set of context features used for the desired hyperparameters
    */
   context_features?: string[];
-
-  /**
-   * The method of calculation used to find the desired hyperparameters
-   */
-  mode?: "full" | "robust";
 
   /**
    * The weight feature used in the calculation of the desired hyperparameters
@@ -54,5 +52,9 @@ export type GetParamsResponse = {
   /**
    * The full map of hyperparameters or a specific map of hyperparameters if any parameters were given
    */
-  hyperparameter_map?: HyperparameterMap | HyperparameterMapTree;
+  hyperparameter_map?: HyperparameterMap | HyperparameterMapFull;
+  /**
+   * Parameter controlling the tradeoff of precision of computations for speed.
+   */
+  numerical_precision?: NumericalPrecision;
 };

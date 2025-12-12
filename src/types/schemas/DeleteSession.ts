@@ -10,7 +10,7 @@
 /** Request parameters of the Trainee method: deleteSession. */
 export type DeleteSessionRequest = {
   /**
-   * Session to remove
+   * The id of the session to remove
    */
-  session: string;
+  target_session: string;
 };

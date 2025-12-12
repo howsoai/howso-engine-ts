@@ -9,5 +9,7 @@
  * - A value, must match exactly.
  * - An array of two numeric values, specifying an inclusive range. Only applicable to continuous and numeric ordinal features.
  * - An array of string values, must match any of these values exactly. Only applicable to nominal and string ordinal features.
+ * - A map with the key 'exclude' to either a value or an array of values. Must not match any of these values exactly. Only applicable to nominal and string ordinal features.
+ * - A map with the key 'include' to either a value or an array of values. Must match any of these values exactly. Only applicable to nominal and string ordinal features.
  */
 export type Condition = Record<string, any>;

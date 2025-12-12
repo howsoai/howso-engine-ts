@@ -2,6 +2,7 @@
  * 🛑 WARNING: DO NOT EDIT! 🛑
  * This file is auto generated and should not be modified directly.
  */
+import type { Condition } from "./Condition";
 import type { PredictionStat } from "./PredictionStat";
 
 /**
@@ -17,45 +18,36 @@ export type ReactDetails = {
    */
   boundary_cases_familiarity_convictions?: boolean;
   /**
+   * The condition map to define the boundary within which the action of a prediction will be shifted to when the returned  boundary values are used as context values instead of those given. The dictionary keys are the feature name and values are one of:
+   * - None
+   * - A value, must match exactly.
+   * - An array of two numeric values, specifying an inclusive range. Only applicable to continuous and numeric ordinal features.
+   * - An array of string values, must match any of these values exactly. Only applicable to nominal and string ordinal features.
+   * - A map with the key 'exclude' to either a value or an array of values. Must not match any of these values exactly. Only applicable to nominal and string ordinal features.
+   * - A map with the key 'include' to either a value or an array of values. Must match any of these values exactly. Only applicable to nominal and string ordinal features.
+   * Continuous edit-distance features (JSON, code, YAML, string) cannot have possible values or ranges specified in "boundary_value_action_outcome" (bounds are not well-defined and the search space is theoretically infinite.)
+   */
+  boundary_value_action_outcome?: Condition;
+  /**
+   * When specified, outputs a map of each specified feature to possible boundary values under "boundary_values". If 'boundary_value_action_outcome' is unspecified, then the returned values are values where the ratio of change in action to total change is maximized. If 'boundary_value_action_outcome' is specified, then the boundary values represent the closest found values for each context feature that shift the action to fulfill the condition.
+   */
+  boundary_value_context_features?: string[];
+  /**
+   * If True, outputs each influential case's Accuracy Contribution in predicting the action feature in the local data area, as if each individual case were included versus not included. Uses only the context features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
+   */
+  case_full_accuracy_contributions?: boolean;
+  /**
    * If true outputs each influential case's differences between the predicted action feature value and the predicted action feature value if each individual case were not included. Uses only the context features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
    */
-  case_contributions_full?: boolean;
+  case_full_prediction_contributions?: boolean;
+  /**
+   * If True, outputs each influential case's Accuracy Contribution in predicting the action feature in the local data area, as if each individual case were included versus not included. Uses only the context features of the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from the power set of all combinations of cases.
+   */
+  case_robust_accuracy_contributions?: boolean;
   /**
    * If true outputs each influential case's differences between the predicted action feature value and the predicted action feature value if each individual case were not included. Uses only the context features of the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from the power set of all combinations of cases.
    */
-  case_contributions_robust?: boolean;
-  /**
-   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context feature were not in the model for all context features in this case, using only the values from this specific case. Uses full calculations, which uses leave-one-out for cases for computations. Directional case feature contributions are returned under the 'case_directional_feature_contributions_full' key.
-   */
-  case_feature_contributions_full?: boolean;
-  /**
-   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context feature were not in the model for all context features in this case, using only the values from this specific case. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions. Directional case feature contributions are returned under the 'case_directional_feature_contributions_robust' key.
-   */
-  case_feature_contributions_robust?: boolean;
-  /**
-   * If True, outputs feature residuals for all (context and action) features for just the specified case. Uses leave-one-out for each feature, while using the others to predict the left out feature with their corresponding values from this case. Uses full calculations, which uses leave-one-out for cases for computations.
-   */
-  case_feature_residuals_full?: boolean;
-  /**
-   * If True, outputs feature residuals for all (context and action) features for just the specified case. Uses leave-one-out for each feature, while using the others to predict the left out feature with their corresponding values from this case. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
-   */
-  case_feature_residuals_robust?: boolean;
-  /**
-   * If True, outputs this case's feature residual model. Computed as: model feature full residual divided by case feature full residual.
-   */
-  case_feature_residual_convictions_full?: boolean;
-  /**
-   * If True, outputs this case's feature residual model. Computed as: model feature robust residual divided by case feature robust residual.
-   */
-  case_feature_residual_convictions_robust?: boolean;
-  /**
-   * If True, outputs each influential case's mean decrease in accuracy of predicting the action feature in the local model area, as if each individual case were included versus not included. Uses only the context features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
-   */
-  case_mda_full?: boolean;
-  /**
-   * If True, outputs each influential case's mean decrease in accuracy of predicting the action feature in the local model area, as if each individual case were included versus not included. Uses only the context features of the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from the power set of all combinations of cases.
-   */
-  case_mda_robust?: boolean;
+  case_robust_prediction_contributions?: boolean;
   /**
    * When true, outputs probabilities for each class for the action. Applicable only to categorical action features.
    */
@@ -77,37 +69,61 @@ export type ReactDetails = {
    */
   features?: string[];
   /**
-   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context were not in the model for all context features in the local model area. Uses full calculations, which uses leave-one-out for cases for computations. Directional feature contributions are returned under the key 'directional_feature_contributions_full'.
+   * If True, outputs the deviations for each feature based on the data surrounding the prediction.
    */
-  feature_contributions_full?: boolean;
+  feature_deviations?: boolean;
   /**
-   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context were not in the model for all context features in the local model area Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions. Directional feature contributions are returned under the key 'directional_feature_contributions_robust'.
+   * When True will compute the Accuracy Contribution for each context feature at predicting the action feature value of the influential cases. Uses leave-one-out logic, dropping each feature and use the full set of remaining context features for each prediction.
    */
-  feature_contributions_robust?: boolean;
+  feature_full_accuracy_contributions?: boolean;
   /**
-   * If True, outputs each context feature's mean decrease in accuracy of predicting the action feature as an explanation detail given that the specified prediction was already made as specified by the action value. Uses both context and action features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
+   * If True, outputs each context feature's Accuracy Contribution in predicting the action feature as an explanation detail given that the specified prediction was already made as specified by the action value. Uses both context and action features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
    */
-  feature_mda_ex_post_full?: boolean;
+  feature_full_accuracy_contributions_ex_post?: boolean;
   /**
-   * If True, outputs each context feature's mean decrease in accuracy of predicting the action feature as an explanation detail given that the specified prediction was already made as specified by the action value. Uses both context and action features of the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
+   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context were not in the dataset for all context features in the local data area. Uses full calculations, which uses leave-one-out for cases for computations. Directional feature contributions are returned under the key 'feature_full_directional_prediction_contributions'.
    */
-  feature_mda_ex_post_robust?: boolean;
+  feature_full_prediction_contributions?: boolean;
   /**
-   * When True will compute Mean Decrease in Accuracy (MDA) for each context feature at predicting the action feature. Drop each feature and use the full set of remaining context features for each prediction. False removes cached values.
+   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context feature were not in the dataset for all context features in this case, using only the values from this specific case. Uses full calculations, which uses leave-one-out for cases for computations. Directional case feature contributions are returned under the 'feature_full_directional_prediction_contributions_for_case' key.
    */
-  feature_mda_full?: boolean;
-  /**
-   * Compute Mean Decrease in Accuracy MDA by dropping each feature and using the robust (power set/permutations) set of remaining context features for each prediction. False removes cached values.
-   */
-  feature_mda_robust?: boolean;
+  feature_full_prediction_contributions_for_case?: boolean;
   /**
    * If True, outputs feature residuals for all (context and action) features locally around the prediction. Uses only the context features of the reacted case to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
    */
-  feature_residuals_full?: boolean;
+  feature_full_residuals?: boolean;
+  /**
+   * If True, outputs feature residuals for all (context and action) features for just the specified case. Uses leave-one-out for each feature, while using the others to predict the left out feature with their corresponding values from this case.
+   */
+  feature_full_residuals_for_case?: boolean;
+  /**
+   * If True, outputs this case's full residual conviction for each feature. Computed as the dataset feature full residual divided by each case's feature full residual.
+   */
+  feature_full_residual_convictions_for_case?: boolean;
+  /**
+   * When True will compute the Accuracy Contribution for each context feature at predicting the action feature value of the influential cases. Uses robust logic, making predictions using contexts sampled from the power set of context features.
+   */
+  feature_robust_accuracy_contributions?: boolean;
+  /**
+   * If True, outputs each context feature's Accuracy Contribution in predicting the action feature as an explanation detail given that the specified prediction was already made as specified by the action value. Uses both context and action features of the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
+   */
+  feature_robust_accuracy_contributions_ex_post?: boolean;
+  /**
+   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context were not in the dataset for all context features in the local data area Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions. Directional feature contributions are returned under the key 'feature_robust_directional_prediction_contributions'.
+   */
+  feature_robust_prediction_contributions?: boolean;
+  /**
+   * If True outputs each context feature's absolute and directional differences between the predicted action feature value and the predicted action feature value if each context feature were not in the model for all context features in this case, using only the values from this specific case. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions. Directional case feature contributions are returned under the 'feature_robust_directional_prediction_contributions_for_case' key.
+   */
+  feature_robust_prediction_contributions_for_case?: boolean;
   /**
    * If True, outputs feature residuals for all (context and action) features locally around the prediction. Uses only the context features of the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions. 'selected_prediction_stats' controls the returned prediction stats.
    */
-  feature_residuals_robust?: boolean;
+  feature_robust_residuals?: boolean;
+  /**
+   * If True, outputs feature residuals for all (context and action) features for just the specified case. Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
+   */
+  feature_robust_residuals_for_case?: boolean;
   /**
    * When true, outputs the number of attempts taken to generate each case. Only applicable when 'generate_new_cases' is "always" or "attempt". When used in react_series, "series_generate_attempts" is also returned.
    */
@@ -147,13 +163,13 @@ export type ReactDetails = {
   /**
    * Specifies the number of robust samples to use for each case. Applicable only for computing robust feature contributions or robust case feature contributions. Defaults to 2000 when unspecified. Higher values will take longer but provide more stable results.
    */
-  num_robust_influence_samples_per_case?: number;
+  num_robust_prediction_contributions_samples_per_case?: number;
   /**
    * When true, outputs observational errors for all features as defined in feature attributes.
    */
   observational_errors?: boolean;
   /**
-   * When true, outputs the reacted case's context feature values that are outside the min or max of the corresponding feature values of all the cases in the local model area. Uses only the context features of the reacted case to determine that area.
+   * When true, outputs the reacted case's context feature values that are outside the min or max of the corresponding feature values of all the cases in the local data area. Uses only the context features of the reacted case to determine that area.
    */
   outlying_feature_values?: boolean;
   /**
@@ -161,9 +177,21 @@ export type ReactDetails = {
    */
   prediction_stats?: boolean;
   /**
+   * When true, outputs a collection of typical values around the given contexts for each context feature. If a list of feature names, outputs a collection of typical values around the given contexts for each specified feature.
+   */
+  relevant_values?: boolean | string[];
+  /**
    * Types of stats to output. When unspecified, returns all except the confusion_matrix. If all, then returns all including the confusion_matrix.
    */
   selected_prediction_stats?: PredictionStat[];
+  /**
+   * When true, outputs the mean absolute deviation (MAD) of each continuous feature to represent the estimated uncertainty for each timestep of each generated series based on internal generative forecasts.
+   */
+  series_residuals?: boolean;
+  /**
+   * The number of generative series to use when estimating the uncertainty of the series over time. Defaults to 30 when unspecified.
+   */
+  series_residuals_num_samples?: number;
   /**
    * When true, outputs similarity conviction for the reacted case. Uses both context and action feature values as the case values for all computations. This is defined as expected (local) distance contribution divided by reacted case distance contribution.
    */

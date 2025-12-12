@@ -5,19 +5,23 @@
  * LoadSubtrainee
  *
  * Attempts to load a subtrainee with the following optional parameters.
- * If a parameter is not specified, it will look to this entity's own label of the same name.
  * If the saved instance does not exist the existing trainee will remain unmodified and the function will return null.
  * assumes loaded trainee filenames need to be escaped
- * returns the trainee name if successful, null if not
+ * returns the trainee path if successful, null if not
  */
+import type { TraineePath } from "./TraineePath";
 
 /** Request parameters of the Trainee method: loadSubtrainee. */
 export type LoadSubtraineeRequest = {
   /**
-   * Name to load (without extension)
-   * @default ""
+   * Unique id of child trainee to load
    */
-  filename?: string;
+  child_id: string;
+
+  /**
+   * Name to load (without extension)
+   */
+  filename: string;
 
   /**
    * Base path to load from
@@ -26,22 +30,22 @@ export type LoadSubtraineeRequest = {
   filepath?: string;
 
   /**
+   * List of strings specifying the user-friendly path of the child subtrainee to load
+   * including the label of the child as the last value in the path
+   */
+  path: TraineePath;
+
+  /**
    * Flag, default to false. if set to true will load each case from its individual file
    * @default false
    */
   separate_files?: boolean;
-
-  /**
-   * Name path of trainee to load
-   * @default ""
-   */
-  trainee?: string | string[];
 };
 
 /** Response of the Trainee method: loadSubtrainee. */
 export type LoadSubtraineeResponse = {
   /**
-   * The name of the resulting trainee that was loaded.
+   * The path of the resulting trainee that was loaded.
    */
-  name: string;
+  path: string | string[];
 };

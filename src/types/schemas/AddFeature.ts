@@ -5,9 +5,9 @@
  * AddFeature
  *
  * Adds the specified feature on all cases for a trainee that match the specified condition. overwrites features that
- * If condition are not specified, adds feature for all cases and to the model.  If condition is an empty assoc, will not modify feature metadata in the model.
- * If feature attributes are passed in, will also set the model's feature attributes.
- * Updates the accumulated data mass for the model proportional to the number of cases modified.
+ * If condition are not specified, adds feature for all cases and to the trainee.  If condition is an empty assoc, will not modify feature metadata in the trainee.
+ * If feature attributes are passed in, will also set the trainee's feature attributes.
+ * Updates the accumulated data mass for the dataset proportional to the number of cases modified.
  */
 import type { Condition } from "./Condition";
 import type { FeatureAttributes } from "./FeatureAttributes";
@@ -16,10 +16,11 @@ import type { FeatureAttributes } from "./FeatureAttributes";
 export type AddFeatureRequest = {
   /**
    * Assoc of feature->value(s).
-   *     no value = must have feature
+   *     no value or (null) = select cases where that feature is (null)/missing
    *   - for continuous or numeric ordinal features:
    *     one value = must equal exactly the value or be close to it for fuzzy match
-   *     values = inclusive between
+   *     two values = inclusive between, supports (null) on either side for less than/greater than conditions
+   *     [(null) (null)] = select all non-null cases
    *   - for nominal or string ordinal features:
    *     n values = must match any of these values exactly
    */
@@ -57,7 +58,7 @@ export type AddFeatureRequest = {
   internal_feature?: boolean;
 
   /**
-   * {type "boolean"}
+   * If true, will overwrite any previously trained values under the same feature name
    * @default true
    */
   overwrite?: boolean;

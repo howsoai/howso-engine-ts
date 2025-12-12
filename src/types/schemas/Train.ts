@@ -64,6 +64,17 @@ export type TrainRequest = {
   skip_auto_analyze?: boolean;
 
   /**
+   * Flag, if set to true, will not reduce_data, but will instead return the status "reduce_data" which indicates that a reduce_data call is recommended
+   * @default false
+   */
+  skip_reduce_data?: boolean;
+
+  /**
+   * If specified, then the training indices for this batch of cases will start at this value. This value must be greater than the last trained index of the session.
+   */
+  start_index?: number;
+
+  /**
    * Flag, if set to true, and accumulate_weight_feature is provided, will not train on the cases, but instead accumulate all of their neighbor weights.
    * @default false
    */
@@ -73,7 +84,7 @@ export type TrainRequest = {
 /** Response of the Trainee method: train. */
 export type TrainResponse = {
   /**
-   * The session training indices for the ablated cases.
+   * The indices of the ablated input cases.
    */
   ablated_indices?: number[];
   /**
@@ -84,8 +95,8 @@ export type TrainResponse = {
    * The status output.
    *
    * - (null): No status output. This is the default.
-   * - analyzed: If auto analysis is enabled and model has grown large enough to be analyzed again and was analyzed.
-   * - analyze: If auto analysis is enabled and model has grown large enough to be analyzed again but was not analyzed.
+   * - analyzed: If auto analysis is enabled and dataset has grown large enough to be analyzed again and was analyzed.
+   * - analyze: If auto analysis is enabled and dataset has grown large enough to be analyzed again but was not analyzed.
    */
   status: "analyze" | "analyzed" | null;
 };

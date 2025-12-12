@@ -99,7 +99,7 @@ Once you have a client you can then start by creating a Trainee with some initia
 const client: HowsoWorkerClient = await getClient();
 const trainee = await client.createTrainee({ name: "MyTrainee" });
 await trainee.setFeatureAttributes({ feature_attributes });
-await trainee.batchTrain({ cases: dataset.data, columns: dataset.columns });
+await trainee.batchTrain({ cases: dataset.data, features: dataset.columns });
 await trainee.analyze();
 const { payload, warnings } = await trainee.react({
   context_values: [

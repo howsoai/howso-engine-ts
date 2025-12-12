@@ -12,7 +12,7 @@ export type FeatureOriginalTypeDatetime = {
    */
   data_type: "datetime";
   /**
-   * The standardized timezone name.
+   * The standardized time zone name.
    */
   timezone?: string | null;
 };

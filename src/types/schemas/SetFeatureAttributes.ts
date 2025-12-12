@@ -25,9 +25,11 @@ export type SetFeatureAttributesRequest = {
    *     'min': number or date string, the minimum value to be output
    *     'max': number or date string, the maximum value to be output
    *     'allowed': list of explicitly allowed values to be output. Example: ["low", "medium", "high"]
-   *     'allow_null': flag, allow nulls to be output, per their distribution in the data. Defaults to true
+   *     'allow_null': flag, allow nulls to be output, per their distribution in the data. Defaults to true (false for time feature)
    *     'constraint': code, whose logic has to evaluate to true for value to be considered valid.
-   *       Same format as 'derived_feature_code. Example: "(> #f1 0 #f2 0)"
+   *       Same format as 'derived_feature_code'. Example: "(> (call value {feature \"f1\"}) (call value {feature \"f2\"}) )"
+   *        'observed_min': number, string, or date string, the minimum value observed in the data
+   *        'observed_max': number, string, or date string, the maximum value observed in the data
    *
    *   'cycle_length': integer, specifies cycle length of cyclic feature, default is no cycle length
    *
@@ -38,6 +40,9 @@ export type SetFeatureAttributesRequest = {
    *             ISO8601 format of "%H:%M%S".
    *
    *   'locale': string, the date time format locale. If unspecified, uses platform default locale. Example: "en_US"
+   *
+   *   'default_time_zone': string, the default time zone used for datetimes if a time zone is not specified
+   *           explicitly specified in the date_time_format.  Defaults to 'UTC' when unspecified.
    *
    *   'significant_digits': integer, round to the specified significant digits, default is no rounding
    *
@@ -74,13 +79,12 @@ export type SetFeatureAttributesRequest = {
    *             when they use null as a context value. Only applicable to dependent features. When false, the
    *             feature will be treated as a non-dependent context feature. When true for nominal types,
    *             treats null as an individual dependent class value, only cases that also have nulls as this
-   *             feature's value will be considered. When true for continuous types, only the cases with the
-   *             same dependent feature values as the cases that also have nulls as this feature's value
-   *             will be considered. Default is false.
+   *             feature's value will be considered. When true for continuous types, if continuous value is null,
+   *             only considers cases that also have null for this feature value. Default is false.
    *
    *   'auto_derive_on_train': assoc, defines how to create and derive all the values for this feature from
    *               the trained dataset. For full list of specific 'auto_derive_on_train' feature
-   *               attributes refer the comments at the top of the derive.amlg module.
+   *               attributes refer the comments at the top of the derive_features.amlg module.
    *
    *   'derived_feature_code': string, code defining how the value for this feature could be derived if this feature
    *               is specified as a "derived_context_feature" or a "derived_action_feature" during
@@ -89,19 +93,30 @@ export type SetFeatureAttributesRequest = {
    *               Each row is comprised of all the combined context and action features. Referencing
    *               data in these rows uses 0-based indexing, where the current row index is 0, the
    *               previous row's is 1, etc. Specified code may do simple logic and numeric operations
-   *               on feature values referenced via feature name and row offset.
+   *               on feature values referenced via feature name and row offset. Format to get feature
+   *               value is: (call value {feature "feature_name" lag lag_value }) where lag and lag_value
+   *               are optional and only needed if lag > 0.
    *               Examples:
-   *               "#x 1" - Use the value for feature 'x' from the previously processed row (offset of 1, one lag value).
-   *               "(- #y 0 #x 1)" - Feature 'y' value from current (offset 0) row minus feature 'x' value from previous (offset 1) row.
+   *               "(call value {feature \"x\" lag 1})" - Use value for feature 'x' from the previous row (offset of 1, one lag value).
+   *               "(- (call value {feature \"y\"})  (call value {feature \"x\" lag 1}) )" - Feature 'y' value from
+   *                 current (offset 0) row minus feature 'x' value from previous (offset 1) row.
+   *
+   *               Note: Feature names must be explicitly specified as the 'feature' parameter and not as output from logic.
+   *               This example code will not work: "(call value {feature (call value {feature \"another\"}) })" because
+   *               the feature name is determined dynamically from the value of 'another' feature and not specified directly.
    *
    *   'post_process': string, custom Amalgam code that is called on resulting values of this feature during react operations.
-   *           Example: "(set_digits #x 0 3.1 (list 1 0) 2 3 (false))"
+   *           Same format as 'derived_feature_code'. Example: "(set_digits (call value {feature \"x\"})  3.1 [1 0] 2 3 .false)"
    *
    *   'non_sensitive': boolean, flag a categorical nominal feature as non-sensitive. It is recommended that
    *           all nominal features be represented with either an 'int-id' subtype or another
    *           available nominal subtype using the 'subtype' attribute. However, if the nominal
    *           feature is non-sensitive, setting this parameter to true will bypass the 'subtype'
    *           requirement. Only applicable to nominal features. Default is false
+   *
+   *   'shared_deviations': list or boolean, The shared deviations feature group. If a list, this feature will share deviations with
+   *           the features in this list. By default, derived lag values share deviations with the parent feature. If
+   *           false and a parent feature, derived lags of this feature will not share deviations.
    *
    *   'subtype': string, the type used in novel nominal substitution.
    *
@@ -112,10 +127,12 @@ export type SetFeatureAttributesRequest = {
    *
    *   'time_series': assoc, defining time series options for a feature, keys of assoc defined below as:
    *
-   *     'type': string, one of "rate" or "delta". When 'rate' is specified, uses the difference of the current value
+   *     'type': string, one of "rate", "delta", or "covariate". When 'rate' is specified, uses the difference of the current value
    *         from its previous value divided by the change in time since the previous value.
    *         When 'delta' is specified, uses the difference of the current value from its previous value
    *         regardless of the elapsed time. Set to 'delta' if feature has 'time_feature' set to true.
+   *         When `covariate` is specified, temporal changes are not modeled and feature values are directly
+   *         predicted with interpolation in series generation rather than derived using a rate or delta.
    *
    *     'time_feature': boolean, When true, the feature will be treated as the time feature for time
    *             series modeling. Additionally, time features must use type 'delta'. Default is false.
@@ -150,12 +167,6 @@ export type SetFeatureAttributesRequest = {
    *     'delta_max': list of number, if specified, ensures that the largest difference between feature values is not larger than
    *           this specified value. A null value means no max boundary. The length of the list must match the number of
    *           derivatives as specified by 'order'. Only applicable when time series type is set to 'delta'. Example: [2.0]
-   *
-   *     'series_has_terminators': boolean, when true, requires that the model identify and learn values that explicitly denote
-   *                 the end of a series. Only applicable to id features for a series. Default is false
-   *
-   *     'stop_on_terminator': boolean, when true, requires that a series ends on a terminator value.
-   *               Only applicable to id features for a series. Default is false
    *
    *     'universal': boolean, applicable only to the time_feature, controls whether future values of independent time series are considered.
    *           When false, time_feature is not universal and allows using future data from other series in decisions;

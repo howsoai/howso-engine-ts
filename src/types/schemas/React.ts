@@ -6,21 +6,25 @@
  *
  * Run reacts in a batch, output a an assoc of list of outputs from each individual react.
  */
+import type { CaseAccuracyContributions } from "./CaseAccuracyContributions";
 import type { CaseIndices } from "./CaseIndices";
-import type { CaseMDA } from "./CaseMDA";
 import type { Cases } from "./Cases";
 import type { CategoricalActionProbabilities } from "./CategoricalActionProbabilities";
+import type { Condition } from "./Condition";
+import type { DerivationParameters } from "./DerivationParameters";
 import type { DesiredConviction } from "./DesiredConviction";
 import type { DistanceRatioParts } from "./DistanceRatioParts";
 import type { FeatureBounds } from "./FeatureBounds";
 import type { FeatureMetricIndex } from "./FeatureMetricIndex";
-import type { FullCaseContribution } from "./FullCaseContribution";
+import type { FullCasePredictionContribution } from "./FullCasePredictionContribution";
 import type { GenerateNewCases } from "./GenerateNewCases";
+import type { GoalFeatures } from "./GoalFeatures";
+import type { NewCaseMinDistanceRatio } from "./NewCaseMinDistanceRatio";
 import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { OutlyingFeatureValuesIndex } from "./OutlyingFeatureValuesIndex";
 import type { ReactDetails } from "./ReactDetails";
 import type { ReactionPredictionStats } from "./ReactionPredictionStats";
-import type { RobustCaseContribution } from "./RobustCaseContribution";
+import type { RobustCasePredictionContribution } from "./RobustCasePredictionContribution";
 import type { SimilarCaseIndex } from "./SimilarCaseIndex";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
@@ -33,13 +37,13 @@ export type ReactRequest = {
   action_features?: string[];
 
   /**
-   * ;values of action features. If specified will bypass react and only do the explanation if details is set.
+   * Values of action features. If specified will bypass react and only do the explanation if details is set.
    * if specified must be either length of 1 or num_reacts. One list us used per individual reaction
    */
   action_values?: any[][];
 
   /**
-   * Flag, if set to true will allow return of null values if there are nulls in the local model for the action features. Applicable
+   * Flag, if set to true will allow return of null values if there are nulls in the local data for the action features. Applicable
    *   only to discriminative reacts.
    * @default false
    */
@@ -51,6 +55,20 @@ export type ReactRequest = {
    *  If specified must be either length of 1 or num_reacts.
    */
   case_indices?: CaseIndices;
+
+  /**
+   * A mapping of conditions for features that will be used to constrain the queries used to find the most similar
+   * trained cases to the given contexts.
+   * assoc of feature->value(s).
+   *     no value or (null) = select cases where that feature is (null)/missing
+   *   - for continuous or numeric ordinal features:
+   *     one value = must equal exactly the value or be close to it for fuzzy match
+   *     two values = inclusive between, supports (null) on either side for less than/greater than conditions
+   *     [(null) (null)] = select all non-null cases
+   *   - for nominal or string ordinal features:
+   *     n values = must match any of these values exactly
+   */
+  constraints?: Condition;
 
   /**
    * List of context features. For generative react, features used to condition the generated case
@@ -75,7 +93,10 @@ export type ReactRequest = {
 
   /**
    * List of context features whose values should be computed from the provided contexts in the specified order.
-   *   Must be different than context_features.
+   *   Must be different than context_features. May include similarity conviction and distance contribution features,
+   *   however, if either of those features are requested, then `react_into_features` must be called first with those features
+   *    selected. For those features, the name must match the name specified when calling `react_into_features`. If not specified
+   *   in `react_into_features`, then they default to "similarity_conviction" and "distance_contribution".
    * @default []
    */
   derived_context_features?: string[];
@@ -83,8 +104,8 @@ export type ReactRequest = {
   /**
    * If null, will do a discriminative react. If specified, will do a generative react
    *   For Generative React, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
-   *   larger values will increase the variance (or creativity) of the generated case from the existing model
-   *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
+   *   larger values will increase the variance (or creativity) of the generated case from the existing dataset
+   *   smaller values will decrease the variance (or creativity) of the generated case from the existing dataset
    */
   desired_conviction?: DesiredConviction;
 
@@ -102,8 +123,7 @@ export type ReactRequest = {
    *             Not applicable to generative reacts.
    *
    *      "derivation_parameters" true or false. If true outputs the parameters used during the react. These parameters
-   *             include k, p, distance_transform, feature_weights, feature_deviations, nominal_class_counts, and flags to indicate
-   *              if deviations or inverse residual weighting were used.
+   *             include k, p, distance_transform, feature_weights, feature_deviations.
    *
    *      "hypothetical_values"  assoc context feature -> values. If specified, shows how a prediction could change
    *             in a what-if scenario where the influential cases' context feature values are replaced with
@@ -125,8 +145,22 @@ export type ReactRequest = {
    *             not specified) relevant number of boundary cases. Uses both context and action features
    *             of the reacted case to determine the counterfactual boundary based on action features,
    *             which maximize the dissimilarity of action features while maximizing the similarity of
-   *             context features. If action features aren't specified, uses familarity conviction to
+   *             context features. If action features aren't specified, uses familiarity conviction to
    *             determine the boundary instead.
+   *
+   *       "boundary_value_context_features" list of strings. When specified, outputs a map of each specified feature to
+   *              possible boundary values under "boundary_values". If 'boundary_value_action_outcome' is
+   *              unspecified, then the returned values are values where the ratio of change in action to total
+   *              change is maximized. If 'boundary_value_action_outcome' is specified, then the boundary values
+   *              represent the closest found values for each context feature that shift the action to fulfill the condition.
+   *
+   *     "boundary_value_action_outcome" assoc of action_feature -> condition. When specified, outputs a map of each specified feature
+   *             to possible boundary values under "boundary_values". If 'boundary_value_action_outcome' is unspecified, then
+   *             the returned values are values where the ratio of change in action to total change is maximized. If
+   *             'boundary_value_action_outcome' is specified, then the boundary values represent the closest found values for
+   *             each context feature that shift the action to fulfill the condition. Continuous edit-distance features
+   *             (JSON, code, YAML, string) cannot have possible values or ranges specified in "boundary_value_action_outcome"
+   *             (bounds are not well-defined and the search space is theoretically infinite.)
    *
    *      "num_boundary_cases" integer. Outputs this manually specified number of boundary cases.
    *
@@ -147,7 +181,7 @@ export type ReactRequest = {
    *
    *      "outlying_feature_values" true or false. If true outputs the reacted case's context feature values that are
    *             outside the min or max of the corresponding feature values of all the cases in the local
-   *             model area. Uses only the context features of the reacted case to determine that area.
+   *             data area. Uses only the context features of the reacted case to determine that area.
    *
    *      "categorical_action_probabilities" true or false. If true outputs probabilities for each class for the action
    *             features. Applicable only to categorical action features. single_react_series calls additionally
@@ -156,12 +190,12 @@ export type ReactRequest = {
    *      "observational_errors" true or false. If true outputs observational errors for all features as defined
    *             in feature attributes.
    *
-   *      "feature_residuals_robust" true or false. If true outputs feature residuals for all (context and action) features
+   *      "feature_robust_residuals" true or false. If true outputs feature residuals for all (context and action) features
    *             locally around the prediction. Uses only the context features of the reacted case to
    *             determine that area. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "feature_residuals_full" true or false. If true outputs feature residuals for all (context and action) features
+   *      "feature_full_residuals" true or false. If true outputs feature residuals for all (context and action) features
    *             locally around the prediction. Uses only the context features of the reacted case to
    *             determine that area. Uses full calculations, which uses leave-one-out context features for computations.
    *
@@ -176,101 +210,103 @@ export type ReactRequest = {
    *                        If "all", then returns all including the confusion_matrix. Valid values are: "mae" "confusion_matrix" "r2" "rmse"
    *             "adjusted_smape" "smape" "spearman_coeff" "precision" "recall" "accuracy" "mcc" "all" "missing_value_accuracy"
    *
-   *      "feature_mda_robust" true or false. If true outputs each context feature's robust mean decrease in accuracy of predicting
+   *      "feature_robust_accuracy_contributions" true or false. If true outputs each context feature's robust Accuracy Contribution in predicting
    *             the action feature given the context. Uses only the context features of the reacted
-   *             case to determine that area.  Uses robust calculations, which uses uniform sampling from
-   *             the power set of features as the contexts for predictions.
+   *             case to determine that area. Averages out the result of predictions for all cases in this local data area.
+   *             Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
    *
-   *      "feature_mda_full" true or false. If true outputs each context feature's full mean decrease in accuracy of predicting
+   *      "feature_full_accuracy_contributions" true or false. If true outputs each context feature's full Accuracy Contribution in predicting
    *             the action feature given the context. Uses only the context features of the reacted
-   *             case to determine that area. Uses full calculations, which uses leave-one-out context features for computations.
-   *
-   *      "feature_mda_ex_post_robust" true or false. If true outputs each context feature's mean decrease in accuracy of
-   *             predicting the action feature as a detail given that the specified prediction was
-   *             already made as specified by the action value. Uses both context and action features of
-   *             the reacted case to determine that area. Uses robust calculations, which uses uniform sampling from
-   *             the power set of features as the contexts for predictions.
-   *
-   *      "feature_mda_ex_post_full" true or false. If true outputs each context feature's mean decrease in accuracy of
-   *             predicting the action feature as a detail given that the specified prediction was
-   *             already made as specified by the action value. Uses both context and action features of
-   *             the reacted case to determine that area. Uses full calculations, which uses leave-one-out for features for computations.
-   *
-   *      "feature_contributions_robust" true or false. If true outputs each context feature's differences between the
-   *             predicted action feature value and the predicted action feature value if each context
-   *             feature were not in the model for all context features in the local model area. Outputs
-   *             both 'feature_contributions' and non-absolute 'directional_feature_contributions'.
-   *              Uses robust calculations, which uses uniform sampling from the power set of features as
-   *             the contexts for predictions.
-   *
-   *      "feature_contributions_full" true or false. If true outputs each context feature's differences between the
-   *             predicted action feature value and the predicted action feature value if each context
-   *             feature were not in the model for all context features in the local model area. Outputs
-   *             both 'feature_contributions' and non-absolute 'directional_feature_contributions'.
+   *             case to determine that area. Averages out the result of predictions for all cases in this local data area.
    *             Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "case_mda_robust" true or false. If true outputs each influential case's mean decrease in accuracy of predicting
-   *             the action feature in the local model area, as if each individual case were included
+   *      "feature_robust_accuracy_contributions_ex_post" true or false. If true outputs each context feature's Accuracy Contribution in
+   *             predicting the action feature as a detail given that the specified prediction was
+   *             already made as specified by the action value. Uses both context and action features of
+   *             the reacted case to determine that area. Averages out the result of predictions for all cases in this local data area.
+   *             Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
+   *
+   *      "feature_full_accuracy_contributions_ex_post" true or false. If true outputs each context feature's Accuracy Contribution in
+   *             predicting the action feature as a detail given that the specified prediction was
+   *             already made as specified by the action value. Uses both context and action features of
+   *             the reacted case to determine that area. Averages out the result of predictions for all cases in this local data area.
+   *             Uses full calculations, which uses leave-one-out for features for computations.
+   *
+   *      "feature_robust_prediction_contributions" true or false. If true outputs each context feature's differences between the
+   *             predicted action feature value and the predicted action feature value if each context
+   *             feature were not in the dataset for all context features. Averages out the result of predictions for all
+   *             cases in the local data area. Outputs both 'feature_robust_prediction_contributions' and non-absolute
+   *             'feature_robust_directional_prediction_contributions'. Uses robust calculations, which uses uniform sampling
+   *             from the power set of features as the contexts for predictions.
+   *
+   *      "feature_full_prediction_contributions" true or false. If true outputs each context feature's differences between the
+   *             predicted action feature value and the predicted action feature value if each context
+   *             feature were not in the dataset for all context features. Averages out the result of predictions for all
+   *             cases in this local data area. Outputs both 'feature_full_prediction_contributions' and non-absolute
+   *             'feature_full_directional_prediction_contributions'. Uses full calculations, which uses leave-one-out
+   *             context features for computations.
+   *
+   *      "case_robust_accuracy_contributions" true or false. If true outputs each influential case's Accuracy Contribution in predicting
+   *             the action feature in the local data area, as if each individual case were included
    *             versus not included. Uses only the context features of the reacted case to determine
    *             that area. Uses robust calculations, which uses uniform sampling from the power set of all combinations of cases.
    *
-   *      "case_mda_full" true or false. If true outputs each influential case's mean decrease in accuracy of predicting
-   *             the action feature in the local model area, as if each individual case were included
+   *      "case_full_accuracy_contributions" true or false. If true outputs each influential case's Accuracy Contribution in predicting
+   *             the action feature in the local data area, as if each individual case were included
    *             versus not included. Uses only the context features of the reacted case to determine
    *             that area. Uses full calculations, which uses leave-one-out for cases for computations.
    *
-   *      "case_contributions_robust" true or false. If true outputs each influential case's differences between the
+   *      "case_robust_prediction_contributions" true or false. If true outputs each influential case's differences between the
    *             predicted action feature value and the predicted action feature value if each
    *             individual case were not included. Uses only the context features of the reacted case
    *             to determine that area. Uses robust calculations, which uses uniform sampling from the power set of all
    *             combinations of cases.
    *
-   *      "case_contributions_full" true or false. If true outputs each influential case's differences between the
+   *      "case_full_prediction_contributions" true or false. If true outputs each influential case's differences between the
    *             predicted action feature value and the predicted action feature value if each
    *             individual case were not included. Uses only the context features of the reacted case
    *             to determine that area. Uses full calculations, which uses leave-one-out for cases for computations.
    *
-   *      "case_feature_residuals_robust"  true or false. If true outputs feature residuals for all (context and action)
+   *      "feature_robust_residuals_for_case"  true or false. If true outputs feature residuals for all (context and action)
    *             features for just the specified case. Uses leave-one-out for each feature, while
    *             using the others to predict the left out feature with their corresponding values
    *             from this case. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "case_feature_residuals_full"  true or false. If true outputs feature residuals for all (context and action)
+   *      "feature_full_residuals_for_case"  true or false. If true outputs feature residuals for all (context and action)
    *             features for just the specified case. Uses leave-one-out for each feature, while
    *             using the others to predict the left out feature with their corresponding values
    *             from this case. Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "case_feature_contributions_robust" true or false. If true outputs each context feature's differences between the
+   *      "feature_robust_prediction_contributions_for_case" true or false. If true outputs each context feature's differences between the
    *             predicted action feature value and the predicted action feature value if each context
-   *             feature were not in the model for all context features in this case, using only the
+   *             feature were not in the dataset for all context features. Predicts action feature value using only the
    *             values from this specific case. Uses robust calculations, which uses uniform sampling from
    *             the power set of features as the contexts for predictions.
    *
-   *      "case_feature_contributions_full" true or false. If true outputs each context feature's differences between the
+   *      "feature_full_prediction_contributions_for_case" true or false. If true outputs each context feature's differences between the
    *             predicted action feature value and the predicted action feature value if each context
-   *             feature were not in the model for all context features in this case, using only the
+   *             feature were not in the dataset for all context features. Predicts action feature value using only the
    *             values from this specific case. Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *      "num_robust_influence_samples_per_case" integer. Specifies the number of robust samples to use for each case.
+   *      "num_robust_prediction_contributions_samples_per_case" integer. Specifies the number of robust samples to use for each case.
    *             Applicable only for computing robust feature contributions or robust case feature contributions.
    *             When unspecified, defaults to 2000. Higher values will take longer but provide more stable results.
    *
-   *      "case_feature_residual_convictions_robust" true or false. If true outputs this case's robust feature residual
-   *             convictions for the region around the prediction. Uses only the context features of
-   *             the reacted case to determine that region. Computed as: region feature residual / case feature residual.
-   *             Uses robust calculations, which uses uniform sampling from the power set of features as the contexts for predictions.
-   *
-   *      "case_feature_residual_convictions_full" true or false. If true outputs this case's full feature residual
+   *      "feature_full_residual_convictions_for_case" true or false. If true outputs this case's full feature residual
    *             convictions for the region around the prediction. Uses only the context features of
    *             the reacted case to determine that region. Computed as: region feature residual / case feature residual.
    *             Uses full calculations, which uses leave-one-out context features for computations.
    *
-   *         "features" list of features that specifies what features to calculate per-feature details for. (contributions, mda, residuals, etc)
+   *      "features" list of features that specifies what features to calculate per-feature details for. (contributions, mda, residuals, etc)
    *              when robust computations are False. This should generally preserve compute, but will not when computing details robustly.
    *
-   *         "generate_attempts" true or false. If true, outputs the total number of attempts to generate the unique case. Only applicable for generative
-   *                        reacts. When used with ReactSeries, "series_generate_attempts" is also returned.
+   *      "generate_attempts" true or false. If true, outputs the total number of attempts to generate the unique case. Only applicable for generative
+   *             reacts. When used with ReactSeries, "series_generate_attempts" is also returned.
+   *
+   *      "relevant_values" true or list of feature names. If true, outputs a collection of typical values around the given context
+   *              for each context feature. If a list of strings, then outputs a collection of typical values around the context
+   *              for each specified feature.
    *   )
    */
   details?: ReactDetails;
@@ -291,13 +327,31 @@ export type ReactRequest = {
 
   /**
    * Assoc of :
-   *     to ensure that specified features' generated values stay in bounds
+   *   { feature : { "min": a, "max": b, "allow_null": false/true } }
+   *   to ensure that specified features' generated values stay in bounds
    *   for nominal features instead of min/max it's a set of allowed values, ie:
-   *     allow_null - default is true, if true nulls may be generated per their distribution in the data
+   *   { feature: { "allowed" : [ "value1", "value2" ... ] }, "allow_null": false/true }
+   *   allow_null - default is true, if true nulls may be generated per their distribution in the data
    *  Only used when desired_conviction is specified
    * @default {}
    */
   feature_bounds_map?: Record<string, FeatureBounds>;
+
+  /**
+   * A mapping of feature name to custom code strings that will be evaluated to update the value of the feature they are mapped from after inference/derivation.
+   * In the time-series synthesis, these custom codes are executed just after the original feature value is derived or synthed, but before
+   * any other features would be derived or generated from the value. This means that the result of this custom code may be used as the
+   * context in the generation or derivation of other feature values within a single timestep. Custom code will be able to access the values
+   * of all context features and all previously generated action feature values.
+   */
+  feature_post_process_code_map?: Record<string, string>;
+
+  /**
+   * A mapping of feature name to custom code strings that will be evaluated to update the value of the context feature they are mapped from after inference/derivation.
+   * Custom code will be able to access the pre-modification encoded values of all context features and resulting values should also be in the
+   * encoded format for the feature.
+   */
+  feature_pre_process_code_map?: Record<string, string>;
 
   /**
    * Enum, acceptable values are:
@@ -307,6 +361,22 @@ export type ReactRequest = {
    * @default "no"
    */
   generate_new_cases?: GenerateNewCases;
+
+  /**
+   * Assoc of :
+   *     { feature : { "goal" : "min"/"max", "value" : value }}
+   *     A mapping of feature name to the goals for the feature, which will cause the react to achieve the goals as appropriate
+   *     for the context.  This is useful for conditioning responses when it is challenging or impossible to know appropriate
+   *     values ahead of time, such as maximizing the reward or minimizing cost for reinforcement learning, or conditioning a
+   *     forecast based on attempting to achieve some value.  Goal features will reevaluate the inference for the given context
+   *     optimizing for the specified goals. Valid keys in the map are:
+   *     "goal": "min" or "max", will make a prediction while minimizing or maximizing the value for the feature or
+   *     "value" : value, will make a prediction while approaching the specified value
+   *   note: nominal features only support 'value', 'goal' is ignored.
+   *       for non-nominals, if both are provided, only 'goal' is considered.
+   * @default {}
+   */
+  goal_features_map?: Record<string, GoalFeatures>;
 
   /**
    * Flag, if set to true assumes provided categorical (nominal or ordinal) feature values already been substituted.
@@ -323,6 +393,14 @@ export type ReactRequest = {
    * Flag, if set to true and specified along with case_indices, will set ignore_case to the one specified by case_indices.
    */
   leave_case_out?: boolean;
+
+  /**
+   * Parameter that adjusts the required distance ratio for a newly generated case to be considered private.
+   *   When unspecified, defaults to 1.0 and generated cases with a ratio of 1.0 or greater are considered private.
+   *    Larger values will increase strictness of privacy check.
+   *    Smaller values will loosen the privacy check. Must be a positive number, since 0 would function same as `generate_new_cases='no'`
+   */
+  new_case_min_distance_ratio?: NewCaseMinDistanceRatio;
 
   /**
    * Distance to determine privacy cutoff. Used to query the local minimum distance used in the distance ratio
@@ -372,11 +450,24 @@ export type ReactRequest = {
   rand_seed?: any[];
 
   /**
+   * Flag, if true will return the context values used in the reaction alongside the action values.
+   * @default false
+   */
+  return_context_values?: boolean;
+
+  /**
    * Flag, default is true, only applicable if a substitution value map has been set. If set to false, will not substitute categorical feature values.
    *  Only used when desired_conviction is specified
    * @default true
    */
   substitute_output?: boolean;
+
+  /**
+   * Flag, if set to true this changes generative output to use aggregation instead of selection before adding noise.
+   * By default generative output uses selection.
+   * @default false
+   */
+  use_aggregation_based_differential_privacy?: boolean;
 
   /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
@@ -385,10 +476,11 @@ export type ReactRequest = {
   use_case_weights?: UseCaseWeights;
 
   /**
-   * Flag, if false uses model feature residuals, if true recalculates regional model residuals. Only used when desired_conviction is specified
-   * @default true
+   * Flag, if true will use differentially private approach to adding noise during generative reacts. Default is false.
+   * Only used when desired_conviction is specified.
+   * @default false
    */
-  use_regional_model_residuals?: boolean;
+  use_differential_privacy?: boolean;
 
   /**
    * Name of feature whose values to use as case weights
@@ -412,65 +504,41 @@ export type ReactResponse = {
    */
   boundary_cases?: Cases[];
   /**
-   * A list of lists of maps containing the case index and full contribution to the action feature for each influential case of each given case.
+   * A list of maps of feature names to the boundary values computed for them. For continuous and ordinal features, a tuple of values will be returned indicating the values of a boundary above and below the given value. For nominals, only the boundary value itself is returned. A missing value indicates that there was no boundary found.
    */
-  case_contributions_full?: FullCaseContribution[][];
-  /**
-   * A list of lists of maps containing the case index and robust contribution to the action feature for each influential case of each given case.
-   */
-  case_contributions_robust?: RobustCaseContribution[][];
-  /**
-   * A list of lists of maps containing the case index and full directional contribution to the action feature each given case.
-   */
-  case_directional_feature_contributions_full?: FeatureMetricIndex[];
-  /**
-   * A list of lists of maps containing the case index and robust directional contribution to the action feature each given case.
-   */
-  case_directional_feature_contributions_robust?: FeatureMetricIndex[];
-  /**
-   * A list of lists of maps containing the case index and full contribution to the action feature each given case.
-   */
-  case_feature_contributions_full?: FeatureMetricIndex[];
-  /**
-   * A list of lists of maps containing the case index and robust contribution to the action feature each given case.
-   */
-  case_feature_contributions_robust?: FeatureMetricIndex[];
-  /**
-   * A list of maps from feature name to the full prediction residual for each given case.
-   */
-  case_feature_residuals_full?: FeatureMetricIndex[];
-  /**
-   * A list of maps from feature name to the robust prediction residual for each given case.
-   */
-  case_feature_residuals_robust?: FeatureMetricIndex[];
-  /**
-   * A list of maps from feature name to feature full residual conviction for each given case.
-   */
-  case_feature_residual_convictions_full?: FeatureMetricIndex[];
-  /**
-   * A list of maps from feature name to feature robust residual conviction for each given case.
-   */
-  case_feature_residual_convictions_robust?: FeatureMetricIndex[];
+  boundary_values?: Record<string, any>[];
   /**
    * A list of lists of maps containing the case index and full MDA for each influential case of each given case.
    */
-  case_mda_full?: CaseMDA[][];
+  case_full_accuracy_contributions?: CaseAccuracyContributions[][];
+  /**
+   * A list of lists of maps containing the case index and full contribution to the action feature for each influential case of each given case.
+   */
+  case_full_prediction_contributions?: FullCasePredictionContribution[][];
   /**
    * A list of lists of maps containing the case index and robust MDA for each influential case of each given case.
    */
-  case_mda_robust?: CaseMDA[][];
+  case_robust_accuracy_contributions?: CaseAccuracyContributions[][];
+  /**
+   * A list of lists of maps containing the case index and robust contribution to the action feature for each influential case of each given case.
+   */
+  case_robust_prediction_contributions?: RobustCasePredictionContribution[][];
   /**
    * A list of maps of feature names to their estimated probabilities of each class for the given cases.
    */
   categorical_action_probabilities?: Record<string, CategoricalActionProbabilities>[];
   /**
-   * A list of maps defining the local feature robust directional contributions of the action feature for each feature in the query.
+   * The list of context features in the order the context values are returned.
    */
-  directional_feature_contributions_full?: FeatureMetricIndex[];
+  context_features?: string[];
   /**
-   * A list of maps defining the local feature robust directional contributions of the action feature for each feature in the query.
+   * A list of lists of provided contexts.
    */
-  directional_feature_contributions_robust?: FeatureMetricIndex[];
+  context_values?: any[][];
+  /**
+   * A list of maps of the parameters used in the React call to their values.
+   */
+  derivation_parameters?: DerivationParameters[];
   /**
    * The computed distance contribution for each given case.
    */
@@ -484,37 +552,77 @@ export type ReactResponse = {
    */
   distance_ratio_parts?: DistanceRatioParts[];
   /**
-   * A list of maps defining the local feature full contributions of the action feature for each feature in the query.
+   * A list of maps defining the local feature deviations for each feature in the query.
    */
-  feature_contributions_full?: FeatureMetricIndex[];
-  /**
-   * A list of maps defining the local feature robust contributions of the action feature for each feature in the query.
-   */
-  feature_contributions_robust?: FeatureMetricIndex[];
-  /**
-   * A list of maps defining the local feature full MDA of the action feature for each feature in the query given the prediction was already made as the given action value.
-   */
-  feature_mda_ex_post_full?: FeatureMetricIndex[];
-  /**
-   * A list of maps defining the local feature robust MDA of the action feature for each feature in the query given the prediction was already made as the given action value.
-   */
-  feature_mda_ex_post_robust?: FeatureMetricIndex[];
+  feature_deviations?: FeatureMetricIndex[];
   /**
    * A list of maps defining the local feature full MDA of the action feature for each feature in the query.
    */
-  feature_mda_full?: FeatureMetricIndex[];
+  feature_full_accuracy_contributions?: FeatureMetricIndex[];
   /**
-   * A list of maps defining the local feature robust MDA of the action feature for each feature in the query.
+   * A list of maps defining the local feature full MDA of the action feature for each feature in the query given the prediction was already made as the given action value.
    */
-  feature_mda_robust?: FeatureMetricIndex[];
+  feature_full_accuracy_contributions_ex_post?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust directional contributions of the action feature for each feature in the query.
+   */
+  feature_full_directional_prediction_contributions?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust directional contributions of the action feature each given case.
+   */
+  feature_full_directional_prediction_contributions_for_case?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature full contributions of the action feature for each feature in the query.
+   */
+  feature_full_prediction_contributions?: FeatureMetricIndex[];
+  /**
+   * A list of maps containing the case index and full contribution to the action feature each given case.
+   */
+  feature_full_prediction_contributions_for_case?: FeatureMetricIndex[];
   /**
    * A list of maps defining the local feature full residuals for each feature in the query.
    */
-  feature_residuals_full?: FeatureMetricIndex[];
+  feature_full_residuals?: FeatureMetricIndex[];
+  /**
+   * A list of maps from feature name to the full prediction residual for each given case.
+   */
+  feature_full_residuals_for_case?: FeatureMetricIndex[];
+  /**
+   * A list of maps from feature name to feature full residual conviction for each given case.
+   */
+  feature_full_residual_convictions_for_case?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust MDA of the action feature for each feature in the query.
+   */
+  feature_robust_accuracy_contributions?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust MDA of the action feature for each feature in the query given the prediction was already made as the given action value.
+   */
+  feature_robust_accuracy_contributions_ex_post?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust directional contributions of the action feature for each feature in the query.
+   */
+  feature_robust_directional_prediction_contributions?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust directional contributions of the action feature each given case.
+   */
+  feature_robust_directional_prediction_contributions_for_case?: FeatureMetricIndex[];
+  /**
+   * A list of maps defining the local feature robust contributions of the action feature for each feature in the query.
+   */
+  feature_robust_prediction_contributions?: FeatureMetricIndex[];
+  /**
+   * A list of maps containing the case index and robust contribution to the action feature each given case.
+   */
+  feature_robust_prediction_contributions_for_case?: FeatureMetricIndex[];
   /**
    * A list of maps defining the local feature robust residuals for each feature in the query.
    */
-  feature_residuals_robust?: FeatureMetricIndex[];
+  feature_robust_residuals?: FeatureMetricIndex[];
+  /**
+   * A list of maps from feature name to the robust prediction residual for each given case.
+   */
+  feature_robust_residuals_for_case?: FeatureMetricIndex[];
   /**
    * A list of the amount of generation attempts taken for each synthesized case. Only returned if `generate_new_cases` is 'attempt' or 'always'.
    */
@@ -536,6 +644,14 @@ export type ReactResponse = {
    */
   most_similar_case_indices?: SimilarCaseIndex[][];
   /**
+   * The computed distance contribution for each given case without its cluster id.
+   */
+  non_clustered_distance_contribution?: number[];
+  /**
+   * The computed similarity conviction for each given case without its cluster id.
+   */
+  non_clustered_similarity_conviction?: number[];
+  /**
    * A list of maps defining the observational errors for each feature defined in the feature attributes.
    */
   observational_errors?: FeatureMetricIndex[];
@@ -544,9 +660,17 @@ export type ReactResponse = {
    */
   outlying_feature_values?: OutlyingFeatureValuesIndex[];
   /**
+   * A list of maps from feature name to predicted value for each given case.
+   */
+  predicted_values_for_case?: Record<string, any>[];
+  /**
    * A list of maps containing the resulting prediction stats for the region of cases nearest to each given case.
    */
   prediction_stats?: ReactionPredictionStats[];
+  /**
+   * A list of maps from feature name to list of relevant values for each context
+   */
+  relevant_values?: Record<string, any>[];
   /**
    * The computed similarity conviction for each given case.
    */

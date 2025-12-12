@@ -4,8 +4,11 @@
  *
  * ReduceData
  *
- * Reduce the trained data by removing cases which have an influence weight entropy that falls above
- *  a threshold.
+ * Reduce the trained data by removing cases that match the following criteria:
+ * a) it's an exact duplicate
+ * b) a near-duplicate (very similar to exactly one other case)
+ * c) it's not "too far" away (keep outliers and dissimilar cases)
+ * d) its influence weight entropy is relatively high (above a threshold, case can be evenly distributed among its neighbors)
  */
 import type { AblationThresholdMap } from "./AblationThresholdMap";
 
@@ -50,7 +53,7 @@ export type ReduceDataRequest = {
   /**
    * Numeric maximum threshold for influence weight entropy of cases to keep, defaults to the value
    *  influence weight entropy threshold stored within the Trainee
-   * @default 0.15
+   * @default 0.632120559
    */
   influence_weight_entropy_threshold?: number;
 

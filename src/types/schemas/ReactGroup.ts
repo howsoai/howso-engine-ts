@@ -4,7 +4,8 @@
  *
  * ReactGroup
  *
- * Computes the convictions of an average case for each given hypothetical set of cases specified
+ * Computes the convictions of an average case for each given set of cases specified by either a list of
+ * case indices, a condition, or given data.
  *  output an assoc react key -> list of corresponding values from each individual group.
  *  example output for 2 groups:
  *  (assoc
@@ -13,10 +14,39 @@
  *   "distance_contributions" (list 4.5 3.2)
  *  )
  */
+import type { CaseIndices } from "./CaseIndices";
+import type { Cases } from "./Cases";
+import type { CategoricalActionProbabilities } from "./CategoricalActionProbabilities";
+import type { Condition } from "./Condition";
+import type { FeatureMetricIndex } from "./FeatureMetricIndex";
+import type { ReactGroupDetails } from "./ReactGroupDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
 
 /** Request parameters of the Trainee method: reactGroup. */
 export type ReactGroupRequest = {
+  /**
+   * List of feature names to predict the values of for each group
+   * @default []
+   */
+  action_features?: string[];
+
+  /**
+   * A list of lists of tuples containing the session id and index that uniquely select trained cases. Each outer sublist makes a list of case indices
+   * that define a group of trained cases to react to.
+   */
+  case_indices?: CaseIndices[];
+
+  /**
+   * A list of assocs defining conditions that each select a collection of cases to react to.
+   */
+  conditions?: Condition[];
+
+  /**
+   * An assoc declaring the details requested by the user.
+   * @default {}
+   */
+  details?: ReactGroupDetails;
+
   /**
    * Calculate and output distance contribution ratios in the output assoc
    * @default false
@@ -25,7 +55,7 @@ export type ReactGroupRequest = {
 
   /**
    * Calculate and output familiarity conviction of adding the specified new_cases in the output assoc
-   * @default true
+   * @default false
    */
   familiarity_conviction_addition?: boolean;
 
@@ -57,7 +87,7 @@ export type ReactGroupRequest = {
    * A list of lists of lists of values corresponding to a list of sets of feature values, where the values are ordered corresponding to
    *   the features
    */
-  new_cases: any[][][];
+  new_cases?: any[][][];
 
   /**
    * If true will output p value of addition
@@ -70,6 +100,12 @@ export type ReactGroupRequest = {
    * @default false
    */
   p_value_of_removal?: boolean;
+
+  /**
+   * Calculate and output the mean similarity conviction of cases in each group
+   * @default false
+   */
+  similarity_conviction?: boolean;
 
   /**
    * Flag, if set to true will scale influence weights by each case's weight_feature weight.
@@ -87,11 +123,23 @@ export type ReactGroupRequest = {
 /** Response of the Trainee method: reactGroup. */
 export type ReactGroupResponse = {
   /**
-   * The average distance contribution of cases in the model.
+   * The list of feature names coressponding to the values in action_values
+   */
+  action_features?: string[];
+  /**
+   * 2-d list of the predicted action values for each given group.
+   */
+  action_values?: any[][];
+  /**
+   * The average distance contribution of cases in the dataset.
    */
   base_model_average_distance_contribution?: number[];
   /**
-   * The average distance contribution of cases in the model and the cases of each group.
+   * A list of maps of feature names to their estimated probabilities of each class for the given groups.
+   */
+  categorical_action_probabilities?: Record<string, CategoricalActionProbabilities>[];
+  /**
+   * The average distance contribution of cases in the dataset and the cases of each group.
    */
   combined_model_average_distance_contribution?: number[];
   /**
@@ -99,27 +147,39 @@ export type ReactGroupResponse = {
    */
   distance_contribution?: number[];
   /**
-   * The familiarity conviction of adding each group of cases to the model.
+   * The familiarity conviction of adding each group of cases to the dataset.
    */
   familiarity_conviction_addition?: number[];
   /**
-   * The familiarity conviction of removing each group of cases to the model.
+   * The familiarity conviction of removing each group of cases to the dataset.
    */
   familiarity_conviction_removal?: number[];
   /**
-   * The KL divergence of adding each group of cases to the model.
+   * A list of maps of feature names to their full residuals.
+   */
+  feature_full_residuals?: FeatureMetricIndex[];
+  /**
+   * The cases influential to the predictions made for each group.
+   */
+  influential_cases?: Cases[];
+  /**
+   * The KL divergence of adding each group of cases to the dataset.
    */
   kl_divergence_addition?: number[];
   /**
-   * The KL divergence of removing each group of cases to the model.
+   * The KL divergence of removing each group of cases to the dataset.
    */
   kl_divergence_removal?: number[];
   /**
-   * The p-value of adding each group of cases to the model.
+   * The p-value of adding each group of cases to the dataset.
    */
   p_value_of_addition?: number[];
   /**
-   * The p-value of removing each group of cases to the model.
+   * The p-value of removing each group of cases to the dataset.
    */
   p_value_of_removal?: number[];
+  /**
+   * The average similarity conviction of cases in each group.
+   */
+  similarity_conviction?: number[];
 };

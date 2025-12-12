@@ -8,12 +8,14 @@
  * derived_context and derived_action features, utilizing previous rows to derive values as necessary. Outputs an assoc of "action_features" and
  * corresponding "series" where "series" is the completed 'matrix' for the corresponding action_features and derived_action_features.
  */
-import type { CaseIndices } from "./CaseIndices";
 import type { Cases } from "./Cases";
 import type { CategoricalActionProbabilities } from "./CategoricalActionProbabilities";
+import type { Condition } from "./Condition";
 import type { DesiredConviction } from "./DesiredConviction";
 import type { FeatureBounds } from "./FeatureBounds";
 import type { GenerateNewCases } from "./GenerateNewCases";
+import type { GoalFeatures } from "./GoalFeatures";
+import type { NewCaseMinDistanceRatio } from "./NewCaseMinDistanceRatio";
 import type { NewCaseThreshold } from "./NewCaseThreshold";
 import type { ReactDetails } from "./ReactDetails";
 import type { UseCaseWeights } from "./UseCaseWeights";
@@ -27,47 +29,25 @@ export type ReactSeriesRequest = {
   action_features?: string[];
 
   /**
-   * 2d-list of predicted feature values for non time-series features, one list is used per series.
-   * @default []
+   * A mapping of conditions for features that will be used to constrain the queries used to find the most similar
+   * trained cases to the given contexts.
+   * assoc of feature->value(s).
+   *     no value or (null) = select cases where that feature is (null)/missing
+   *   - for continuous or numeric ordinal features:
+   *     one value = must equal exactly the value or be close to it for fuzzy match
+   *     two values = inclusive between, supports (null) on either side for less than/greater than conditions
+   *     [(null) (null)] = select all non-null cases
+   *   - for nominal or string ordinal features:
+   *     n values = must match any of these values exactly
    */
-  action_values?: any[][];
+  constraints?: Condition;
 
   /**
-   * Pair (list) of session id and index, where index is the original 0-based session_training_index of the case as it was
-   *       trained into the session. If this case does not exist, discriminative react outputs null, generative react ignores it.
-   */
-  case_indices?: CaseIndices;
-
-  /**
-   * List of feature names corresponding to values in each row of context_values
-   * @default []
-   */
-  context_features?: string[];
-
-  /**
-   * 2d-list of context feature values for non time-series features, one list is used per series.
-   */
-  context_values?: any[][];
-
-  /**
-   * Flag, default is false.  When true will attempt to continue existing series instead of starting new series.
-   *   If initial_values provide series IDs, it will continue those explicitly specified IDs, otherwise it will randomly select series to continue.
-   *   Note: terminated series with terminators cannot be continued and will result in null output.
+   * Flag, default is false.  When true, react_series will do a forecast of a series.
+   *   When true, either series_id_values or series_context_values must be specified.
    * @default false
    */
   continue_series?: boolean;
-
-  /**
-   * List of features corresponding to the values in each row of continue_series_values.
-   *   This value is ignored if continue_series_values is not specified.
-   */
-  continue_series_features?: string[];
-
-  /**
-   * 3d-list of values, when specified will continue this specific untrained series as defined by these values.
-   *   continue_series flag will be ignored and treated as true if this value is specified.
-   */
-  continue_series_values?: any[][];
 
   /**
    * List of action features whose values should be computed from the resulting last row in series, in the specified
@@ -88,8 +68,8 @@ export type ReactSeriesRequest = {
   /**
    * If null, will do a discriminative react. If specified, will do a generative react
    *   For Generative React, value of desired avg conviction of generated cases, in the range of (0,infinity] with 1 as standard
-   *   larger values will increase the variance (or creativity) of the generated case from the existing model
-   *   smaller values will decrease the variance (or creativity) of the generated case from the existing model
+   *   larger values will increase the variance (or creativity) of the generated case from the existing dataset
+   *   smaller values will decrease the variance (or creativity) of the generated case from the existing dataset
    */
   desired_conviction?: DesiredConviction;
 
@@ -111,12 +91,23 @@ export type ReactSeriesRequest = {
 
   /**
    * Assoc of :
-   *     to ensure that specified features' generated values stay in bounds
+   *   { feature : { "min": a, "max": b, "allow_null": false/true } }
+   *   to ensure that specified features' generated values stay in bounds
    *   for nominal features instead of min/max it's a set of allowed values, ie:
-   *     allow_null - default is true, if true nulls may be generated per their distribution in the data
+   *   { feature: { "allowed" : [ "value1", "value2" ... ] }, "allow_null": false/true }
+   *   allow_null - default is true, if true nulls may be generated per their distribution in the data
    * @default {}
    */
   feature_bounds_map?: Record<string, FeatureBounds>;
+
+  /**
+   * A mapping of feature name to custom code strings that will be evaluated to update the value of the feature they are mapped from after inference/derivation.
+   * In the time-series synthesis, these custom codes are executed just after the original feature value is derived or synthed, but before
+   * any other features would be derived or generated from the value. This means that the result of this custom code may be used as the
+   * context in the generation or derivation of other feature values within a single timestep. Custom code will be able to access feature
+   * values of the current time step as well as previously generated timesteps.
+   */
+  feature_post_process_code_map?: Record<string, string>;
 
   /**
    * Time step values at which to end synthesis for each series, applicable only for time series.
@@ -133,17 +124,20 @@ export type ReactSeriesRequest = {
   generate_new_cases?: GenerateNewCases;
 
   /**
-   * List of features to condition just the first case in a series, overwrites context_features and
-   *   derived_context_features for that first case. All specified initial features must be in one of: context_features, action_features,
-   *   derived_context_features or derived_action_features. If provided a value that isn't in one of those lists, it will be ignored.
-   * @default []
+   * Assoc of :
+   *     { feature : { "goal" : "min"/"max", "value" : value }}
+   *     A mapping of feature name to the goals for the feature, which will cause the react to achieve the goals as appropriate
+   *     for the context.  This is useful for conditioning responses when it is challenging or impossible to know appropriate
+   *     values ahead of time, such as maximizing the reward or minimizing cost for reinforcement learning, or conditioning a
+   *     forecast based on attempting to achieve some value.  Goal features will reevaluate the inference for the given context
+   *     optimizing for the specified goals. Valid keys in the map are:
+   *     "goal": "min" or "max", will make a prediction while minimizing or maximizing the value for the feature or
+   *     "value" : value, will make a prediction while approaching the specified value
+   *   note: nominal features only support 'value', 'goal' is ignored.
+   *       for non-nominals, if both are provided, only 'goal' is considered.
+   * @default {}
    */
-  initial_features?: string[];
-
-  /**
-   * 2d-list of values corresponding to the initial_features, used to condition just the first case in a series. One list is used per series.
-   */
-  initial_values?: any[][];
+  goal_features_map?: Record<string, GoalFeatures>;
 
   /**
    * Time step values at which to begin synthesis for each series, applicable only for time series.
@@ -157,15 +151,25 @@ export type ReactSeriesRequest = {
   input_is_substituted?: boolean;
 
   /**
-   * Flag, if set to true and specified along with case_indices, will set ignore_case to the one specified by case_indices.
+   * Flag, if true and series IDs are specified with series_id_values, then that series' cases will be held out of queries made within the
+   * react_series call.
+   * @default false
    */
-  leave_case_out?: boolean;
+  leave_series_out?: boolean;
 
   /**
-   * List of maximum sizes each series is allowed to be.  Default is 3 * model_size, a 0 or less is no limit.
+   * List of maximum sizes each series is allowed to be.  Default is 3 * dataset_size, a 0 or less is no limit.
    *   If forecasting with 'continue_series', this defines the maximum length of the forecast.
    */
   max_series_lengths?: number[];
+
+  /**
+   * Parameter that adjusts the required distance ratio for a newly generated case to be considered private.
+   *   When unspecified, defaults to 1.0 and generated cases with a ratio of 1.0 or greater are considered private.
+   *    Larger values will increase strictness of privacy check.
+   *    Smaller values will loosen the privacy check. Must be a positive number, since 0 would function same as `generate_new_cases='no'`
+   */
+  new_case_min_distance_ratio?: NewCaseMinDistanceRatio;
 
   /**
    * Distance to determine privacy cutoff. Used to query the local minimum distance used in the distance ratio
@@ -182,7 +186,7 @@ export type ReactSeriesRequest = {
    * Total number of series to generate, for generative reacts.
    *
    *    All of the following parameters, if specified, must be either length of 1 or equal to the length of
-   *   context_values/case_indices for discriminative reacts, and num_series_to_generate for generative reacts.
+   *   series_context_values for discriminative reacts, and num_series_to_generate for generative reacts.
    */
   num_series_to_generate?: number;
 
@@ -212,10 +216,19 @@ export type ReactSeriesRequest = {
   series_context_features?: string[];
 
   /**
-   * 3d-list of values, context value for each feature for each row of a series.
-   *   If specified max_series_lengths are ignored.
+   * 3d-list of values, context value for each feature for each row of each series. series_context_features must be specified if this parameter
+   * is specified. If continue_series is true, then this data is forecasted. Otherwise this data conditions each row of the generated series.
+   *   If specified and not using continue_series, then max_series_lengths are ignored.
    */
   series_context_values?: any[][][];
+
+  /**
+   * List of series ID features used to uniquely select a trained series.
+   *   This list should contain all ID features, but the order can vary depending on the order of the
+   *   features values given in series_id_values.
+   * @default []
+   */
+  series_id_features?: string[];
 
   /**
    * Controls how closely generated series should follow existing series (plural).
@@ -226,11 +239,14 @@ export type ReactSeriesRequest = {
   series_id_tracking?: "dynamic" | "fixed" | "no";
 
   /**
+   * 2d-list of values whose order corresponds to the list of features defined in series_id_features, used to identify trained series.
+   */
+  series_id_values?: any[][];
+
+  /**
    * List of assocs of feature -> stop conditions:
    *   for continuous features:  { feature:  { "min" : val,  "max": val } } - stops series when feature value exceeds max or is smaller than min
    *   for nominal features:  { feature:  { "values" : ['val1', 'val2' ]} }  - stops series when feature value matches any of the values listed
-   *   specifying ".series_progress" with a value between 0 and 1.0 corresponding to percent completion e.g., { ".series_progress" : .95 } -
-   *     stops series when it progresses at or beyond 95%.
    *  one assoc is used per series.
    * @default []
    */
@@ -243,15 +259,31 @@ export type ReactSeriesRequest = {
   substitute_output?: boolean;
 
   /**
+   * Flag, if set to true this changes generative output to use aggregation instead of selection before adding noise.
+   * By default generative output uses selection.
+   * @default false
+   */
+  use_aggregation_based_differential_privacy?: boolean;
+
+  /**
+   * Flag, if true will internally generate values for all trained features and derived features while generating a series.
+   * if false, will only generate values for the features specified as action features and the features necessary to derive them, reducing
+   * the expected runtime but possibly reducing accuracy.
+   * @default true
+   */
+  use_all_features?: boolean;
+
+  /**
    * Flag, whether to use case weights or not. If unspecified will automatically select based on cached parameters
    */
   use_case_weights?: UseCaseWeights;
 
   /**
-   * Flag, if false uses model feature residuals, if true recalculates regional model residuals.
-   * @default true
+   * Flag, if true will use differentially private approach to adding noise during generative reacts. Default is false.
+   * Only used when desired_conviction is specified.
+   * @default false
    */
-  use_regional_model_residuals?: boolean;
+  use_differential_privacy?: boolean;
 
   /**
    * Name of the feature that stores case weights
@@ -281,51 +313,23 @@ export type ReactSeriesResponse = {
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_contributions_full?: any;
+  boundary_values?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_contributions_robust?: any;
+  case_full_accuracy_contributions?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_directional_feature_contributions_full?: any;
+  case_full_prediction_contributions?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_directional_feature_contributions_robust?: any;
+  case_robust_accuracy_contributions?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  case_feature_contributions_full?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_feature_contributions_robust?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_feature_residuals_full?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_feature_residuals_robust?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_feature_residual_convictions_full?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_feature_residual_convictions_robust?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_mda_full?: any;
-  /**
-   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
-   */
-  case_mda_robust?: any;
+  case_robust_prediction_contributions?: any;
   /**
    * A list of the detail result lists for each case of each series.
    */
@@ -333,11 +337,15 @@ export type ReactSeriesResponse = {
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  directional_feature_contributions_full?: any;
+  context_features?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  directional_feature_contributions_robust?: any;
+  context_values?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  derivation_parameters?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
@@ -353,35 +361,75 @@ export type ReactSeriesResponse = {
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_contributions_full?: any;
+  feature_deviations?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_contributions_robust?: any;
+  feature_full_accuracy_contributions?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_ex_post_full?: any;
+  feature_full_accuracy_contributions_ex_post?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_ex_post_robust?: any;
+  feature_full_directional_prediction_contributions?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_full?: any;
+  feature_full_directional_prediction_contributions_for_case?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_mda_robust?: any;
+  feature_full_prediction_contributions?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_residuals_full?: any;
+  feature_full_prediction_contributions_for_case?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
-  feature_residuals_robust?: any;
+  feature_full_residuals?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_full_residuals_for_case?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_full_residual_convictions_for_case?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_accuracy_contributions?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_accuracy_contributions_ex_post?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_directional_prediction_contributions?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_directional_prediction_contributions_for_case?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_prediction_contributions?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_prediction_contributions_for_case?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_residuals?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  feature_robust_residuals_for_case?: any;
   /**
    * A list of the detail result lists for each case of each series.
    */
@@ -405,6 +453,14 @@ export type ReactSeriesResponse = {
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
+  non_clustered_distance_contribution?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  non_clustered_similarity_conviction?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
   observational_errors?: any;
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
@@ -413,11 +469,23 @@ export type ReactSeriesResponse = {
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */
+  predicted_values_for_case?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
   prediction_stats?: any;
+  /**
+   * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
+   */
+  relevant_values?: any;
   /**
    * A list of generation attempts for each series as a whole.
    */
   series_generate_attempts?: number[];
+  /**
+   * A list of lists of estimated uncertainties of continuous features for each time step of the returned series.
+   */
+  series_residuals?: Record<string, any>[][];
   /**
    * Experimental. The same detail as in standard #react, but accumulated for each case in each series.
    */

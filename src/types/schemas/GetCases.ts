@@ -4,13 +4,15 @@
  *
  * GetCases
  *
- * Returns assoc with features and cases - a list of lists of all feature values. Retrieves all feature values for cases for
- * all (unordered) sessions in the order they were trained within each session. If a session is specified, only that session's
- * cases wil be output.
+ * Returns assoc with features and cases - a list of lists of all feature values. Retrieves all feature values for cases in
+ * all sessions. If a session is specified, only that session's cases will be output. Session and case order is not guaranteed,
+ * however, the features ".session" and ".session_training_index" may be requested to get the session id and session train order
+ * for each case respectively.
  */
 import type { CaseIndices } from "./CaseIndices";
 import type { Condition } from "./Condition";
 import type { Precision } from "./Precision";
+import type { SortByCriteria } from "./SortByCriteria";
 
 /** Request parameters of the Trainee method: getCases. */
 export type GetCasesRequest = {
@@ -26,7 +28,7 @@ export type GetCasesRequest = {
   condition?: Condition;
 
   /**
-   * List of features to retrieve.
+   * List of features to retrieve. Case values will be output given this feature order.
    * @default []
    */
   features?: string[];
@@ -65,6 +67,12 @@ export type GetCasesRequest = {
    * @default 0
    */
   skip_decoding?: number;
+
+  /**
+   * List of maps defining sorting criteria in order of precedence. Each map should specify the feature name under the "feature" key and
+   * "asc"/"desc" under the "order" key.
+   */
+  sort_by?: SortByCriteria;
 };
 
 /** Response of the Trainee method: getCases. */

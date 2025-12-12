@@ -4,7 +4,7 @@
  *
  * SetAutoAblationParams
  *
- * Sets the model to auto-ablate by tracking its size and training certain cases as weights
+ * Sets the dataset to auto-ablate by tracking its size and training certain cases as weights
  */
 import type { AblationThresholdMap } from "./AblationThresholdMap";
 
@@ -30,6 +30,13 @@ export type SetAutoAblationParamsRequest = {
    * @default false
    */
   auto_ablation_enabled?: boolean;
+
+  /**
+   * The influence weight entropy quantile that a case must be beneath in order to be trained.
+   *   default of 1/e^2.
+   * @default 0.135335283
+   */
+  auto_ablation_influence_weight_entropy_threshold?: number;
 
   /**
    * The weight feature that should be used when ablating.
@@ -69,18 +76,40 @@ export type SetAutoAblationParamsRequest = {
   exact_prediction_features?: string[];
 
   /**
-   * The influence weight entropy quantile that a case must be beneath in order to be trained.
-   *   default of 0.6.
-   * @default 0.15
+   * Maximum number of cases to sample without replacement for computing the influence weight entropy threshold
+   *  default of 2000
+   * @default 2000
    */
-  influence_weight_entropy_threshold?: number;
+  influence_weight_entropy_sample_size?: number;
 
   /**
-   * Stores the threshold for the minimum number of cases at which the model should auto-ablate.
-   *   default of 1000.
-   * @default 1000
+   * Stores the threshold for the number of cases at which the dataset should automatically reduce data.
+   *   default of 200,000.
+   * @default 200000
    */
-  minimum_num_cases?: number;
+  max_num_cases?: number;
+
+  /**
+   * Stores the threshold for the minimum number of cases at which the dataset should auto-ablate.
+   * This is also the minimum number of cases that calls to reduce_data will reduce the training data down to.
+   *   default of 10000.
+   * @default 10000
+   */
+  min_num_cases?: number;
+
+  /**
+   * The influence weight entropy quantile that a case must be beneath in order to not be removed.
+   *   default of 1-1/e.
+   * @default 0.632120559
+   */
+  reduce_data_influence_weight_entropy_threshold?: number;
+
+  /**
+   * Stores the maximum number of cases that may remain after a call to reduce_data.
+   *   default of 50,000.
+   * @default 50000
+   */
+  reduce_max_cases?: number;
 
   /**
    * Assoc of feature -> PERCENT. for each of the features specified, will

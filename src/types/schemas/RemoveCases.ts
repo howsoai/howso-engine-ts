@@ -18,7 +18,7 @@ export type RemoveCasesRequest = {
   case_indices?: CaseIndices;
 
   /**
-   * Assoc of feature->value(s) (no value = must have feature, one value = must equal exactly the value, two values = inclusive between). Ignored if case_indices is specified.
+   * Assoc of feature->value(s) (no value or (null) = select cases where that feature is (null)/missing, one value = must equal exactly the value, two values = inclusive between with support for (null) on either side for less than/greater than conditions, [(null) (null)] = select all non-null cases). Ignored if case_indices is specified.
    * @default {}
    */
   condition?: Condition;

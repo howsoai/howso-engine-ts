@@ -6,8 +6,8 @@
 /**
  * A map for an influential case that describes its training index, session, and the robust contribution to the action feature.
  */
-export type RobustCaseContribution = {
+export type RobustCasePredictionContribution = {
   ".session"?: string;
   ".session_training_index"?: number;
-  case_contributions_robust?: number;
+  robust_prediction_contribution?: number;
 };

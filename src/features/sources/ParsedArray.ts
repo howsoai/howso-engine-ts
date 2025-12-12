@@ -8,7 +8,7 @@ import { FeatureSerializerBase } from "./Base";
  * @param dataset The source dataset.
  * @returns The new dataset format.
  */
-function parsedDataToArrayData(dataset: ParsedArrayData): ArrayData {
+export function parsedDataToArrayData(dataset: ParsedArrayData): ArrayData {
   const data = [];
   for (const row of dataset) {
     const item: any[] = [];
